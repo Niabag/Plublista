@@ -131,6 +131,7 @@ async function processJob(job) {
     const orchestratorPath = path.join(__dirname, '../../scripts/orchestrator.py')
     
     addLog(job, '🎬 Lancement de l\'orchestrateur Python...')
+    addLog(job, `⏱️  Durée vidéo: ${job.targetDuration || 17} secondes`)
     
     const { spawn } = await import('child_process')
     
@@ -138,7 +139,9 @@ async function processJob(job) {
       orchestratorPath,
       '--job-id', job.id.toString(),
       '--code-file', codePath,
-      '--title', job.title
+      '--title', job.title,
+      '--music-style', job.musicStyle || 'tech/energetic',
+      '--video-duration', (job.targetDuration || 17).toString()
     ], {
       cwd: path.join(__dirname, '../../'),
       env: { 

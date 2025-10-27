@@ -67,15 +67,17 @@ def run_command(cmd, description):
         log(f"❌ {description} error: {e}", "ERROR")
         return False
 
-def launch_stream_view(code_file, config):
+def launch_stream_view(code_file, music_style, video_duration, config):
     """Launch combined stream view (Code + Result in single window)"""
     log("Running: Launch Stream View (Combined Code + Result)")
+    log(f"   Music style: {music_style}", "INFO")
+    log(f"   Target video duration: {video_duration}s", "INFO")
     try:
         # Use the Python script to launch the combined view
         python_path = config.get('paths', {}).get('python', 'python')
         script_path = Path(__file__).parent / "launch_stream_view.py"
         
-        cmd = f'{python_path} "{script_path}" "{code_file}"'
+        cmd = f'{python_path} "{script_path}" "{code_file}" --music-style "{music_style}" --video-duration {video_duration}'
         
         # Launch in background
         process = subprocess.Popen(
@@ -100,18 +102,28 @@ def launch_stream_view(code_file, config):
                 log("   Format: Portrait 9:16 (Code en haut, Résultat en bas)", "INFO")
                 log("   Mode: Animation de typing automatique", "INFO")
                 log("   Capture cette fenêtre unique dans OBS!", "INFO")
-                return True
+                
+                # Extract PID from stdout for cleanup later
+                chrome_pid = None
+                for line in stdout.split('\n'):
+                    if 'Chrome PID:' in line:
+                        try:
+                            chrome_pid = int(line.split(':')[1].strip())
+                        except:
+                            pass
+                
+                return {'success': True, 'pid': chrome_pid}
             else:
                 log(f"❌ Stream view failed: {stderr[:300]}", "ERROR")
-                return False
+                return {'success': False}
         else:
             # Process still running (shouldn't happen but OK)
             log("✅ Stream View launched", "SUCCESS")
-            return process
+            return {'success': True, 'pid': None}
             
     except Exception as e:
         log(f"❌ Stream view launch error: {e}", "ERROR")
-        return False
+        return {'success': False}
 
 def open_vscode(code_file, config):
     """Open VS Code with the snippet (LEGACY - use launch_electron_app instead)"""
@@ -251,13 +263,66 @@ def post_process(input_path, output_path, config):
     cmd = f'powershell -File "{script_path}" -In "{input_path}" -Out "{output_path}"'
     return run_command(cmd, "Post-process video")
 
+def close_stream_view(chrome_pid=None):
+    """Close the Stream View window (Chrome/Edge) and music server"""
+    log("\n🪟 Closing Stream View window...")
+    try:
+        if chrome_pid:
+            # Try to kill specific process
+            import psutil
+            try:
+                process = psutil.Process(chrome_pid)
+                process.terminate()
+                process.wait(timeout=5)
+                log("✅ Stream View closed successfully", "SUCCESS")
+            except psutil.NoSuchProcess:
+                log("   Process already closed", "INFO")
+            except:
+                pass
+        
+        # Fallback: use taskkill to close all Chrome app windows
+        # This will only close Chrome windows, not entire browser
+        cmd = 'taskkill /F /FI "WINDOWTITLE eq Stream View*" >nul 2>&1'
+        subprocess.run(cmd, shell=True)
+        
+        # Stop music server
+        log("🎵 Stopping music server...")
+        try:
+            import socket
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            if sock.connect_ex(('localhost', 8766)) == 0:
+                # Server is running, find and kill it
+                import psutil
+                for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                    try:
+                        if 'python' in proc.info['name'].lower():
+                            cmdline = proc.info.get('cmdline', [])
+                            if cmdline and 'music_server.py' in ' '.join(cmdline):
+                                proc.terminate()
+                                log("   Music server stopped", "INFO")
+                                break
+                    except:
+                        pass
+            sock.close()
+        except:
+            pass
+        
+        log("✅ Cleanup complete", "SUCCESS")
+        return True
+    except Exception as e:
+        log(f"⚠️  Could not close Stream View: {e}", "WARNING")
+        log("   Please close manually if still open", "INFO")
+        return False
+
 def main():
     """Main orchestrator"""
     parser = argparse.ArgumentParser(description='Orchestrate Reels creation')
     parser.add_argument('--job-id', required=True, help='Job ID')
     parser.add_argument('--code-file', required=True, help='Path to code file')
     parser.add_argument('--title', default='Untitled', help='Reel title')
-    
+    parser.add_argument('--music-style', default='tech/energetic', help='Music style')
+    parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
     args = parser.parse_args()
     
     log("=" * 60)
@@ -281,26 +346,44 @@ def main():
     log("\n🎬 STEP 2: Launching Stream View")
     log(f"   File: {code_file}")
     log(f"   Absolute path: {code_file.absolute()}")
-    if not launch_stream_view(code_file, config):
+    stream_view_result = launch_stream_view(code_file, args.music_style, args.video_duration, config)
+    if not stream_view_result or not stream_view_result.get('success'):
         log("Pipeline failed at Stream View launch", "ERROR")
         return 1
-    # Wait for window to fully load
-    log("⏳ Waiting for window to stabilize...")
+    
+    chrome_pid = stream_view_result.get('pid')
+    log(f"   Chrome PID: {chrome_pid if chrome_pid else 'Unknown'}", "INFO")
+    
+    # Remove title bar from Chrome window
+    if chrome_pid:
+        log("🪟 Suppression de la barre de titre...")
+        try:
+            remove_titlebar_script = Path(__file__).parent / "remove_titlebar.ps1"
+            cmd = f'powershell -ExecutionPolicy Bypass -File "{remove_titlebar_script}" -ProcessId {chrome_pid}'
+            subprocess.run(cmd, shell=True, capture_output=True, timeout=5)
+            log("   Barre de titre retirée", "INFO")
+        except Exception as e:
+            log(f"   Could not remove titlebar: {e}", "WARNING")
+    
+    # Wait for countdown to finish (3 seconds)
+    log("⏳ Compte à rebours (3 secondes)...")
+    log("   Le compte à rebours n'est PAS enregistré", "INFO")
     time.sleep(3)
     
-    # Step 3: Start recording
+    # Step 3: Start recording AFTER countdown (just before typing starts)
     log("\n🎥 STEP 3: Starting OBS recording")
+    log("   Recording starts AFTER countdown (dès le début du code)", "INFO")
     if not start_recording(config):
         log("Pipeline failed at recording start", "ERROR")
         return 1
-    time.sleep(2)
     
-    # Step 4: Show content with typing animation
+    # Step 4: Wait for typing + affichage final (5s)
     log("\n👁️  STEP 4: Recording content")
-    log("   Animation de typing du code (8 secondes)")
-    log("   Résultat visible en bas")
-    log("   Recording for 12 seconds total...")
-    time.sleep(12)  # 8s typing + 4s for viewing result
+    typing_duration = args.video_duration - 5  # Total - affichage final (5s)
+    log(f"   Animation de typing: {typing_duration} secondes")
+    log(f"   Affichage final: 5 secondes (2s transition + 3s résultat)")
+    log(f"   Recording for {args.video_duration} seconds exact...")
+    time.sleep(args.video_duration)  # Durée exacte demandée
     
     # Step 5: Stop recording
     log("\n🛑 STEP 5: Stopping recording")
@@ -321,11 +404,13 @@ def main():
         log("Pipeline failed at post-processing", "ERROR")
         return 1
     
+    # Step 7: Close Stream View window
+    close_stream_view(chrome_pid)
+    
     # Success!
     log("\n" + "=" * 60)
     log("✨ REELS AUTOMATION COMPLETE!", "SUCCESS")
     log(f"Final video: {final_video}")
-    log("💡 You can now close the Stream View window")
     log("=" * 60)
     
     return 0

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Musique</title>
+</head>
+<body style="background: #000; color: #fff; padding: 40px; font-family: Arial;">
+    <h1>🎵 Test de Musique</h1>
+    
+    <p>Cliquez sur le bouton pour tester la musique :</p>
+    
+    <button onclick="testMusic()" style="padding: 20px 40px; font-size: 18px; cursor: pointer;">
+        ▶️ Jouer la musique
+    </button>
+    
+    <div id="status" style="margin-top: 20px; font-size: 16px;"></div>
+    
+    <audio id="bgm" loop>
+        <source src="http://localhost:8766/tech-energy.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        const audio = document.getElementById('bgm');
+        const status = document.getElementById('status');
+        
+        audio.volume = 0.15;
+        
+        function testMusic() {
+            status.innerHTML = 'Tentative de lecture...';
+            
+            audio.play()
+                .then(() => {
+                    status.innerHTML = '✅ Musique en cours de lecture !<br>Volume: 15%';
+                    status.style.color = '#00ff00';
+                })
+                .catch(err => {
+                    status.innerHTML = '❌ Erreur: ' + err.message + '<br><br>Possible causes:<br>- Serveur musical non démarré<br>- Fichier introuvable<br>- Problème de chargement';
+                    status.style.color = '#ff0000';
+                });
+        }
+        
+        // Test de chargement
+        audio.addEventListener('loadeddata', () => {
+            console.log('Musique chargée avec succès');
+            status.innerHTML = '✅ Fichier musical chargé ! Cliquez sur le bouton.';
+            status.style.color = '#ffaa00';
+        });
+        
+        audio.addEventListener('error', (e) => {
+            console.error('Erreur de chargement:', e);
+            status.innerHTML = '❌ Erreur de chargement du fichier musical<br>Vérifiez que le serveur est démarré (port 8766)';
+            status.style.color = '#ff0000';
+        });
+    </script>
+</body>
+</html>

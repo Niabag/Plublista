@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Launch streaming view with VS Code + Browser in Chrome App mode
-Alternative to Electron app
+Launch the stream view window with Chrome in app mode.
+Shows code and result in a single portrait window for OBS capture.
 """
 
 import subprocess
@@ -93,11 +93,15 @@ def launch_vscode(file_path):
     return process
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python launch_stream_view.py <file_path>")
-        sys.exit(1)
+    import argparse
+    parser = argparse.ArgumentParser(description='Launch Stream View')
+    parser.add_argument('file_path', help='Path to HTML file')
+    parser.add_argument('--music-style', default='tech/energetic', help='Music style')
+    parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
+    args = parser.parse_args()
     
-    file_path = Path(sys.argv[1]).resolve()  # Convert to absolute path
+    file_path = Path(args.file_path).resolve()  # Convert to absolute path
+    music_style = args.music_style
     
     if not file_path.exists():
         print(f"ERROR: File not found: {file_path}")
@@ -132,22 +136,35 @@ if __name__ == "__main__":
     file_url_json = json.dumps(file_path.as_uri())
     filename_json = json.dumps(file_path.name)
     
-    # Try to load music file
-    music_path = Path(__file__).parent.parent / "assets" / "music" / "tech-energy.mp3"
+    # Map music styles to filenames
+    music_style_map = {
+        'tech/energetic': 'tech-energy.mp3',
+        'chill': 'chill-vibes.mp3',
+        'ambient': 'ambient-tech.mp3',
+        'upbeat': 'upbeat-coding.mp3'
+    }
+    
+    # Get music filename from style, default to tech-energy.mp3
+    music_filename = music_style_map.get(music_style, 'tech-energy.mp3')
+    
+    # Use direct file:// URL for music (works in Chrome app mode with --allow-file-access-from-files)
+    music_path = Path(__file__).parent.parent / "assets" / "music" / music_filename
     music_data_url = ""
+    
     if music_path.exists():
         try:
-            with open(music_path, 'rb') as f:
-                music_bytes = f.read()
-                music_base64 = base64.b64encode(music_bytes).decode('ascii')
-                music_data_url = f"data:audio/mpeg;base64,{music_base64}"
-                print(f"Music loaded: {music_path.name} ({len(music_bytes)/1024:.1f} KB)")
+            # Convert to file:// URL
+            music_data_url = music_path.as_uri()
+            print(f"Music URL: {music_data_url}")
+            print(f"Music file: {music_path.name} ({music_path.stat().st_size/1024:.1f} KB)")
         except Exception as e:
             print(f"Warning: Could not load music: {e}")
     else:
         print(f"Info: No music file found at {music_path}")
+        print(f"   Music style: {music_style}")
     
     music_url_json = json.dumps(music_data_url)
+    video_duration = args.video_duration
     
     injection = f"""
     <script>
@@ -156,6 +173,7 @@ if __name__ == "__main__":
       window.injectedFileUrl = {file_url_json};
       window.injectedFilename = {filename_json};
       window.injectedMusicUrl = {music_url_json};
+      window.injectedVideoDuration = {video_duration};
     </script>
     """
     
@@ -240,19 +258,24 @@ if __name__ == "__main__":
     cmd = [
         chrome_exe,
         f"--app={template_url}",
-        "--window-size=608,1080",  # 9:16 ratio (608x1080)
-        "--window-position=100,0",
+        "--window-size=480,854",  # 9:16 ratio - Format téléphone compact
+        "--window-position=0,0",
         f"--user-data-dir={user_data_dir}",
         "--disable-cache",
         "--disable-application-cache",
         "--disk-cache-size=0",
-        "--incognito",
+        "--allow-file-access-from-files",  # Allow access to local music files
+        "--autoplay-policy=no-user-gesture-required",  # Allow autoplay
+        "--hide-scrollbars",  # Hide scrollbars
+        "--disable-infobars",  # Disable infobars
+        "--disable-features=TranslateUI",  # Disable translate bar
     ]
     
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    chrome_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-    if process:
+    if chrome_process:
         print("[OK] Stream view launched successfully!")
+        print(f"Chrome PID: {chrome_process.pid}")
         print("Format: Portrait 9:16 (608x1080)")
         print("View: Code en haut, Resultat en bas")
         print("\nCapture this window in OBS for your Reels!")
