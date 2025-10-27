@@ -332,22 +332,21 @@
     let targetVideoDuration = window.injectedVideoDuration || 17; // Durée totale par défaut: 17s
     
     // Durées fixes
-    const introDuration = 5;           // 5 secondes d'écran intro (temps pour OBS)
-    const transitionDuration = 2;      // 2 secondes de transition plein écran
-    const finalDisplayDuration = 3;    // 3 secondes d'affichage final
-    const totalFixedDuration = introDuration + transitionDuration + finalDisplayDuration; // 10 secondes total
+    const introDuration = 5;           // 5 secondes d'écran intro (OBS démarre avec 3s de délai, donc 2s visible)
+    const finalDisplayDuration = 0;    // 0 seconde d'affichage final (code jusqu'à la fin)
     
     // Calculer la durée de typing disponible
-    // Exemple: 32s total = 5s intro + 17s code + 2s transition + 3s final
-    const typingDuration = targetVideoDuration - totalFixedDuration;
+    // Le code s'écrit jusqu'à la fin de la vidéo
+    // Donc: typingDuration = totalDuration - intro
+    // Exemple: 45s total = 5s intro + 40s code + 0s final
+    const typingDuration = targetVideoDuration - introDuration - finalDisplayDuration;
     
     console.log('=== TIMING CONFIGURATION ===');
     console.log(`Target video duration: ${targetVideoDuration}s`);
     console.log(`Intro duration: ${introDuration}s`);
     console.log(`Typing duration: ${typingDuration}s`);
-    console.log(`Transition duration: ${transitionDuration}s`);
     console.log(`Final display duration: ${finalDisplayDuration}s`);
-    console.log(`Total: ${introDuration + typingDuration + transitionDuration + finalDisplayDuration}s`);
+    console.log(`Total: ${introDuration + typingDuration + finalDisplayDuration}s`);
     console.log('==========================');
     
     // Background music setup

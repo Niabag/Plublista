@@ -150,6 +150,15 @@ if __name__ == "__main__":
     
     # Use direct file:// URL for music (works in Chrome app mode with --allow-file-access-from-files)
     music_path = Path(__file__).parent.parent / "assets" / "music" / music_filename
+    
+    # Fallback to tech-energy.mp3 if requested file doesn't exist
+    if not music_path.exists():
+        print(f"Warning: Music file not found: {music_filename}")
+        fallback_path = Path(__file__).parent.parent / "assets" / "music" / "tech-energy.mp3"
+        if fallback_path.exists():
+            print(f"Using fallback music: tech-energy.mp3")
+            music_path = fallback_path
+    
     music_data_url = ""
     
     if music_path.exists():

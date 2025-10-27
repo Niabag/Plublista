@@ -27,6 +27,17 @@ export default function JobDetails() {
     }
   }
 
+  const handleDownload = () => {
+    if (job.videoUrl) {
+      const link = document.createElement('a')
+      link.href = job.videoUrl
+      link.download = `job-${job.id}.mp4`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
   const handlePublish = async (jobId) => {
     if (!confirm('Êtes-vous sûr de vouloir publier cette vidéo sur Instagram maintenant?')) {
       return
@@ -94,7 +105,7 @@ export default function JobDetails() {
                   <video src={job.videoUrl} controls className="w-full h-full" />
                 </div>
                 <div className="flex gap-2 mt-4 justify-center">
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={handleDownload}>
                     <Download size={16} className="mr-2" />
                     Télécharger
                   </Button>

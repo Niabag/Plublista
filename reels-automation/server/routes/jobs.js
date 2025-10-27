@@ -100,6 +100,26 @@ async function processJob(job) {
     const workspacePath = path.join(__dirname, '../../workspace', `job-${job.id}`)
     await fs.mkdir(workspacePath, { recursive: true })
     
+    // Copy shared images from assets/images to workspace
+    const assetsImagesPath = path.join(__dirname, '../../assets/images')
+    try {
+      const imageFiles = await fs.readdir(assetsImagesPath)
+      for (const file of imageFiles) {
+        if (file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg') || 
+            file.endsWith('.gif') || file.endsWith('.svg') || file.endsWith('.webp')) {
+          const srcPath = path.join(assetsImagesPath, file)
+          const destPath = path.join(workspacePath, file)
+          await fs.copyFile(srcPath, destPath)
+          addLog(job, `📷 Image copiée: ${file}`)
+        }
+      }
+    } catch (err) {
+      // Si le dossier n'existe pas ou est vide, continuer sans erreur
+      if (err.code !== 'ENOENT') {
+        console.warn('Avertissement lors de la copie des images:', err.message)
+      }
+    }
+    
     // Prepare HTML content - add boilerplate if it's a fragment
     let htmlContent = job.code
     const isFragment = !job.code.toLowerCase().trim().startsWith('<!doctype') && 

@@ -390,13 +390,11 @@ def main():
     # Step 4: Wait exact duration requested
     log("\n👁️  STEP 4: Recording content")
     intro_duration = 5.0
-    transition_duration = 2
-    final_duration = 3
-    typing_duration = args.video_duration - intro_duration - transition_duration - final_duration
-    log(f"   Écran intro: {intro_duration} secondes")
-    log(f"   Animation de typing: {typing_duration} secondes")
-    log(f"   Transition plein écran: {transition_duration} secondes")
-    log(f"   Affichage final: {final_duration} secondes")
+    final_duration = 0
+    typing_duration = args.video_duration - intro_duration - final_duration
+    log(f"   Écran intro: {intro_duration} secondes (2s visible avec délai OBS)")
+    log(f"   Animation de typing: {typing_duration} secondes (code jusqu'à la fin)")
+    log(f"   Affichage final du résultat: {final_duration} secondes")
     log(f"   Total: {args.video_duration} secondes")
     log(f"   Recording for {args.video_duration} seconds exact...")
     
