@@ -1,0 +1,27 @@
+{
+  "window": {
+    "width": 1920,
+    "height": 1080,
+    "fullscreen": false,
+    "title": "Reels Automation - Stream View"
+  },
+  "webapp": {
+    "url": "http://localhost:5173",
+    "autoReload": true,
+    "reloadInterval": 30000
+  },
+  "vscode": {
+    "autoOpen": true,
+    "delay": 1000,
+    "command": "code"
+  },
+  "branding": {
+    "title": "Reels Automation - Stream View",
+    "headerColor": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    "showFooter": true
+  },
+  "layout": {
+    "mode": "split",
+    "vscodePlaceholder": true
+  }
+}

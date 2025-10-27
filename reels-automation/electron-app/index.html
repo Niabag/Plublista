@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reels Automation - Stream View</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1e1e1e;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header .status {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #252526;
+      border-right: 1px solid #3e3e42;
+    }
+
+    .panel:last-child {
+      border-right: none;
+    }
+
+    .panel-header {
+      background: #2d2d30;
+      color: #cccccc;
+      padding: 10px 15px;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 1px solid #3e3e42;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    webview {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .vscode-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #8b8b8b;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .vscode-placeholder svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .vscode-placeholder h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #cccccc;
+    }
+
+    .vscode-placeholder p {
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    .instructions {
+      background: #2d2d30;
+      border: 1px solid #3e3e42;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      line-height: 1.8;
+    }
+
+    .footer {
+      background: #2d2d30;
+      color: #8b8b8b;
+      padding: 8px 20px;
+      font-size: 12px;
+      border-top: 1px solid #3e3e42;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ready-badge {
+      background: #4ade80;
+      color: #1e1e1e;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      Reels Automation - Stream View
+    </h1>
+    <div class="status">
+      <div class="status-dot"></div>
+      <span>Live • Prêt pour streaming</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Panel VS Code -->
+    <div class="panel">
+      <div class="panel-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+        VS Code
+      </div>
+      <div class="panel-content">
+        <div class="vscode-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          <h3>VS Code ouvert séparément</h3>
+          <p>
+            VS Code s'est ouvert dans une fenêtre externe. 
+            Placez cette fenêtre et VS Code côte à côte pour capturer les deux dans votre logiciel de streaming.
+          </p>
+          <div class="instructions">
+            <strong>💡 Instructions OBS/Streaming :</strong>
+            <ol>
+              <li>Placez cette fenêtre à droite de votre écran</li>
+              <li>Placez VS Code à gauche</li>
+              <li>Capturez "Window" ou "Display" dans OBS</li>
+              <li>Les deux panneaux seront visibles ensemble</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Application Web -->
+    <div class="panel">
+      <div class="panel-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        Application Web - localhost:5173
+      </div>
+      <div class="panel-content">
+        <webview id="webview" src="about:blank" partition="persist:webapp"></webview>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-item">
+      <span>Electron Stream App v1.0.0</span>
+    </div>
+    <div class="footer-item">
+      <span class="ready-badge">✓ Ready to Stream</span>
+    </div>
+    <div class="footer-item">
+      <span>📹 Capturez cette fenêtre dans OBS</span>
+    </div>
+  </div>
+
+  <script>
+    // Gestion de la webview
+    const webview = document.getElementById('webview');
+    
+    // Écouter l'événement de réception du fichier cible
+    window.addEventListener('target-file-ready', () => {
+      console.log('Target file:', window.targetFile);
+      
+      if (window.targetFile) {
+        // Mode automatisation : afficher le fichier HTML directement
+        const fileUrl = 'file:///' + window.targetFile.replace(/\\/g, '/');
+        console.log('Loading file:', fileUrl);
+        webview.src = fileUrl;
+        
+        // Mettre à jour le header
+        document.querySelector('.panel-header span').textContent = 'Preview - ' + window.targetFile.split('\\').pop();
+      } else {
+        // Mode normal : afficher l'app React
+        console.log('Loading React app: http://localhost:5173');
+        webview.src = 'http://localhost:5173';
+      }
+    });
+    
+    webview.addEventListener('did-start-loading', () => {
+      console.log('Application web en cours de chargement...');
+    });
+
+    webview.addEventListener('did-finish-load', () => {
+      console.log('Application web chargée avec succès');
+    });
+
+    webview.addEventListener('did-fail-load', (event) => {
+      console.error('Échec du chargement:', event.errorDescription);
+      
+      // Si le fichier local ne charge pas, réessayer
+      if (event.errorCode === -102 || event.errorCode === -6) {
+        console.log('Retrying in 2 seconds...');
+        setTimeout(() => {
+          if (window.targetFile) {
+            const fileUrl = 'file:///' + window.targetFile.replace(/\\/g, '/');
+            webview.src = fileUrl;
+          } else {
+            webview.src = 'http://localhost:5173';
+          }
+        }, 2000);
+      }
+    });
+
+    // Auto-reload en cas de connexion perdue (seulement pour l'app React)
+    setInterval(() => {
+      if (!window.targetFile && !webview.isLoading()) {
+        webview.reload();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>
