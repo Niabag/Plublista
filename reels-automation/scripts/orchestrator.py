@@ -67,17 +67,19 @@ def run_command(cmd, description):
         log(f"❌ {description} error: {e}", "ERROR")
         return False
 
-def launch_stream_view(code_file, music_style, video_duration, config):
+def launch_stream_view(code_file, music_style, video_duration, intro_title, config):
     """Launch combined stream view (Code + Result in single window)"""
     log("Running: Launch Stream View (Combined Code + Result)")
     log(f"   Music style: {music_style}", "INFO")
+    if intro_title:
+        log(f"   Intro title: {intro_title}", "INFO")
     log(f"   Target video duration: {video_duration}s", "INFO")
     try:
         # Use the Python script to launch the combined view
         python_path = config.get('paths', {}).get('python', 'python')
         script_path = Path(__file__).parent / "launch_stream_view.py"
         
-        cmd = f'{python_path} "{script_path}" "{code_file}" --music-style "{music_style}" --video-duration {video_duration}'
+        cmd = f'{python_path} "{script_path}" "{code_file}" --music-style "{music_style}" --video-duration {video_duration} --intro-title "{intro_title}"'
         
         # Launch in background
         process = subprocess.Popen(
@@ -257,10 +259,10 @@ def stop_recording(config):
         log(f"❌ Stop recording error: {e}", "ERROR")
         return None
 
-def post_process(input_path, output_path, config):
+def post_process(input_path, output_path, target_duration, config):
     """Post-process video with FFmpeg"""
     script_path = Path(__file__).parent / "compose_ffmpeg.ps1"
-    cmd = f'powershell -File "{script_path}" -In "{input_path}" -Out "{output_path}"'
+    cmd = f'powershell -File "{script_path}" -In "{input_path}" -Out "{output_path}" -Duration {target_duration}'
     return run_command(cmd, "Post-process video")
 
 def close_stream_view(chrome_pid=None):
@@ -321,6 +323,7 @@ def main():
     parser.add_argument('--job-id', required=True, help='Job ID')
     parser.add_argument('--code-file', required=True, help='Path to code file')
     parser.add_argument('--title', default='Untitled', help='Reel title')
+    parser.add_argument('--intro-title', default='', help='Custom intro title')
     parser.add_argument('--music-style', default='tech/energetic', help='Music style')
     parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
     args = parser.parse_args()
@@ -346,7 +349,7 @@ def main():
     log("\n🎬 STEP 2: Launching Stream View")
     log(f"   File: {code_file}")
     log(f"   Absolute path: {code_file.absolute()}")
-    stream_view_result = launch_stream_view(code_file, args.music_style, args.video_duration, config)
+    stream_view_result = launch_stream_view(code_file, args.music_style, args.video_duration, args.intro_title, config)
     if not stream_view_result or not stream_view_result.get('success'):
         log("Pipeline failed at Stream View launch", "ERROR")
         return 1
@@ -354,36 +357,51 @@ def main():
     chrome_pid = stream_view_result.get('pid')
     log(f"   Chrome PID: {chrome_pid if chrome_pid else 'Unknown'}", "INFO")
     
-    # Remove title bar from Chrome window
-    if chrome_pid:
-        log("🪟 Suppression de la barre de titre...")
-        try:
-            remove_titlebar_script = Path(__file__).parent / "remove_titlebar.ps1"
-            cmd = f'powershell -ExecutionPolicy Bypass -File "{remove_titlebar_script}" -ProcessId {chrome_pid}'
-            subprocess.run(cmd, shell=True, capture_output=True, timeout=5)
-            log("   Barre de titre retirée", "INFO")
-        except Exception as e:
-            log(f"   Could not remove titlebar: {e}", "WARNING")
+    # Remove old signal file if it exists
+    temp_dir = Path(__file__).parent.parent / 'temp'
+    signal_file = temp_dir / 'obs_ready_signal.txt'
+    if signal_file.exists():
+        signal_file.unlink()
+        log("🗑️  Ancien signal supprimé", "INFO")
     
-    # Wait for countdown to finish (3 seconds)
-    log("⏳ Compte à rebours (3 secondes)...")
-    log("   Le compte à rebours n'est PAS enregistré", "INFO")
-    time.sleep(3)
+    # Wait for window to fully load
+    log("\n⏳ Attente chargement fenêtre (1s)...")
+    time.sleep(1)
     
-    # Step 3: Start recording AFTER countdown (just before typing starts)
+    # Step 3: Start recording
     log("\n🎥 STEP 3: Starting OBS recording")
-    log("   Recording starts AFTER countdown (dès le début du code)", "INFO")
+    log("   OBS démarre maintenant", "INFO")
+    
     if not start_recording(config):
         log("Pipeline failed at recording start", "ERROR")
         return 1
     
-    # Step 4: Wait for typing + affichage final (5s)
+    log("✅ OBS enregistre!", "INFO")
+    
+    # Remove title bar (can be done in parallel while recording)
+    if chrome_pid:
+        try:
+            remove_titlebar_script = Path(__file__).parent / "remove_titlebar.ps1"
+            cmd = f'powershell -ExecutionPolicy Bypass -File "{remove_titlebar_script}" -ProcessId {chrome_pid}'
+            subprocess.run(cmd, shell=True, capture_output=True, timeout=2)
+        except Exception as e:
+            pass  # Don't log to avoid cluttering
+    
+    # Step 4: Wait exact duration requested
     log("\n👁️  STEP 4: Recording content")
-    typing_duration = args.video_duration - 5  # Total - affichage final (5s)
+    intro_duration = 5.0
+    transition_duration = 2
+    final_duration = 3
+    typing_duration = args.video_duration - intro_duration - transition_duration - final_duration
+    log(f"   Écran intro: {intro_duration} secondes")
     log(f"   Animation de typing: {typing_duration} secondes")
-    log(f"   Affichage final: 5 secondes (2s transition + 3s résultat)")
+    log(f"   Transition plein écran: {transition_duration} secondes")
+    log(f"   Affichage final: {final_duration} secondes")
+    log(f"   Total: {args.video_duration} secondes")
     log(f"   Recording for {args.video_duration} seconds exact...")
-    time.sleep(args.video_duration)  # Durée exacte demandée
+    
+    # Wait for duration + 2s margin to ensure everything finishes
+    time.sleep(args.video_duration + 2)
     
     # Step 5: Stop recording
     log("\n🛑 STEP 5: Stopping recording")
@@ -400,12 +418,17 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     final_video = output_dir / f"job-{args.job_id}.mp4"
     
-    if not post_process(raw_video, str(final_video), config):
+    if not post_process(raw_video, str(final_video), args.video_duration, config):
         log("Pipeline failed at post-processing", "ERROR")
         return 1
     
     # Step 7: Close Stream View window
     close_stream_view(chrome_pid)
+    
+    # Clean up signal file
+    if signal_file.exists():
+        signal_file.unlink()
+        log("🗑️  Signal file cleaned up", "INFO")
     
     # Success!
     log("\n" + "=" * 60)

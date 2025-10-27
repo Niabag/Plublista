@@ -11,6 +11,7 @@ export default function CreateWizard() {
     inputMode: 'paste',
     code: '',
     title: '',
+    introTitle: '',
     hashtags: '',
     musicStyle: 'tech/energetic',
     targetDuration: 45,
@@ -89,6 +90,19 @@ export default function CreateWizard() {
                   placeholder="Amazing CSS Effect"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Intro Title</label>
+                <input
+                  type="text"
+                  value={formData.introTitle}
+                  onChange={(e) => setFormData({ ...formData, introTitle: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  placeholder="Balle Rouge"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Hashtags</label>
                 <input

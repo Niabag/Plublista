@@ -257,16 +257,20 @@
     <span class="header-brand">SiteOnweb.fr</span>
   </div>
 
-  <!-- Start Overlay (for music autoplay) -->
-  <div id="start-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+  <!-- Intro Screen -->
+  <div id="start-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
     <div style="text-align: center;">
-      <h1 style="font-size: 48px; margin-bottom: 20px;">🎬</h1>
-      <h2 style="font-size: 24px; margin-bottom: 40px; font-weight: 600;">Démarrage automatique...</h2>
-      <div id="countdown" style="font-size: 72px; font-weight: bold; color: #667eea; margin: 20px 0;">3</div>
-      <button id="start-btn" style="padding: 20px 60px; font-size: 20px; font-weight: bold; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); transition: transform 0.2s;">
-        ▶️ DÉMARRER MAINTENANT
-      </button>
-      <p style="margin-top: 30px; font-size: 14px; color: #888;">Ou cliquez pour démarrer immédiatement</p>
+      <!-- Logo -->
+      <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff4757, #ff6348); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; box-shadow: 0 10px 40px rgba(255, 71, 87, 0.4);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+      </div>
+      <!-- Site Name -->
+      <h1 style="font-size: 42px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -1px;">SiteOnweb.fr</h1>
+      <!-- Custom Intro Title (dynamic) -->
+      <p id="intro-custom-title" style="font-size: 24px; font-weight: 600; color: #ff6348; margin-top: 20px; opacity: 0.9;"></p>
     </div>
   </div>
 
@@ -327,13 +331,24 @@
     // Durée totale configurée (en secondes) - peut être injectée
     let targetVideoDuration = window.injectedVideoDuration || 17; // Durée totale par défaut: 17s
     
-    // Durées fixes pour l'affichage final (5 secondes total)
-    const transitionDuration = 2;      // 2 secondes pour l'animation
+    // Durées fixes
+    const introDuration = 5;           // 5 secondes d'écran intro (temps pour OBS)
+    const transitionDuration = 2;      // 2 secondes de transition plein écran
     const finalDisplayDuration = 3;    // 3 secondes d'affichage final
-    const totalFinalDuration = transitionDuration + finalDisplayDuration; // 5 secondes total
+    const totalFixedDuration = introDuration + transitionDuration + finalDisplayDuration; // 10 secondes total
     
     // Calculer la durée de typing disponible
-    const typingDuration = targetVideoDuration - totalFinalDuration;
+    // Exemple: 32s total = 5s intro + 17s code + 2s transition + 3s final
+    const typingDuration = targetVideoDuration - totalFixedDuration;
+    
+    console.log('=== TIMING CONFIGURATION ===');
+    console.log(`Target video duration: ${targetVideoDuration}s`);
+    console.log(`Intro duration: ${introDuration}s`);
+    console.log(`Typing duration: ${typingDuration}s`);
+    console.log(`Transition duration: ${transitionDuration}s`);
+    console.log(`Final display duration: ${finalDisplayDuration}s`);
+    console.log(`Total: ${introDuration + typingDuration + transitionDuration + finalDisplayDuration}s`);
+    console.log('==========================');
     
     // Background music setup
     const bgmPlayer = document.getElementById('bgm-player');
@@ -343,6 +358,13 @@
       console.log('Background music loaded and ready');
     } else {
       console.log('No background music available');
+    }
+    
+    // Custom intro title setup
+    const introTitleEl = document.getElementById('intro-custom-title');
+    if (window.injectedIntroTitle && window.injectedIntroTitle !== '') {
+      introTitleEl.textContent = window.injectedIntroTitle;
+      console.log('Intro title:', window.injectedIntroTitle);
     }
 
     // Check if code was injected (preferred method to avoid CORS)
@@ -377,18 +399,57 @@
     }
     
     function initializeView() {
-      // Extract head and body content for result preview
+      // Extract body and head content from full code
       const bodyMatch = fullCode.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       const headMatch = fullCode.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
       
-      // Extract head content (styles, scripts, meta tags, links) for result iframe
+      let bodyContent = '';
+      let headContentRaw = '';
+      
+      // Extract head content for result iframe
       if (headMatch && headMatch[1]) {
         headContent = headMatch[1];
+        headContentRaw = headMatch[1];
         console.log('Extracted head content for result iframe');
       }
       
-      // Display FULL code in the code section (not just body)
-      codeLines = fullCode.split('\n');
+      // Extract body content
+      if (bodyMatch && bodyMatch[1]) {
+        bodyContent = bodyMatch[1];
+      }
+      
+      // Reorganize code for progressive result display:
+      // 1. Basic structure first (DOCTYPE, html, empty head, body opening)
+      // 2. Body content (so result appears progressively!)
+      // 3. Head content at the end (CSS, scripts)
+      
+      const basicStructure = [
+        '<!DOCTYPE html>',
+        '<html lang="fr">',
+        '<head>',
+        '  <meta charset="UTF-8" />',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1" />',
+        '  <title>Preview</title>',
+        '</head>',
+        '<body>',
+        ''
+      ];
+      
+      const bodyLines = bodyContent ? bodyContent.split('\n') : [];
+      
+      const headSection = [
+        '',
+        '</body>',
+        '',
+        '<!-- CSS et Scripts -->',
+        '<head>',
+        ...headContentRaw.split('\n'),
+        '</head>',
+        '</html>'
+      ];
+      
+      // Combine: structure → body → head
+      codeLines = [...basicStructure, ...bodyLines, ...headSection];
       
       // Update title with filename
       document.getElementById('code-title').textContent = `Code Source - ${filename}`;
@@ -414,65 +475,35 @@
 </html>`);
       doc.close();
       
-      // Setup start button and countdown
-      const startBtn = document.getElementById('start-btn');
-      const startOverlay = document.getElementById('start-overlay');
-      const countdownEl = document.getElementById('countdown');
+      // No button setup needed - auto-start with fixed timing
       
-      let countdown = 3;
-      let countdownInterval = null;
-      let autoStarted = false;
+      // Show intro immediately, then wait introDuration before starting code
+      window.startTime = performance.now();
+      console.log(`✅ Intro visible for ${introDuration} seconds... (START TIME: ${window.startTime})`);
       
-      function startAnimation() {
-        if (autoStarted) return;
-        autoStarted = true;
+      setTimeout(() => {
+        console.log('✅ Intro finished, starting code...');
         
-        // Clear countdown if running
-        if (countdownInterval) {
-          clearInterval(countdownInterval);
+        // Find and hide overlay
+        const overlay = document.getElementById('start-overlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+          console.log('✅ Overlay hidden');
+        } else {
+          console.error('❌ Overlay not found!');
         }
+        
+        // Start typing
+        console.log('✅ Calling startTypingAnimation()...');
+        startTypingAnimation();
         
         // Start music
         if (bgmPlayer.src) {
           bgmPlayer.play().then(() => {
-            console.log('Background music started');
-          }).catch(err => {
-            console.warn('Music play failed:', err);
-          });
+            console.log('✅ Music started');
+          }).catch(err => console.warn('Music play failed:', err));
         }
-        
-        // Hide overlay
-        startOverlay.style.display = 'none';
-        
-        // Start typing animation after a short delay
-        setTimeout(() => {
-          startTypingAnimation();
-        }, 500);
-      }
-      
-      // Manual start button
-      startBtn.addEventListener('click', startAnimation);
-      
-      // Add hover effect to button
-      startBtn.addEventListener('mouseenter', () => {
-        startBtn.style.transform = 'scale(1.05)';
-      });
-      startBtn.addEventListener('mouseleave', () => {
-        startBtn.style.transform = 'scale(1)';
-      });
-      
-      // Auto-start countdown (3 seconds)
-      countdownInterval = setInterval(() => {
-        countdown--;
-        if (countdown > 0) {
-          countdownEl.textContent = countdown;
-        } else {
-          countdownEl.textContent = 'GO!';
-          setTimeout(() => {
-            startAnimation();
-          }, 500);
-        }
-      }, 1000);
+      }, introDuration * 1000); // Wait introDuration milliseconds
     }
 
     function startTypingAnimation() {
@@ -484,12 +515,18 @@
       // Start line counter at 1
       document.getElementById('line-counter-current').textContent = '1';
       
+      // Record when typing starts
+      window.typingStartTime = performance.now();
+      const elapsedFromStart = ((window.typingStartTime - window.startTime) / 1000).toFixed(1);
+      console.log(`⌨️ Typing starts at ${elapsedFromStart}s from beginning`);
+      
       // Typing speed: type LINE BY LINE (faster and more reliable)
       const totalLines = codeLines.length;
       const targetDurationMs = typingDuration * 1000; // Convertir en millisecondes
       const lineSpeed = Math.max(30, targetDurationMs / totalLines); // ms per line (minimum 30ms)
       
-      console.log(`Typing duration: ${typingDuration}s for ${totalLines} lines = ${lineSpeed.toFixed(2)}ms/line`);
+      console.log(`⌨️ Typing duration: ${typingDuration}s for ${totalLines} lines = ${lineSpeed.toFixed(2)}ms/line`);
+      console.log(`⌨️ Expected finish at: ${(elapsedFromStart*1 + typingDuration).toFixed(1)}s`);
       
       typingInterval = setInterval(typeLine, lineSpeed);
     }
@@ -498,8 +535,10 @@
       if (currentLineIndex >= codeLines.length) {
         clearInterval(typingInterval);
         
-        // Code terminé - déclencher immédiatement la transition plein écran
-        console.log('Code typing terminé - transition immédiate vers plein écran');
+        // Code terminé - transition vers plein écran
+        const endTime = performance.now();
+        const elapsedSeconds = ((endTime - window.startTime) / 1000).toFixed(1);
+        console.log(`✅ Code typing terminé après ${elapsedSeconds}s - transition plein écran`);
         showFullscreenResult();
         
         return;

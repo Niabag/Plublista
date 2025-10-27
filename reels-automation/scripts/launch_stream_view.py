@@ -98,6 +98,7 @@ if __name__ == "__main__":
     parser.add_argument('file_path', help='Path to HTML file')
     parser.add_argument('--music-style', default='tech/energetic', help='Music style')
     parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
+    parser.add_argument('--intro-title', default='', help='Custom title to display in the intro screen')
     args = parser.parse_args()
     
     file_path = Path(args.file_path).resolve()  # Convert to absolute path
@@ -166,6 +167,10 @@ if __name__ == "__main__":
     music_url_json = json.dumps(music_data_url)
     video_duration = args.video_duration
     
+    # Encode intro title
+    import json
+    intro_title_json = json.dumps(args.intro_title)
+    
     injection = f"""
     <script>
       // Decode base64 to avoid any injection issues
@@ -174,6 +179,7 @@ if __name__ == "__main__":
       window.injectedFilename = {filename_json};
       window.injectedMusicUrl = {music_url_json};
       window.injectedVideoDuration = {video_duration};
+      window.injectedIntroTitle = {intro_title_json};
     </script>
     """
     

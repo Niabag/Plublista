@@ -8,6 +8,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$Out,
     
+    [int]$Duration = 0,
+    
     [string]$ConfigPath = "..\config.yaml"
 )
 
@@ -64,7 +66,15 @@ Write-Host "  [DEBUG] Target format: 1080x1920 (9:16)" -ForegroundColor Magenta
 # Crop to 9:16 aspect ratio (center crop)
 # This takes the center part of the video and crops it to portrait
 $portraitFilter = 'crop=ih*9/16:ih,scale=1080:1920'
-$ffmpegArgs = @('-i', $In, '-vf', $portraitFilter, '-c:v', 'libx264', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', $step0, '-y')
+$ffmpegArgs = @('-i', $In)
+
+# Add duration cut if specified
+if ($Duration -gt 0) {
+    Write-Host "  [DEBUG] Cutting video to exactly $Duration seconds" -ForegroundColor Cyan
+    $ffmpegArgs += @('-t', $Duration.ToString())
+}
+
+$ffmpegArgs += @('-vf', $portraitFilter, '-c:v', 'libx264', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', $step0, '-y')
 
 Write-Host "  [DEBUG] Command: ffmpeg $($ffmpegArgs -join ' ')" -ForegroundColor DarkGray
 $output = & ffmpeg @ffmpegArgs 2>&1

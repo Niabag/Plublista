@@ -11,12 +11,16 @@
       box-sizing: border-box;
     }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0a0a0a;
-      color: #fff;
+    html, body {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      height: 100vh;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #000;
+      color: #fff;
       display: flex;
       flex-direction: column;
     }
@@ -250,10 +254,11 @@
     <script>
       // Decode base64 to avoid any injection issues
       window.injectedCode = atob('PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImZyIj4KPGhlYWQ+CiAgPG1ldGEgY2hhcnNldD0iVVRGLTgiIC8+CiAgPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xIiAvPgogIDx0aXRsZT5Cb25ob21tZSBxdWkgc2F1dGU8L3RpdGxlPgogIDxsaW5rIHJlbD0icHJlY29ubmVjdCIgaHJlZj0iaHR0cHM6Ly9mb250cy5nb29nbGVhcGlzLmNvbSI+CiAgPGxpbmsgcmVsPSJwcmVjb25uZWN0IiBocmVmPSJodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tIiBjcm9zc29yaWdpbj4KICA8bGluayBocmVmPSJodHRwczovL2ZvbnRzLmdvb2dsZWFwaXMuY29tL2NzczI/ZmFtaWx5PVBvcHBpbnM6d2dodEA0MDA7NjAwOzgwMCZkaXNwbGF5PXN3YXAiIHJlbD0ic3R5bGVzaGVldCI+CiAgPHN0eWxlPgogICAgOnJvb3QgewogICAgICAtLWJnOiAjMGYxMjI2OwogICAgICAtLWdyb3VuZDogIzFiMWYzYTsKICAgICAgLS1hY2NlbnQ6ICNmZjZiNmI7CiAgICAgIC0tYWNjZW50LTI6ICNmZmQxNjY7CiAgICAgIC0td2hpdGU6ICNmZmZmZmY7CiAgICAgIC0tc2hhZG93OiAwIDIwcHggNjBweCByZ2JhKDAsMCwwLC40NSk7CiAgICB9CgogICAgKiB7IGJveC1zaXppbmc6IGJvcmRlci1ib3g7IH0KICAgIGh0bWwsIGJvZHkgeyBoZWlnaHQ6IDEwMCU7IH0KICAgIGJvZHkgewogICAgICBtYXJnaW46IDA7CiAgICAgIGZvbnQtZmFtaWx5OiAnUG9wcGlucycsIHN5c3RlbS11aSwgLWFwcGxlLXN5c3RlbSwgU2Vnb2UgVUksIFJvYm90bywgVWJ1bnR1LCBDYW50YXJlbGwsICdIZWx2ZXRpY2EgTmV1ZScsIEFyaWFsLCBzYW5zLXNlcmlmOwogICAgICBiYWNrZ3JvdW5kOiByYWRpYWwtZ3JhZGllbnQoMTIwMHB4IDYwMHB4IGF0IDcwJSAtMTAlLCAjMWMyMTQ5IDAlLCB2YXIoLS1iZykgNjAlKSBmaXhlZDsKICAgICAgY29sb3I6IHZhcigtLXdoaXRlKTsKICAgICAgZGlzcGxheTogZ3JpZDsKICAgICAgcGxhY2UtaXRlbXM6IGNlbnRlcjsKICAgICAgb3ZlcmZsb3c6IGhpZGRlbjsKICAgIH0KCiAgICAuc2NlbmUgewogICAgICBwb3NpdGlvbjogcmVsYXRpdmU7CiAgICAgIHdpZHRoOiBtaW4oOTJ2dywgOTgwcHgpOwogICAgICBoZWlnaHQ6IG1pbig3MHZoLCA1NDBweCk7CiAgICAgIGJvcmRlci1yYWRpdXM6IDMycHg7CiAgICAgIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgjMWExZjQzIDAlLCAjMGYxMjI2IDYwJSk7CiAgICAgIGJveC1zaGFkb3c6IHZhcigtLXNoYWRvdyk7CiAgICAgIG92ZXJmbG93OiBoaWRkZW47CiAgICAgIGlzb2xhdGlvbjogaXNvbGF0ZTsKICAgIH0KCiAgICAvKiBQYXJhbGxheGUgZMOpY29yICovCiAgICAuc3RhcnMgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IGluc2V0OiAwOyBwb2ludGVyLWV2ZW50czogbm9uZTsKICAgICAgYmFja2dyb3VuZDoKICAgICAgICByYWRpYWwtZ3JhZGllbnQoMnB4IDJweCBhdCAxMCUgMzAlLCAjZmZmZmZmODgsIHRyYW5zcGFyZW50IDY1JSksCiAgICAgICAgcmFkaWFsLWdyYWRpZW50KDJweCAycHggYXQgMzUlIDYwJSwgI2ZmZmZmZjg4LCB0cmFuc3BhcmVudCA2NSUpLAogICAgICAgIHJhZGlhbC1ncmFkaWVudCgycHggMnB4IGF0IDcwJSAyMCUsICNmZmZmZmY4OCwgdHJhbnNwYXJlbnQgNjUlKSwKICAgICAgICByYWRpYWwtZ3JhZGllbnQoMnB4IDJweCBhdCA4NSUgNzUlLCAjZmZmZmZmODgsIHRyYW5zcGFyZW50IDY1JSksCiAgICAgICAgcmFkaWFsLWdyYWRpZW50KDEuNXB4IDEuNXB4IGF0IDU1JSA0MCUsICNmZmZmZmY2NiwgdHJhbnNwYXJlbnQgNjUlKSwKICAgICAgICByYWRpYWwtZ3JhZGllbnQoMS41cHggMS41cHggYXQgMjUlIDgwJSwgI2ZmZmZmZjY2LCB0cmFuc3BhcmVudCA2NSUpOwogICAgICBhbmltYXRpb246IHR3aW5rbGUgNnMgZWFzZS1pbi1vdXQgaW5maW5pdGU7CiAgICAgIG9wYWNpdHk6IC43OwogICAgfQogICAgQGtleWZyYW1lcyB0d2lua2xlIHsgNTAlIHsgb3BhY2l0eTogLjk1OyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTNweCk7IH0gfQoKICAgIC5tb29uIHsKICAgICAgcG9zaXRpb246IGFic29sdXRlOyB0b3A6IDYlOyBsZWZ0OiA4JTsgd2lkdGg6IDkwcHg7IGhlaWdodDogOTBweDsKICAgICAgYmFja2dyb3VuZDogcmFkaWFsLWdyYWRpZW50KGNpcmNsZSBhdCAzNSUgMzUlLCAjZmZmIDAgMzAlLCAjZTZlN2ZmIDMwJSA2MCUsICNjZGQwZmYgNjAlIDEwMCUpOwogICAgICBib3JkZXItcmFkaXVzOiA1MCU7CiAgICAgIGJveC1zaGFkb3c6IDAgMCA0MHB4IDVweCAjYWFiMGZmNTU7CiAgICAgIGZpbHRlcjogYmx1ciguMnB4KTsKICAgICAgei1pbmRleDogMDsKICAgICAgYW5pbWF0aW9uOiBmbG9hdCA4cyBlYXNlLWluLW91dCBpbmZpbml0ZTsKICAgIH0KICAgIEBrZXlmcmFtZXMgZmxvYXQgeyA1MCUgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoNnB4KSB0cmFuc2xhdGVYKDJweCk7IH0gfQoKICAgIC5tb3VudHMgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IGJvdHRvbTogMTEwcHg7IGxlZnQ6IDA7IHJpZ2h0OiAwOyBoZWlnaHQ6IDE4MHB4OyB6LWluZGV4OiAxOwogICAgICBiYWNrZ3JvdW5kOgogICAgICAgIHJhZGlhbC1ncmFkaWVudCg2MDBweCAyMDBweCBhdCAxNSUgMTAwJSwgIzJhMzE2NiAwIDYwJSwgdHJhbnNwYXJlbnQgNjElKSwKICAgICAgICByYWRpYWwtZ3JhZGllbnQoODAwcHggMjQwcHggYXQgNjUlIDEwMCUsICMyMzJhNTkgMCA2MCUsIHRyYW5zcGFyZW50IDYxJSksCiAgICAgICAgcmFkaWFsLWdyYWRpZW50KDUwMHB4IDE4MHB4IGF0IDk1JSAxMDAlLCAjMWQyNDUwIDAgNjAlLCB0cmFuc3BhcmVudCA2MSUpOwogICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVooMCk7CiAgICB9CgogICAgLmdyb3VuZCB7CiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTsgbGVmdDogMDsgcmlnaHQ6IDA7IGJvdHRvbTogMDsgaGVpZ2h0OiAxMjBweDsgei1pbmRleDogMzsKICAgICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KCMxNzFhMzMsIHZhcigtLWdyb3VuZCkpOwogICAgICBib3JkZXItdG9wOiAycHggc29saWQgIzJiMmY1YTsKICAgICAgZGlzcGxheTogZ3JpZDsgcGxhY2UtaXRlbXM6IGNlbnRlcjsKICAgIH0KCiAgICAucGxhdGZvcm0gewogICAgICAtLXc6IDM4MHB4OyAtLWg6IDE4cHg7CiAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTsgd2lkdGg6IHZhcigtLXcpOyBoZWlnaHQ6IHZhcigtLWgpOwogICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoOTBkZWcsICMzYjNmNzIsICM0YTRmOGEpOwogICAgICBib3JkZXItcmFkaXVzOiA5OTlweDsgb3V0bGluZTogMXB4IHNvbGlkICMyYzJmNTk7CiAgICAgIGJveC1zaGFkb3c6IGluc2V0IDAgMnB4IDAgIzYzNjhhOCwgMCAxNHB4IDMwcHggIzBhMGIxNzNhOwogICAgfQoKICAgIC5zaGFkb3cgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IGluc2V0OiBhdXRvIDAgLThweCAwOyBoZWlnaHQ6IDE2cHg7CiAgICAgIGJhY2tncm91bmQ6IHJhZGlhbC1ncmFkaWVudCg1MCUgNDAlIGF0IDUwJSAzMCUsICMwMDA4LCB0cmFuc3BhcmVudCA4MCUpOwogICAgICBmaWx0ZXI6IGJsdXIoMnB4KTsKICAgIH0KCiAgICAvKiBCb25ob21tZSAoYXNzZW1ibGFnZSBkZSBmb3JtZXMpICovCiAgICAuaGVybyB7CiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTsgbGVmdDogNTAlOyBib3R0b206IDEzMHB4OyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSk7CiAgICAgIHdpZHRoOiAxMjBweDsgaGVpZ2h0OiAxODBweDsgei1pbmRleDogMjsKICAgICAgYW5pbWF0aW9uOiBqdW1wIDEuNHMgY3ViaWMtYmV6aWVyKC4yLC43LC4yLDEpIGluZmluaXRlOwogICAgfQoKICAgIC5oZWFkIHsKICAgICAgcG9zaXRpb246IGFic29sdXRlOyB0b3A6IDA7IGxlZnQ6IDUwJTsgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKC01MCUpOwogICAgICB3aWR0aDogNzBweDsgaGVpZ2h0OiA3MHB4OyBib3JkZXItcmFkaXVzOiA1MCU7IGJhY2tncm91bmQ6ICNmZmQ2YTE7CiAgICAgIGJveC1zaGFkb3c6IGluc2V0IDAgLTZweCAjZjdiNTZkOwogICAgfQogICAgLmV5ZSB7IHBvc2l0aW9uOiBhYnNvbHV0ZTsgdG9wOiAyOHB4OyB3aWR0aDogMTBweDsgaGVpZ2h0OiAxMHB4OyBiYWNrZ3JvdW5kOiAjMjQyNDI0OyBib3JkZXItcmFkaXVzOiA1MCU7IH0KICAgIC5leWUubGVmdCB7IGxlZnQ6IGNhbGMoNTAlIC0gMThweCk7IH0KICAgIC5leWUucmlnaHQgeyBsZWZ0OiBjYWxjKDUwJSArIDhweCk7IH0KICAgIC5leWU6OmFmdGVyIHsgY29udGVudDoiIjsgcG9zaXRpb246IGFic29sdXRlOyB0b3A6IDJweDsgbGVmdDogMnB4OyB3aWR0aDogM3B4OyBoZWlnaHQ6IDNweDsgYmFja2dyb3VuZDogI2ZmZjsgYm9yZGVyLXJhZGl1czogNTAlOyB9CgogICAgLmJvZHkgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IHRvcDogNjBweDsgbGVmdDogNTAlOyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSk7CiAgICAgIHdpZHRoOiA5MHB4OyBoZWlnaHQ6IDgwcHg7IGJvcmRlci1yYWRpdXM6IDQwcHggNDBweCAzMHB4IDMwcHg7CiAgICAgIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgxODBkZWcsIHZhcigtLWFjY2VudCkgMCUsICNlMTQ5NjIgMTAwJSk7CiAgICAgIGJveC1zaGFkb3c6IGluc2V0IDAgLTZweCAjYmIyYzQ3OwogICAgfQoKICAgIC5hcm0gewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IHRvcDogNzBweDsgd2lkdGg6IDE4cHg7IGhlaWdodDogNjBweDsgYmFja2dyb3VuZDogI2ZmZDZhMTsgYm9yZGVyLXJhZGl1czogMTJweDsKICAgICAgdHJhbnNmb3JtLW9yaWdpbjogdG9wIGNlbnRlcjsgYm94LXNoYWRvdzogaW5zZXQgMCAtNnB4ICNmN2I1NmQ7CiAgICAgIGFuaW1hdGlvbjogYXJtcyAxLjRzIGVhc2UtaW4tb3V0IGluZmluaXRlOwogICAgfQogICAgLmFybS5sZWZ0IHsgbGVmdDogY2FsYyg1MCUgLSA1MnB4KTsgdHJhbnNmb3JtOiByb3RhdGUoMTRkZWcpOyB9CiAgICAuYXJtLnJpZ2h0IHsgbGVmdDogY2FsYyg1MCUgKyAzNHB4KTsgdHJhbnNmb3JtOiByb3RhdGUoLTE0ZGVnKTsgfQoKICAgIC5sZWcgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IHRvcDogMTIwcHg7IHdpZHRoOiAyNHB4OyBoZWlnaHQ6IDc0cHg7IGJhY2tncm91bmQ6ICMzMzNhNmQ7IGJvcmRlci1yYWRpdXM6IDEycHg7CiAgICAgIHRyYW5zZm9ybS1vcmlnaW46IHRvcCBjZW50ZXI7IGJveC1zaGFkb3c6IGluc2V0IDAgLThweCAjMjYyYzU4OwogICAgICBhbmltYXRpb246IGxlZ3MgMS40cyBlYXNlLWluLW91dCBpbmZpbml0ZTsKICAgIH0KICAgIC5sZWcubGVmdCB7IGxlZnQ6IGNhbGMoNTAlIC0gMjhweCk7IH0KICAgIC5sZWcucmlnaHQgeyBsZWZ0OiBjYWxjKDUwJSArIDRweCk7IGFuaW1hdGlvbi1kZWxheTogLS4xczsgfQoKICAgIC5zaG9lIHsgcG9zaXRpb246IGFic29sdXRlOyBib3R0b206IC0zcHg7IGxlZnQ6IC00cHg7IHJpZ2h0OiAtNHB4OyBoZWlnaHQ6IDE2cHg7IGJhY2tncm91bmQ6ICMwYzBlMWE7IGJvcmRlci1yYWRpdXM6IDE2cHg7IH0KCiAgICAubGFiZWwgewogICAgICBwb3NpdGlvbjogYWJzb2x1dGU7IGJvdHRvbTogMTJweDsgbGVmdDogNTAlOyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSk7CiAgICAgIHBhZGRpbmc6IDEwcHggMTZweDsgYm9yZGVyLXJhZGl1czogOTk5cHg7IGZvbnQtd2VpZ2h0OiA2MDA7IGxldHRlci1zcGFjaW5nOiAuM3B4OwogICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoOTBkZWcsICM0YjUwYTMsICM2YTZmZTYpOwogICAgICBib3gtc2hhZG93OiAwIDEwcHggMzBweCAjMDgwYTE2YWE7CiAgICB9CgogICAgLyogQW5pbWF0aW9ucyBwcmluY2lwYWxlcyAqLwogICAgQGtleWZyYW1lcyBqdW1wIHsKICAgICAgMCUgICB7IHRyYW5zZm9ybTogdHJhbnNsYXRlWCgtNTAlKSB0cmFuc2xhdGVZKDApIHNjYWxlKDEpOyB9CiAgICAgIDM1JSAgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSkgdHJhbnNsYXRlWSgtMTQwcHgpIHNjYWxlKDEuMDIpOyB9CiAgICAgIDUwJSAgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSkgdHJhbnNsYXRlWSgtMTUwcHgpIHNjYWxlKDEuMDIpOyB9CiAgICAgIDY1JSAgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSkgdHJhbnNsYXRlWSgtMTQwcHgpIHNjYWxlKDEuMDEpOyB9CiAgICAgIDEwMCUgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVgoLTUwJSkgdHJhbnNsYXRlWSgwKSBzY2FsZSgxKTsgfQogICAgfQoKICAgIEBrZXlmcmFtZXMgYXJtcyB7CiAgICAgIDUwJSB7IHRyYW5zZm9ybTogcm90YXRlKC0xNGRlZyk7IH0KICAgIH0KCiAgICBAa2V5ZnJhbWVzIGxlZ3MgewogICAgICA1MCUgeyB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTZweCkgcm90YXRlKDZkZWcpOyB9CiAgICB9CgogICAgLyogT21icmUgZHluYW1pcXVlIHNvdXMgbGEgcGxhdGVmb3JtZSAqLwogICAgLmp1bXAtc2hhZG93IHsKICAgICAgcG9zaXRpb246IGFic29sdXRlOyBsZWZ0OiA1MCU7IGJvdHRvbTogOTZweDsgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKC01MCUpOwogICAgICB3aWR0aDogMTYwcHg7IGhlaWdodDogMjZweDsgYm9yZGVyLXJhZGl1czogNTAlOwogICAgICBiYWNrZ3JvdW5kOiByYWRpYWwtZ3JhZGllbnQoNTAlIDUwJSBhdCA1MCUgNTAlLCAjMDAwOCAwJSwgdHJhbnNwYXJlbnQgNzAlKTsKICAgICAgZmlsdGVyOiBibHVyKDVweCk7CiAgICAgIGFuaW1hdGlvbjogc3F1aXNoIDEuNHMgZWFzZS1pbi1vdXQgaW5maW5pdGU7CiAgICAgIHotaW5kZXg6IDA7CiAgICB9CiAgICBAa2V5ZnJhbWVzIHNxdWlzaCB7CiAgICAgIDAlLCAxMDAlIHsgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKC01MCUpIHNjYWxlWCgxKSBzY2FsZVkoMSk7IG9wYWNpdHk6IC42OyB9CiAgICAgIDUwJSAgICAgIHsgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKC01MCUpIHNjYWxlWCguNikgc2NhbGVZKC43KTsgb3BhY2l0eTogLjI7IH0KICAgIH0KICA8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5PgogIDxkaXYgY2xhc3M9InNjZW5lIj4KICAgIDxkaXYgY2xhc3M9InN0YXJzIj48L2Rpdj4KICAgIDxkaXYgY2xhc3M9Im1vb24iPjwvZGl2PgogICAgPGRpdiBjbGFzcz0ibW91bnRzIj48L2Rpdj4KCiAgICA8ZGl2IGNsYXNzPSJoZXJvIj4KICAgICAgPGRpdiBjbGFzcz0iaGVhZCI+CiAgICAgICAgPHNwYW4gY2xhc3M9ImV5ZSBsZWZ0Ij48L3NwYW4+CiAgICAgICAgPHNwYW4gY2xhc3M9ImV5ZSByaWdodCI+PC9zcGFuPgogICAgICA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYm9keSI+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImFybSBsZWZ0Ij48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYXJtIHJpZ2h0Ij48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0ibGVnIGxlZnQiPjxkaXYgY2xhc3M9InNob2UiPjwvZGl2PjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJsZWcgcmlnaHQiPjxkaXYgY2xhc3M9InNob2UiPjwvZGl2PjwvZGl2PgogICAgPC9kaXY+CgogICAgPGRpdiBjbGFzcz0iZ3JvdW5kIj4KICAgICAgPGRpdiBjbGFzcz0icGxhdGZvcm0iPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJzaGFkb3ciPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJsYWJlbCI+Qm9uaG9tbWUgcXVpIHNhdXRlPC9kaXY+CiAgICA8L2Rpdj4KCiAgICA8ZGl2IGNsYXNzPSJqdW1wLXNoYWRvdyI+PC9kaXY+CiAgPC9kaXY+CjwvYm9keT4KPC9odG1sPgo=');
-      window.injectedFileUrl = "file:///C:/Users/gabai/Documents/GitHub/Plublista/reels-automation/workspace/job-6/snippet.html";
-      window.injectedFilename = "snippet.html";
+      window.injectedFileUrl = "file:///C:/Users/gabai/Documents/GitHub/Plublista/reels-automation/snippets/bonhomme-simple.html";
+      window.injectedFilename = "bonhomme-simple.html";
       window.injectedMusicUrl = "file:///C:/Users/gabai/Documents/GitHub/Plublista/reels-automation/assets/music/tech-energy.mp3";
-      window.injectedVideoDuration = 30;
+      window.injectedVideoDuration = 45;
+      window.injectedIntroTitle = "Test 45s";
     </script>
     </head>
 <body>
@@ -262,16 +267,20 @@
     <span class="header-brand">SiteOnweb.fr</span>
   </div>
 
-  <!-- Start Overlay (for music autoplay) -->
-  <div id="start-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+  <!-- Intro Screen -->
+  <div id="start-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
     <div style="text-align: center;">
-      <h1 style="font-size: 48px; margin-bottom: 20px;">🎬</h1>
-      <h2 style="font-size: 24px; margin-bottom: 40px; font-weight: 600;">Démarrage automatique...</h2>
-      <div id="countdown" style="font-size: 72px; font-weight: bold; color: #667eea; margin: 20px 0;">3</div>
-      <button id="start-btn" style="padding: 20px 60px; font-size: 20px; font-weight: bold; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); transition: transform 0.2s;">
-        ▶️ DÉMARRER MAINTENANT
-      </button>
-      <p style="margin-top: 30px; font-size: 14px; color: #888;">Ou cliquez pour démarrer immédiatement</p>
+      <!-- Logo -->
+      <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff4757, #ff6348); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; box-shadow: 0 10px 40px rgba(255, 71, 87, 0.4);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+      </div>
+      <!-- Site Name -->
+      <h1 style="font-size: 42px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -1px;">SiteOnweb.fr</h1>
+      <!-- Custom Intro Title (dynamic) -->
+      <p id="intro-custom-title" style="font-size: 24px; font-weight: 600; color: #ff6348; margin-top: 20px; opacity: 0.9;"></p>
     </div>
   </div>
 
@@ -313,11 +322,6 @@
     </div>
   </div>
 
-  <div class="footer">
-    <span class="live-indicator"></span>
-    LIVE - Prêt pour streaming OBS
-  </div>
-
   <!-- Background Music (captured by OBS) -->
   <audio id="bgm-player" loop style="display: none;"></audio>
 
@@ -337,13 +341,24 @@
     // Durée totale configurée (en secondes) - peut être injectée
     let targetVideoDuration = window.injectedVideoDuration || 17; // Durée totale par défaut: 17s
     
-    // Durées fixes pour l'affichage final (5 secondes total)
-    const transitionDuration = 2;      // 2 secondes pour l'animation
+    // Durées fixes
+    const introDuration = 5;           // 5 secondes d'écran intro (temps pour OBS)
+    const transitionDuration = 2;      // 2 secondes de transition plein écran
     const finalDisplayDuration = 3;    // 3 secondes d'affichage final
-    const totalFinalDuration = transitionDuration + finalDisplayDuration; // 5 secondes total
+    const totalFixedDuration = introDuration + transitionDuration + finalDisplayDuration; // 10 secondes total
     
     // Calculer la durée de typing disponible
-    const typingDuration = targetVideoDuration - totalFinalDuration;
+    // Exemple: 32s total = 5s intro + 17s code + 2s transition + 3s final
+    const typingDuration = targetVideoDuration - totalFixedDuration;
+    
+    console.log('=== TIMING CONFIGURATION ===');
+    console.log(`Target video duration: ${targetVideoDuration}s`);
+    console.log(`Intro duration: ${introDuration}s`);
+    console.log(`Typing duration: ${typingDuration}s`);
+    console.log(`Transition duration: ${transitionDuration}s`);
+    console.log(`Final display duration: ${finalDisplayDuration}s`);
+    console.log(`Total: ${introDuration + typingDuration + transitionDuration + finalDisplayDuration}s`);
+    console.log('==========================');
     
     // Background music setup
     const bgmPlayer = document.getElementById('bgm-player');
@@ -353,6 +368,13 @@
       console.log('Background music loaded and ready');
     } else {
       console.log('No background music available');
+    }
+    
+    // Custom intro title setup
+    const introTitleEl = document.getElementById('intro-custom-title');
+    if (window.injectedIntroTitle && window.injectedIntroTitle !== '') {
+      introTitleEl.textContent = window.injectedIntroTitle;
+      console.log('Intro title:', window.injectedIntroTitle);
     }
 
     // Check if code was injected (preferred method to avoid CORS)
@@ -387,18 +409,57 @@
     }
     
     function initializeView() {
-      // Extract head and body content for result preview
+      // Extract body and head content from full code
       const bodyMatch = fullCode.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       const headMatch = fullCode.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
       
-      // Extract head content (styles, scripts, meta tags, links) for result iframe
+      let bodyContent = '';
+      let headContentRaw = '';
+      
+      // Extract head content for result iframe
       if (headMatch && headMatch[1]) {
         headContent = headMatch[1];
+        headContentRaw = headMatch[1];
         console.log('Extracted head content for result iframe');
       }
       
-      // Display FULL code in the code section (not just body)
-      codeLines = fullCode.split('\n');
+      // Extract body content
+      if (bodyMatch && bodyMatch[1]) {
+        bodyContent = bodyMatch[1];
+      }
+      
+      // Reorganize code for progressive result display:
+      // 1. Basic structure first (DOCTYPE, html, empty head, body opening)
+      // 2. Body content (so result appears progressively!)
+      // 3. Head content at the end (CSS, scripts)
+      
+      const basicStructure = [
+        '<!DOCTYPE html>',
+        '<html lang="fr">',
+        '<head>',
+        '  <meta charset="UTF-8" />',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1" />',
+        '  <title>Preview</title>',
+        '</head>',
+        '<body>',
+        ''
+      ];
+      
+      const bodyLines = bodyContent ? bodyContent.split('\n') : [];
+      
+      const headSection = [
+        '',
+        '</body>',
+        '',
+        '<!-- CSS et Scripts -->',
+        '<head>',
+        ...headContentRaw.split('\n'),
+        '</head>',
+        '</html>'
+      ];
+      
+      // Combine: structure → body → head
+      codeLines = [...basicStructure, ...bodyLines, ...headSection];
       
       // Update title with filename
       document.getElementById('code-title').textContent = `Code Source - ${filename}`;
@@ -424,65 +485,35 @@
 </html>`);
       doc.close();
       
-      // Setup start button and countdown
-      const startBtn = document.getElementById('start-btn');
-      const startOverlay = document.getElementById('start-overlay');
-      const countdownEl = document.getElementById('countdown');
+      // No button setup needed - auto-start with fixed timing
       
-      let countdown = 3;
-      let countdownInterval = null;
-      let autoStarted = false;
+      // Show intro immediately, then wait introDuration before starting code
+      window.startTime = performance.now();
+      console.log(`✅ Intro visible for ${introDuration} seconds... (START TIME: ${window.startTime})`);
       
-      function startAnimation() {
-        if (autoStarted) return;
-        autoStarted = true;
+      setTimeout(() => {
+        console.log('✅ Intro finished, starting code...');
         
-        // Clear countdown if running
-        if (countdownInterval) {
-          clearInterval(countdownInterval);
+        // Find and hide overlay
+        const overlay = document.getElementById('start-overlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+          console.log('✅ Overlay hidden');
+        } else {
+          console.error('❌ Overlay not found!');
         }
+        
+        // Start typing
+        console.log('✅ Calling startTypingAnimation()...');
+        startTypingAnimation();
         
         // Start music
         if (bgmPlayer.src) {
           bgmPlayer.play().then(() => {
-            console.log('Background music started');
-          }).catch(err => {
-            console.warn('Music play failed:', err);
-          });
+            console.log('✅ Music started');
+          }).catch(err => console.warn('Music play failed:', err));
         }
-        
-        // Hide overlay
-        startOverlay.style.display = 'none';
-        
-        // Start typing animation after a short delay
-        setTimeout(() => {
-          startTypingAnimation();
-        }, 500);
-      }
-      
-      // Manual start button
-      startBtn.addEventListener('click', startAnimation);
-      
-      // Add hover effect to button
-      startBtn.addEventListener('mouseenter', () => {
-        startBtn.style.transform = 'scale(1.05)';
-      });
-      startBtn.addEventListener('mouseleave', () => {
-        startBtn.style.transform = 'scale(1)';
-      });
-      
-      // Auto-start countdown (3 seconds)
-      countdownInterval = setInterval(() => {
-        countdown--;
-        if (countdown > 0) {
-          countdownEl.textContent = countdown;
-        } else {
-          countdownEl.textContent = 'GO!';
-          setTimeout(() => {
-            startAnimation();
-          }, 500);
-        }
-      }, 1000);
+      }, introDuration * 1000); // Wait introDuration milliseconds
     }
 
     function startTypingAnimation() {
@@ -494,12 +525,18 @@
       // Start line counter at 1
       document.getElementById('line-counter-current').textContent = '1';
       
+      // Record when typing starts
+      window.typingStartTime = performance.now();
+      const elapsedFromStart = ((window.typingStartTime - window.startTime) / 1000).toFixed(1);
+      console.log(`⌨️ Typing starts at ${elapsedFromStart}s from beginning`);
+      
       // Typing speed: type LINE BY LINE (faster and more reliable)
       const totalLines = codeLines.length;
       const targetDurationMs = typingDuration * 1000; // Convertir en millisecondes
       const lineSpeed = Math.max(30, targetDurationMs / totalLines); // ms per line (minimum 30ms)
       
-      console.log(`Typing duration: ${typingDuration}s for ${totalLines} lines = ${lineSpeed.toFixed(2)}ms/line`);
+      console.log(`⌨️ Typing duration: ${typingDuration}s for ${totalLines} lines = ${lineSpeed.toFixed(2)}ms/line`);
+      console.log(`⌨️ Expected finish at: ${(elapsedFromStart*1 + typingDuration).toFixed(1)}s`);
       
       typingInterval = setInterval(typeLine, lineSpeed);
     }
@@ -508,8 +545,10 @@
       if (currentLineIndex >= codeLines.length) {
         clearInterval(typingInterval);
         
-        // Code terminé - déclencher immédiatement la transition plein écran
-        console.log('Code typing terminé - transition immédiate vers plein écran');
+        // Code terminé - transition vers plein écran
+        const endTime = performance.now();
+        const elapsedSeconds = ((endTime - window.startTime) / 1000).toFixed(1);
+        console.log(`✅ Code typing terminé après ${elapsedSeconds}s - transition plein écran`);
         showFullscreenResult();
         
         return;

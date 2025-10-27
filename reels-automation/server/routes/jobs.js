@@ -40,7 +40,7 @@ router.get('/:id', async (req, res) => {
 // Create new job
 router.post('/create', async (req, res) => {
   try {
-    const { code, title, hashtags, musicStyle, targetDuration, brandOverlay, scheduleEnabled, scheduleDate, scheduleTime } = req.body
+    const { code, title, introTitle, hashtags, musicStyle, targetDuration, brandOverlay, scheduleEnabled, scheduleDate, scheduleTime } = req.body
 
     const jobId = jobIdCounter++
     
@@ -56,6 +56,7 @@ router.post('/create', async (req, res) => {
     const job = {
       id: jobId,
       title,
+      introTitle,
       code,
       hashtags,
       musicStyle,
@@ -140,6 +141,7 @@ async function processJob(job) {
       '--job-id', job.id.toString(),
       '--code-file', codePath,
       '--title', job.title,
+      '--intro-title', job.introTitle || '',
       '--music-style', job.musicStyle || 'tech/energetic',
       '--video-duration', (job.targetDuration || 17).toString()
     ], {
