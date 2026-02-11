@@ -26,6 +26,73 @@ export default function CreateWizard() {
   const previewRef = useRef(null)
   const aiFileInputRef = useRef(null)
 
+  // Smart prompt builder state
+  const [promptMode, setPromptMode] = useState('smart') // 'smart' or 'free'
+  const [selectedPreset, setSelectedPreset] = useState(null)
+  const [selectedPalette, setSelectedPalette] = useState(null)
+  const [selectedSpeed, setSelectedSpeed] = useState('normal')
+  const [customText, setCustomText] = useState('')
+  const [extraDetails, setExtraDetails] = useState('')
+
+  const ANIMATION_PRESETS = [
+    { id: 'particles', icon: '✨', label: 'Particules', desc: 'Systeme de particules animees' },
+    { id: 'neon', icon: '💡', label: 'Neon/Glow', desc: 'Texte ou formes neon brillantes' },
+    { id: 'typing', icon: '⌨️', label: 'Code Typing', desc: 'Effet machine a ecrire' },
+    { id: '3d', icon: '🎲', label: '3D Transform', desc: 'Rotations et perspectives 3D' },
+    { id: 'waves', icon: '🌊', label: 'Vagues', desc: 'Ondulations et vagues fluides' },
+    { id: 'matrix', icon: '🟢', label: 'Matrix Rain', desc: 'Pluie de caracteres style Matrix' },
+    { id: 'geometric', icon: '🔷', label: 'Geometrique', desc: 'Formes et patterns repetitifs' },
+    { id: 'gradient', icon: '🎨', label: 'Gradient Flow', desc: 'Degrades colores animes' },
+    { id: 'morphing', icon: '🫧', label: 'Morphing', desc: 'Formes qui se transforment' },
+    { id: 'fireworks', icon: '🎆', label: 'Feu Artifice', desc: 'Explosions et etincelles' },
+    { id: 'orbit', icon: '🪐', label: 'Orbital', desc: 'Objets en orbite, systeme solaire' },
+    { id: 'glitch', icon: '📺', label: 'Glitch', desc: 'Effet glitch/distorsion retro' },
+  ]
+
+  const COLOR_PALETTES = [
+    { id: 'neon', label: 'Neon', colors: ['#00ff88', '#ff0066', '#00ccff'] },
+    { id: 'cyber', label: 'Cyber Red', colors: ['#DA2626', '#ff4444', '#ff6b6b'] },
+    { id: 'ocean', label: 'Ocean', colors: ['#0066ff', '#00ccff', '#00ffcc'] },
+    { id: 'sunset', label: 'Sunset', colors: ['#ff6b35', '#ff3366', '#cc00ff'] },
+    { id: 'matrix', label: 'Matrix', colors: ['#00ff00', '#33ff33', '#66ff66'] },
+    { id: 'pastel', label: 'Pastel', colors: ['#ff9a9e', '#a18cd1', '#fbc2eb'] },
+    { id: 'mono', label: 'Monochrome', colors: ['#ffffff', '#888888', '#444444'] },
+    { id: 'gold', label: 'Gold', colors: ['#ffd700', '#ffaa00', '#ff8800'] },
+  ]
+
+  const SPEED_OPTIONS = [
+    { id: 'slow', label: 'Lent', desc: 'Zen, hypnotique' },
+    { id: 'normal', label: 'Normal', desc: 'Equilibre' },
+    { id: 'fast', label: 'Rapide', desc: 'Energique, dynamique' },
+  ]
+
+  // Build the smart prompt from selections
+  const buildSmartPrompt = () => {
+    const parts = []
+    if (selectedPreset) {
+      const preset = ANIMATION_PRESETS.find(p => p.id === selectedPreset)
+      parts.push(`Animation style: ${preset.label} (${preset.desc})`)
+    }
+    if (selectedPalette) {
+      const palette = COLOR_PALETTES.find(p => p.id === selectedPalette)
+      parts.push(`Palette de couleurs: ${palette.label} (${palette.colors.join(', ')})`)
+    }
+    parts.push(`Vitesse d'animation: ${SPEED_OPTIONS.find(s => s.id === selectedSpeed).label}`)
+    if (customText.trim()) {
+      parts.push(`Texte a afficher dans l'animation: "${customText.trim()}"`)
+    }
+    if (extraDetails.trim()) {
+      parts.push(`Details supplementaires: ${extraDetails.trim()}`)
+    }
+    parts.push(`Duree cible: ${formData.targetDuration} secondes`)
+    return parts.join('\n')
+  }
+
+  // Get the effective prompt (smart or free)
+  const getEffectivePrompt = () => {
+    return promptMode === 'smart' ? buildSmartPrompt() : aiPrompt
+  }
+
   useEffect(() => {
     fetch('/api/ai/status')
       .then(res => res.json())
@@ -43,11 +110,13 @@ export default function CreateWizard() {
   }
 
   const handleAiGenerate = async () => {
+    const effectivePrompt = getEffectivePrompt()
+    if (!effectivePrompt.trim()) return
     setAiGenerating(true)
     setAiError('')
     try {
       const body = new FormData()
-      body.append('prompt', aiPrompt)
+      body.append('prompt', effectivePrompt)
       if (aiReferenceImage) {
         body.append('referenceImage', aiReferenceImage)
       }
@@ -179,7 +248,7 @@ export default function CreateWizard() {
             )}
 
             {formData.inputMode === 'generate' && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {!aiConfigured && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                     <p className="text-sm text-amber-800">
@@ -188,19 +257,166 @@ export default function CreateWizard() {
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Decrivez ce que vous voulez creer
-                  </label>
-                  <textarea
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg text-sm"
-                    placeholder="Exemple : Une animation neon avec le texte 'Hello World' sur fond sombre avec des particules..."
-                    disabled={aiGenerating}
-                  />
+                {/* Mode toggle: Smart vs Free */}
+                <div className="flex gap-2 bg-gray-100 p-1 rounded-lg w-fit">
+                  <button
+                    type="button"
+                    onClick={() => setPromptMode('smart')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      promptMode === 'smart' ? 'bg-white shadow text-purple-700' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Sparkles size={14} className="inline mr-1.5 -mt-0.5" />
+                    Prompt Intelligent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPromptMode('free')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      promptMode === 'free' ? 'bg-white shadow text-purple-700' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <FileText size={14} className="inline mr-1.5 -mt-0.5" />
+                    Texte Libre
+                  </button>
                 </div>
 
+                {promptMode === 'smart' ? (
+                  <div className="space-y-5">
+                    {/* Animation Type Presets */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Type d'animation
+                      </label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {ANIMATION_PRESETS.map((preset) => (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() => setSelectedPreset(selectedPreset === preset.id ? null : preset.id)}
+                            disabled={aiGenerating}
+                            className={`p-3 rounded-lg border-2 text-left transition-all ${
+                              selectedPreset === preset.id
+                                ? 'border-purple-500 bg-purple-50 shadow-sm'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="text-xl mb-1">{preset.icon}</div>
+                            <div className="text-xs font-semibold text-gray-800">{preset.label}</div>
+                            <div className="text-[10px] text-gray-500 leading-tight mt-0.5">{preset.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Color Palette */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Palette de couleurs
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {COLOR_PALETTES.map((palette) => (
+                          <button
+                            key={palette.id}
+                            type="button"
+                            onClick={() => setSelectedPalette(selectedPalette === palette.id ? null : palette.id)}
+                            disabled={aiGenerating}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all ${
+                              selectedPalette === palette.id
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex gap-0.5">
+                              {palette.colors.map((c, i) => (
+                                <div key={i} className="w-4 h-4 rounded-full" style={{ background: c }} />
+                              ))}
+                            </div>
+                            <span className="text-xs font-medium text-gray-700">{palette.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Speed */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Vitesse
+                      </label>
+                      <div className="flex gap-2">
+                        {SPEED_OPTIONS.map((speed) => (
+                          <button
+                            key={speed.id}
+                            type="button"
+                            onClick={() => setSelectedSpeed(speed.id)}
+                            disabled={aiGenerating}
+                            className={`flex-1 px-4 py-2.5 rounded-lg border-2 text-center transition-all ${
+                              selectedSpeed === speed.id
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="text-sm font-medium text-gray-800">{speed.label}</div>
+                            <div className="text-[10px] text-gray-500">{speed.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Custom Text */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Texte a afficher (optionnel)
+                      </label>
+                      <input
+                        type="text"
+                        value={customText}
+                        onChange={(e) => setCustomText(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                        placeholder="Ex: Hello World, Site.On.Web, Votre texte..."
+                        disabled={aiGenerating}
+                      />
+                    </div>
+
+                    {/* Extra Details */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Details supplementaires (optionnel)
+                      </label>
+                      <textarea
+                        value={extraDetails}
+                        onChange={(e) => setExtraDetails(e.target.value)}
+                        className="w-full h-20 px-4 py-3 border border-gray-300 rounded-lg text-sm"
+                        placeholder="Precisions: ambiance spatiale, logo au centre, explosion a la fin..."
+                        disabled={aiGenerating}
+                      />
+                    </div>
+
+                    {/* Prompt Preview */}
+                    {(selectedPreset || customText || extraDetails) && (
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                        <div className="text-xs font-medium text-gray-500 mb-1.5">Prompt genere :</div>
+                        <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans">{buildSmartPrompt()}</pre>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Free text mode */
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Decrivez ce que vous voulez creer
+                    </label>
+                    <textarea
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg text-sm"
+                      placeholder="Exemple : Une animation neon avec le texte 'Hello World' sur fond sombre avec des particules..."
+                      disabled={aiGenerating}
+                    />
+                  </div>
+                )}
+
+                {/* Reference Image */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Image de reference (optionnel)
@@ -237,11 +453,12 @@ export default function CreateWizard() {
                   </div>
                 </div>
 
+                {/* Generate Button */}
                 <button
                   type="button"
                   onClick={handleAiGenerate}
-                  disabled={aiGenerating || !aiPrompt.trim() || !aiConfigured}
-                  className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  disabled={aiGenerating || !aiConfigured || (promptMode === 'smart' ? !selectedPreset : !aiPrompt.trim())}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base"
                 >
                   {aiGenerating ? (
                     <>
@@ -251,7 +468,7 @@ export default function CreateWizard() {
                   ) : (
                     <>
                       <Sparkles size={20} />
-                      Generer le code
+                      Generer l'animation
                     </>
                   )}
                 </button>

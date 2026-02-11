@@ -10,6 +10,7 @@ import libraryRouter from './routes/library.js'
 import settingsRouter from './routes/settings.js'
 import queueRouter from './routes/queue.js'
 import aiRouter from './routes/ai.js'
+import musicRouter from './routes/music.js'
 import JobScheduler from './scheduler.js'
 
 dotenv.config()
@@ -36,6 +37,7 @@ app.use('/api/library', libraryRouter)
 app.use('/api/settings', settingsRouter)
 app.use('/api/queue', queueRouter)
 app.use('/api/ai', aiRouter)
+app.use('/api/music', musicRouter)
 
 // Health check
 app.get('/api/health', (req, res) => {

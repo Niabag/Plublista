@@ -84,9 +84,9 @@ async function main() {
   await page.goto(fileUrl, { waitUntil: 'domcontentloaded' });
   console.log('Page loaded, recording started');
 
-  // Wait for the full video duration + 2s margin (matches previous OBS behavior)
-  const waitMs = (duration + 2) * 1000;
-  console.log(`Waiting ${duration + 2} seconds for content to play...`);
+  // Wait for the full video duration + 5s margin
+  const waitMs = (duration + 5) * 1000;
+  console.log(`Waiting ${duration + 5} seconds for content to play...`);
   await page.waitForTimeout(waitMs);
 
   console.log('Recording complete, closing browser...');

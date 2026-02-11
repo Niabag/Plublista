@@ -21,6 +21,10 @@ param(
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Force invariant culture for decimal separator (fix fr-FR locale using comma instead of dot)
+$volStr = $MusicVolume.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+Write-Host "  [DEBUG] MusicVolume raw: $MusicVolume, formatted: $volStr" -ForegroundColor Magenta
+
 # Add FFmpeg to PATH - check multiple locations
 $ffmpegPaths = @(
     "$PSScriptRoot\..\node_modules\ffmpeg-static",
@@ -148,13 +152,13 @@ if ($Music -and (Test-Path $Music)) {
 
     if ($hasAudio) {
         # Mix original audio with background music
-        $musicFilter = "[1:a]volume=${MusicVolume}[bgm];[0:a][bgm]amix=inputs=2:duration=first[aout]"
+        $musicFilter = "[1:a]volume=${volStr}[bgm];[0:a][bgm]amix=inputs=2:duration=first[aout]"
         $ffmpegArgs = @('-i', $step1, '-i', $Music, '-filter_complex', $musicFilter, '-map', '0:v', '-map', '[aout]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', $step2, '-y')
     } else {
-        # No audio in video - add music as the only audio track
+        # No audio in video - add music as the only audio track with volume control
         Write-Host "  No audio in recording - adding music as audio track" -ForegroundColor Yellow
-        $musicFilter = "[0:a]volume=${MusicVolume}"
-        $ffmpegArgs = @('-i', $step1, '-i', $Music, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', $step2, '-y')
+        $musicFilter = "[1:a]volume=${volStr}[bgm]"
+        $ffmpegArgs = @('-i', $step1, '-i', $Music, '-filter_complex', $musicFilter, '-map', '0:v', '-map', '[bgm]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', $step2, '-y')
     }
 
     Write-Host "  [DEBUG] Command: ffmpeg $($ffmpegArgs -join ' ')" -ForegroundColor DarkGray
@@ -193,16 +197,13 @@ if (-not (Test-Path $step2)) {
     exit 1
 }
 
-$loudnormFilter = 'loudnorm=I=-16:TP=-1.5:LRA=11'
-Write-Host "  Applying loudness normalization..." -ForegroundColor Cyan
+# Simple copy - no audio processing (music volume already set in step 2)
+Write-Host "  Copying final output..." -ForegroundColor Cyan
 
-# Build args array carefully
 $ffmpegArgs = @(
     '-i', $step2,
-    '-af', $loudnormFilter,
     '-c:v', 'copy',
-    '-c:a', 'aac',
-    '-b:a', '192k',
+    '-c:a', 'copy',
     $Out,
     '-y'
 )

@@ -59,6 +59,7 @@ router.get('/', async (req, res) => {
       igAccessToken: config.instagram.access_token,
       anthropicApiKey: config.ai?.anthropic_api_key || '',
       aiModel: config.ai?.model || 'claude-sonnet-4-20250514',
+      falApiKey: config.ai?.fal_api_key || '',
     })
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -89,6 +90,7 @@ router.put('/', async (req, res) => {
     if (!config.ai) config.ai = {}
     if (req.body.anthropicApiKey !== undefined) config.ai.anthropic_api_key = req.body.anthropicApiKey
     if (req.body.aiModel) config.ai.model = req.body.aiModel
+    if (req.body.falApiKey !== undefined) config.ai.fal_api_key = req.body.falApiKey
     
     await fs.writeFile(configPath, yaml.stringify(config), 'utf8')
     

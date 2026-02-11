@@ -43,7 +43,20 @@
       "Bash(timeout:*)",
       "Bash(\"C:\\\\Users\\\\Utilisateur\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\python.exe\" -c:*)",
       "Bash(npx playwright install:*)",
-      "Bash(node scripts/record_playwright.js:*)"
+      "Bash(node scripts/record_playwright.js:*)",
+      "Bash(npx concurrently:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd privacy policy and data deletion pages for Meta app review\n\nGitHub Pages legal pages required for Instagram Graph API app configuration.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(gh api:*)",
+      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" auth status)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c \"taskkill /f /pid 19400\")",
+      "Bash(cmd /c:*)",
+      "Bash(sort:*)",
+      "WebFetch(domain:fal.ai)",
+      "Bash(node --input-type=module -e:*)"
     ]
   }
 }

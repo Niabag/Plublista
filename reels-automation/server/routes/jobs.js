@@ -165,6 +165,7 @@ async function processJob(job) {
     
     addLog(job, '🎬 Lancement de l\'orchestrateur Python...')
     addLog(job, `⏱️  Durée vidéo: ${job.targetDuration || 17} secondes`)
+    addLog(job, `🎵 Musique: ${job.musicStyle || 'tech/energetic'}`)
     
     const { spawn } = await import('child_process')
     

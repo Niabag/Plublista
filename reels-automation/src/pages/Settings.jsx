@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Save, Upload, Trash2, Search, CheckCircle, XCircle, Loader2, Sparkles, Instagram, ExternalLink, Download } from 'lucide-react'
+import { Save, Upload, Trash2, CheckCircle, XCircle, Loader2, Sparkles, Instagram, Download, Music } from 'lucide-react'
 import Card, { CardHeader, CardContent, CardTitle } from '../components/Card'
 import Button from '../components/Button'
 
@@ -10,23 +10,17 @@ export default function Settings() {
     brandNameImageUrl: '',
     brandSlogan: '',
     brandColor: '#000000',
-    obsHost: '127.0.0.1',
-    obsPort: '4455',
-    obsPassword: '',
-    vscodePath: '',
-    chromePath: '',
     igUserId: '',
     igPageId: '',
     igAccessToken: '',
     anthropicApiKey: '',
     aiModel: 'claude-sonnet-4-20250514',
+    falApiKey: '',
   })
 
   const [saved, setSaved] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadingName, setUploadingName] = useState(false)
-  const [detecting, setDetecting] = useState(false)
-  const [obsStatus, setObsStatus] = useState(null)
   const [aiTesting, setAiTesting] = useState(false)
   const [aiTestResult, setAiTestResult] = useState(null)
   const [igFetching, setIgFetching] = useState(false)
@@ -107,27 +101,6 @@ export default function Settings() {
     } catch (error) {
       console.error('Failed to delete logo:', error)
     }
-  }
-
-  const handleDetect = async () => {
-    setDetecting(true)
-    setObsStatus(null)
-    try {
-      const response = await fetch('/api/settings/detect')
-      const data = await response.json()
-      setSettings(prev => ({
-        ...prev,
-        ...(data.vscodePath && { vscodePath: data.vscodePath }),
-        ...(data.chromePath && { chromePath: data.chromePath }),
-        ...(data.obsHost && { obsHost: data.obsHost }),
-        ...(data.obsPort && { obsPort: data.obsPort }),
-        ...(data.obsPassword && { obsPassword: data.obsPassword }),
-      }))
-      setObsStatus(data.obsStatus)
-    } catch (error) {
-      console.error('Failed to detect:', error)
-    }
-    setDetecting(false)
   }
 
   const handleSave = async () => {
@@ -271,104 +244,6 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* OBS + Paths - Auto-detect */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>OBS & Applications</CardTitle>
-            <button
-              type="button"
-              onClick={handleDetect}
-              disabled={detecting}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
-              {detecting ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-              {detecting ? 'Detection...' : 'Auto-detect'}
-            </button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* OBS WebSocket */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-800 mb-3">OBS WebSocket</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Host</label>
-                  <input
-                    type="text"
-                    value={settings.obsHost}
-                    onChange={(e) => setSettings({ ...settings, obsHost: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Port</label>
-                  <input
-                    type="text"
-                    value={settings.obsPort}
-                    onChange={(e) => setSettings({ ...settings, obsPort: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                </div>
-              </div>
-              <div className="mt-3">
-                <label className="block text-xs font-medium text-gray-500 mb-1">Password</label>
-                <input
-                  type="password"
-                  value={settings.obsPassword}
-                  onChange={(e) => setSettings({ ...settings, obsPassword: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-              {obsStatus && (
-                <div className={`mt-3 flex items-center gap-2 text-sm ${obsStatus === 'connected' ? 'text-green-600' : 'text-red-500'}`}>
-                  {obsStatus === 'connected' ? <CheckCircle size={16} /> : <XCircle size={16} />}
-                  {obsStatus === 'connected' ? 'OBS WebSocket connecte' : 'OBS non joignable (verifiez qu\'OBS est lance)'}
-                </div>
-              )}
-            </div>
-
-            {/* Application Paths */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-800 mb-3">Chemins applications</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">VS Code</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={settings.vscodePath}
-                      onChange={(e) => setSettings({ ...settings, vscodePath: e.target.value })}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-                      placeholder="Auto-detect ou saisir manuellement"
-                    />
-                    {settings.vscodePath && (
-                      <span className="flex items-center px-2 text-green-600"><CheckCircle size={18} /></span>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Chrome / Edge</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={settings.chromePath}
-                      onChange={(e) => setSettings({ ...settings, chromePath: e.target.value })}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-                      placeholder="Auto-detect ou saisir manuellement"
-                    />
-                    {settings.chromePath && (
-                      <span className="flex items-center px-2 text-green-600"><CheckCircle size={18} /></span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* AI Code Generation */}
       <Card>
         <CardHeader>
@@ -435,6 +310,45 @@ export default function Settings() {
                   {aiTestResult.message}
                 </div>
               )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Music Generation */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Music size={20} className="text-pink-500" />
+            <CardTitle>AI Music Generation</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Fal.ai API Key</label>
+              <input
+                type="password"
+                value={settings.falApiKey}
+                onChange={(e) => setSettings({ ...settings, falApiKey: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono"
+                placeholder="votre-cle-fal-ai..."
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Obtenez votre cle sur fal.ai/dashboard/keys
+              </p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-blue-900 mb-2">Comment obtenir votre cle ?</h4>
+              <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
+                <li>Allez sur <a href="https://fal.ai" target="_blank" rel="noopener noreferrer" className="underline font-medium">fal.ai</a> et creez un compte</li>
+                <li>Allez dans Dashboard &gt; Keys</li>
+                <li>Creez une nouvelle API Key</li>
+                <li>Collez-la ci-dessus et sauvegardez</li>
+              </ol>
+              <p className="text-xs text-blue-700 mt-2">
+                Generez ensuite vos musiques dans Library &gt; Music Tracks &gt; "Generer avec IA"
+              </p>
             </div>
           </div>
         </CardContent>
