@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Play, Download, Share2, ArrowLeft, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Play, Download, Share2, ArrowLeft, CheckCircle, XCircle, Clock, RotateCcw, Loader2, Zap, Sparkles } from 'lucide-react'
 import Card, { CardHeader, CardContent, CardTitle } from '../components/Card'
 import Button from '../components/Button'
 
@@ -19,6 +19,12 @@ export default function JobDetails() {
   const fetchJobDetails = async () => {
     try {
       const response = await fetch(`/api/jobs/${id}`)
+      if (!response.ok) {
+        if (response.status === 404) {
+          setJob({ status: 'lost', title: 'Job introuvable', timeline: [], logs: [] })
+        }
+        return
+      }
       const data = await response.json()
       setJob(data)
       setLogs(data.logs || [])
@@ -60,6 +66,20 @@ export default function JobDetails() {
     }
   }
 
+  const handleRetry = async () => {
+    try {
+      const response = await fetch(`/api/jobs/${id}/retry`, { method: 'POST' })
+      if (response.ok) {
+        fetchJobDetails()
+      } else {
+        const error = await response.json()
+        alert(`Erreur: ${error.error}`)
+      }
+    } catch (error) {
+      alert(`Erreur: ${error.message}`)
+    }
+  }
+
   if (!job) {
     return <div className="text-center py-12">Loading...</div>
   }
@@ -67,15 +87,21 @@ export default function JobDetails() {
   const getStepIcon = (status) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="text-green-500" size={20} />
+        return <CheckCircle className="text-green-400" size={22} />
       case 'failed':
-        return <XCircle className="text-red-500" size={20} />
+        return <XCircle className="text-red-500" size={22} />
       case 'running':
-        return <Clock className="text-blue-500 animate-spin" size={20} />
+        return <Loader2 className="text-blue-400 animate-spin" size={22} />
       default:
-        return <Clock className="text-gray-400" size={20} />
+        return <div className="w-[22px] h-[22px] rounded-full border-2 border-gray-600" />
     }
   }
+
+  const completedSteps = job?.timeline?.filter(s => s.status === 'completed').length || 0
+  const totalSteps = job?.timeline?.length || 1
+  const progressPercent = Math.round((completedSteps / totalSteps) * 100)
+  const isProcessing = job?.status === 'processing'
+  const runningStepIndex = job?.timeline?.findIndex(s => s.status === 'running') ?? -1
 
   return (
     <div className="space-y-6">
@@ -85,7 +111,15 @@ export default function JobDetails() {
           <ArrowLeft size={16} className="mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
+          {job.status === 'failed' && (
+            <Button onClick={handleRetry}>
+              <RotateCcw size={16} className="mr-2" />
+              Relancer
+            </Button>
+          )}
+        </div>
         <p className="text-gray-500 mt-1">
           Created {new Date(job.createdAt).toLocaleString()}
         </p>
@@ -127,26 +161,127 @@ export default function JobDetails() {
           )}
 
           {/* Timeline */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Processing Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {job.timeline?.map((step, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="mt-1">{getStepIcon(step.status)}</div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{step.name}</h4>
-                      <p className="text-sm text-gray-500">
-                        {step.duration ? `${step.duration}s` : 'In progress...'}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-gray-900 to-gray-800 text-white pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {isProcessing && <Zap size={20} className="text-yellow-400 animate-pulse" />}
+                  <CardTitle className="text-white">
+                    {job.status === 'completed' ? 'Pipeline terminé' : job.status === 'failed' ? 'Pipeline échoué' : isProcessing ? 'Pipeline en cours...' : 'Pipeline'}
+                  </CardTitle>
+                </div>
+                <span className="text-2xl font-bold text-white tabular-nums">
+                  {progressPercent}%
+                </span>
               </div>
+              {/* Progress bar */}
+              <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                    job.status === 'failed' ? 'bg-red-500' :
+                    progressPercent === 100 ? 'bg-green-400' :
+                    'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'
+                  }`}
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              {isProcessing && runningStepIndex >= 0 && (
+                <p className="mt-2 text-sm text-gray-300 flex items-center gap-1.5">
+                  <Loader2 size={14} className="animate-spin" />
+                  {job.timeline[runningStepIndex].name}...
+                </p>
+              )}
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="relative">
+                {job.timeline?.map((step, index) => {
+                  const isRunning = step.status === 'running'
+                  const isCompleted = step.status === 'completed'
+                  const isFailed = step.status === 'failed'
+                  const isPending = !isRunning && !isCompleted && !isFailed
+                  const isLast = index === job.timeline.length - 1
+
+                  return (
+                    <div
+                      key={index}
+                      className={`relative flex items-center gap-4 px-5 py-3.5 transition-all duration-500 ${
+                        isRunning ? 'bg-blue-50 border-l-4 border-l-blue-500' :
+                        isCompleted ? 'bg-white border-l-4 border-l-green-400' :
+                        isFailed ? 'bg-red-50 border-l-4 border-l-red-500' :
+                        'bg-gray-50 border-l-4 border-l-gray-200'
+                      } ${!isLast ? 'border-b border-gray-100' : ''}`}
+                    >
+                      {/* Icon */}
+                      <div className={`relative z-10 flex-shrink-0 ${isRunning ? 'scale-110' : ''} transition-transform duration-300`}>
+                        {getStepIcon(step.status)}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h4 className={`font-semibold text-sm ${
+                            isRunning ? 'text-blue-700' :
+                            isCompleted ? 'text-gray-800' :
+                            isFailed ? 'text-red-700' :
+                            'text-gray-400'
+                          }`}>
+                            {step.name}
+                          </h4>
+                          {isCompleted && step.duration > 0 && (
+                            <span className="text-xs font-mono text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                              {step.duration}s
+                            </span>
+                          )}
+                          {isFailed && (
+                            <span className="text-xs font-mono text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                              échoué
+                            </span>
+                          )}
+                        </div>
+                        {isRunning && (
+                          <div className="mt-1.5">
+                            <div className="h-1.5 bg-blue-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full animate-timeline-progress" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Step number */}
+                      <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        isCompleted ? 'bg-green-100 text-green-600' :
+                        isRunning ? 'bg-blue-100 text-blue-600' :
+                        isFailed ? 'bg-red-100 text-red-600' :
+                        'bg-gray-100 text-gray-400'
+                      }`}>
+                        {index + 1}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Footer */}
+              {job.status === 'completed' && (
+                <div className="px-5 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-t border-green-100 flex items-center gap-2">
+                  <Sparkles size={16} className="text-green-500" />
+                  <span className="text-sm font-medium text-green-700">Vidéo prête !</span>
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* CSS for progress animation */}
+          <style>{`
+            @keyframes timeline-progress {
+              0% { width: 5%; }
+              50% { width: 80%; }
+              100% { width: 5%; }
+            }
+            .animate-timeline-progress {
+              animation: timeline-progress 2s ease-in-out infinite;
+            }
+          `}</style>
         </div>
 
         {/* Sidebar */}

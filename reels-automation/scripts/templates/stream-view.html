@@ -29,7 +29,7 @@
     .header {
       background: #000000;
       padding: 12px 20px;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       gap: 12px;
@@ -41,17 +41,10 @@
     }
 
     .header-logo {
-      width: 32px;
-      height: 32px;
-      background: #ff4444;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      font-weight: bold;
-      color: white;
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      object-fit: contain;
     }
 
     .header-brand {
@@ -249,29 +242,226 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
+
+    /* ===== Brand Scene (scène après résultat) ===== */
+    .brand-scene {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .brand-scene.active { display: flex; opacity: 1; pointer-events: auto; }
+
+    .brand-scene .scene-logo {
+      width: 380px; height: 380px;
+      border-radius: 30px;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    .brand-scene.active .scene-logo {
+      animation: sceneScaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .brand-scene .scene-brand-name {
+      max-width: 640px;
+      height: auto;
+      object-fit: contain;
+      margin-top: 20px;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .brand-scene.active .scene-brand-name {
+      animation: sceneSlideUp 0.6s ease 0.3s forwards;
+    }
+
+    .brand-scene .scene-slogan {
+      font-size: 24px;
+      color: #999;
+      margin-top: 14px;
+      letter-spacing: 1.5px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .brand-scene.active .scene-slogan {
+      animation: sceneSlideUp 0.5s ease 0.5s forwards;
+    }
+
+    .brand-scene .services-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-top: 30px;
+      max-width: 600px;
+    }
+    .brand-scene .service-btn {
+      background: #cc0000;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .brand-scene.active .service-btn:nth-child(1) { animation: sceneSlideUp 0.4s ease 0.7s forwards; }
+    .brand-scene.active .service-btn:nth-child(2) { animation: sceneSlideUp 0.4s ease 0.85s forwards; }
+    .brand-scene.active .service-btn:nth-child(3) { animation: sceneSlideUp 0.4s ease 1.0s forwards; }
+    .brand-scene.active .service-btn:nth-child(4) { animation: sceneSlideUp 0.4s ease 1.15s forwards; }
+    .brand-scene.active .service-btn:nth-child(5) { animation: sceneSlideUp 0.4s ease 1.3s forwards; }
+
+    /* ===== CTA Scene (dernière scène) ===== */
+    .cta-scene {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .cta-scene.active { display: flex; opacity: 1; pointer-events: auto; }
+
+    .cta-scene .scene-logo {
+      width: 380px; height: 380px;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    .cta-scene.active .scene-logo {
+      animation: sceneScaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .cta-scene .scene-brand-name {
+      max-width: 400px;
+      height: auto;
+      object-fit: contain;
+      margin-top: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .cta-scene.active .scene-brand-name {
+      animation: sceneSlideUp 0.5s ease 0.2s forwards;
+    }
+
+    .cta-scene .cta-text {
+      font-size: 36px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      margin-top: 30px;
+      max-width: 500px;
+      line-height: 1.3;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .cta-scene.active .cta-text {
+      animation: sceneSlideUp 0.6s ease 0.5s forwards;
+    }
+
+    .cta-scene .cta-button {
+      display: inline-block;
+      background: #cc0000;
+      color: white;
+      padding: 18px 56px;
+      border-radius: 35px;
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 30px;
+      opacity: 0;
+      transform: translateY(30px) scale(0.8);
+    }
+    .cta-scene.active .cta-button {
+      animation: ctaButtonIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s forwards;
+    }
+    .cta-scene .cta-button.blinking {
+      animation: ctaBlink 0.8s ease-in-out infinite !important;
+      opacity: 1 !important;
+      transform: translateY(0) scale(1) !important;
+    }
+
+    @keyframes sceneScaleIn {
+      from { opacity: 0; transform: scale(0.3); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes sceneSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes ctaButtonIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.8); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes ctaBlink {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(204, 0, 0, 0.5);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(1.05);
+        box-shadow: 0 0 35px rgba(204, 0, 0, 0.9);
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="header-logo">&lt;/&gt;</div>
-    <span class="header-brand">SiteOnweb.fr</span>
+    <img class="header-logo" src="{{LOGO_DATA_URL}}" alt="Logo">
+    <img class="header-brand" src="{{BRAND_NAME_DATA_URL}}" alt="Brand" style="height: 120px; object-fit: contain;">
   </div>
 
   <!-- Intro Screen -->
   <div id="start-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
     <div style="text-align: center;">
       <!-- Logo -->
-      <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff4757, #ff6348); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; box-shadow: 0 10px 40px rgba(255, 71, 87, 0.4);">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="16 18 22 12 16 6"></polyline>
-          <polyline points="8 6 2 12 8 18"></polyline>
-        </svg>
-      </div>
-      <!-- Site Name -->
-      <h1 style="font-size: 42px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -1px;">SiteOnweb.fr</h1>
+      <img src="{{LOGO_DATA_URL}}" alt="Logo" style="width: 250px; height: 250px; border-radius: 30px; object-fit: contain; margin: 0 auto 30px; display: block;">
+      <!-- Brand Name -->
+      <img src="{{BRAND_NAME_DATA_URL}}" alt="Brand" style="max-width: 400px; height: auto; object-fit: contain; display: block; margin: 0 auto;">
+      <!-- Slogan -->
+      <p style="font-size: 20px; font-weight: 400; color: #aaa; margin-top: 16px; letter-spacing: 1px;">{{SLOGAN}}</p>
       <!-- Custom Intro Title (dynamic) -->
       <p id="intro-custom-title" style="font-size: 24px; font-weight: 600; color: #ff6348; margin-top: 20px; opacity: 0.9;"></p>
     </div>
+  </div>
+
+  <!-- Brand Scene (après résultat) -->
+  <div id="brand-scene" class="brand-scene">
+    <img class="scene-logo" src="{{LOGO_DATA_URL}}" alt="Logo">
+    <img class="scene-brand-name" src="{{BRAND_NAME_DATA_URL}}" alt="Brand">
+    <p class="scene-slogan">Agence Web et Marketing Digital</p>
+    <div class="services-row">
+      <span class="service-btn">Sites Web</span>
+      <span class="service-btn">Marketing Digital</span>
+      <span class="service-btn">SEO / SEA</span>
+      <span class="service-btn">Réseaux Sociaux</span>
+      <span class="service-btn">E-commerce</span>
+    </div>
+  </div>
+
+  <!-- CTA Scene (dernière scène) -->
+  <div id="cta-scene" class="cta-scene">
+    <img class="scene-logo" src="{{LOGO_DATA_URL}}" alt="Logo">
+    <img class="scene-brand-name" src="{{BRAND_NAME_DATA_URL}}" alt="Brand">
+    <p class="cta-text">Développez votre business en ligne</p>
+    <span class="cta-button" id="cta-btn">siteonweb.fr</span>
   </div>
 
   <div class="container">
@@ -333,12 +523,11 @@
     
     // Durées fixes
     const introDuration = 5;           // 5 secondes d'écran intro (OBS démarre avec 3s de délai, donc 2s visible)
-    const finalDisplayDuration = 0;    // 0 seconde d'affichage final (code jusqu'à la fin)
+    const finalDisplayDuration = 8;    // 8 secondes pour les scènes finales (brand + CTA)
     
     // Calculer la durée de typing disponible
-    // Le code s'écrit jusqu'à la fin de la vidéo
-    // Donc: typingDuration = totalDuration - intro
-    // Exemple: 45s total = 5s intro + 40s code + 0s final
+    // typingDuration = totalDuration - intro - finalScenes
+    // Exemple: 45s total = 5s intro + 32s code + 8s scènes finales (résultat + brand + CTA)
     const typingDuration = targetVideoDuration - introDuration - finalDisplayDuration;
     
     console.log('=== TIMING CONFIGURATION ===');
@@ -492,6 +681,9 @@
           console.error('❌ Overlay not found!');
         }
         
+        // Afficher le header pour la phase de code
+        document.querySelector('.header').style.display = 'flex';
+
         // Start typing
         console.log('✅ Calling startTypingAnimation()...');
         startTypingAnimation();
@@ -558,6 +750,27 @@
       console.log('Transition vers plein écran du résultat...');
       const container = document.querySelector('.container');
       container.classList.add('fullscreen-result');
+
+      // Cacher le header pour les scènes finales
+      document.querySelector('.header').style.display = 'none';
+
+      // Après 2s : afficher la scène Brand
+      setTimeout(() => {
+        console.log('🎨 Showing brand scene...');
+        document.getElementById('brand-scene').classList.add('active');
+      }, 2000);
+
+      // Après 5.5s : afficher la scène CTA
+      setTimeout(() => {
+        console.log('📢 Showing CTA scene...');
+        document.getElementById('cta-scene').classList.add('active');
+      }, 5500);
+
+      // Après 7s : démarrer le clignotement du bouton CTA
+      setTimeout(() => {
+        console.log('✨ CTA button blinking...');
+        document.getElementById('cta-btn').classList.add('blinking');
+      }, 7000);
     }
 
     function updateDisplay() {

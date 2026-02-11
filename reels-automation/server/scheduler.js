@@ -28,7 +28,8 @@ class JobScheduler {
     try {
       // Fetch all scheduled jobs from API
       const response = await fetch('http://localhost:3000/api/jobs/scheduled')
-      const jobs = await response.json()
+      const data = await response.json()
+      const jobs = Array.isArray(data) ? data : []
 
       const now = new Date()
 

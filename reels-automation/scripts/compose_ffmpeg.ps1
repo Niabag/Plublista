@@ -4,12 +4,16 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$In,
-    
+
     [Parameter(Mandatory=$true)]
     [string]$Out,
-    
+
     [int]$Duration = 0,
-    
+
+    [string]$Music = "",
+
+    [double]$MusicVolume = 0.15,
+
     [string]$ConfigPath = "..\config.yaml"
 )
 
@@ -17,10 +21,17 @@ param(
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# Add FFmpeg to PATH if installed via WinGet
-$ffmpegPath = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-full_build\bin"
-if (Test-Path $ffmpegPath) {
-    $env:Path = $env:Path + ";" + $ffmpegPath
+# Add FFmpeg to PATH - check multiple locations
+$ffmpegPaths = @(
+    "$PSScriptRoot\..\node_modules\ffmpeg-static",
+    "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-full_build\bin",
+    "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0.1-full_build\bin"
+)
+foreach ($fp in $ffmpegPaths) {
+    if (Test-Path "$fp\ffmpeg.exe") {
+        $env:Path = $env:Path + ";" + $fp
+        break
+    }
 }
 
 Write-Host "Starting video composition..." -ForegroundColor Cyan
@@ -54,78 +65,119 @@ if (-not (Test-Path $outDir)) {
     New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 }
 
-# Step 0: Convert to portrait format (9:16 for Instagram Reels)
+# Step 0: Check if portrait conversion needed (skip if already 1080x1920)
 Write-Host ""
-Write-Host "Step 0: Converting to portrait format (1080x1920)..." -ForegroundColor Yellow
+Write-Host "Step 0: Checking video format..." -ForegroundColor Yellow
 $step0 = "$outDir\step0_portrait.mp4"
 
-Write-Host "  [DEBUG] Input: $In" -ForegroundColor Magenta
-Write-Host "  [DEBUG] Output: $step0" -ForegroundColor Magenta
-Write-Host "  [DEBUG] Target format: 1080x1920 (9:16)" -ForegroundColor Magenta
+# Detect input resolution
+$inputWidth = 0
+$inputHeight = 0
+try {
+    $probeOutput = & ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 $In 2>&1
+    if ($probeOutput -match '(\d+),(\d+)') {
+        $inputWidth = [int]$Matches[1]
+        $inputHeight = [int]$Matches[2]
+    }
+} catch {}
 
-# Crop to 9:16 aspect ratio (center crop)
-# This takes the center part of the video and crops it to portrait
-$portraitFilter = 'crop=ih*9/16:ih,scale=1080:1920'
-$ffmpegArgs = @('-i', $In)
+Write-Host "  Input resolution: ${inputWidth}x${inputHeight}" -ForegroundColor Cyan
 
-# Add duration cut if specified
-if ($Duration -gt 0) {
-    Write-Host "  [DEBUG] Cutting video to exactly $Duration seconds" -ForegroundColor Cyan
-    $ffmpegArgs += @('-t', $Duration.ToString())
-}
+$needsPortraitCrop = ($inputWidth -gt $inputHeight)
+if ($needsPortraitCrop) {
+    Write-Host "  Landscape detected - cropping to portrait 1080x1920..." -ForegroundColor Yellow
+    $portraitFilter = 'crop=ih*9/16:ih,scale=1080:1920'
+    $ffmpegArgs = @('-i', $In)
 
-$ffmpegArgs += @('-vf', $portraitFilter, '-c:v', 'libx264', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', $step0, '-y')
+    if ($Duration -gt 0) {
+        Write-Host "  Cutting video to $Duration seconds" -ForegroundColor Cyan
+        $ffmpegArgs += @('-t', $Duration.ToString())
+    }
 
-Write-Host "  [DEBUG] Command: ffmpeg $($ffmpegArgs -join ' ')" -ForegroundColor DarkGray
-$output = & ffmpeg @ffmpegArgs 2>&1
-
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "  Portrait format applied successfully" -ForegroundColor Green
-    $currentInput = $step0
-} else {
-    Write-Host "  WARNING: Portrait conversion failed, using original" -ForegroundColor Yellow
-    Write-Host "  FFmpeg exit code: $LASTEXITCODE" -ForegroundColor Yellow
-    $currentInput = $In
-}
-
-# Step 1: Add brand overlay
-Write-Host ""
-Write-Host "Step 1: Adding brand overlay..." -ForegroundColor Yellow
-$step1 = "$outDir\step1_brand.mp4"
-
-Write-Host "  [DEBUG] Input: $currentInput" -ForegroundColor Magenta
-Write-Host "  [DEBUG] Logo: $brandLogo" -ForegroundColor Magenta
-Write-Host "  [DEBUG] Output: $step1" -ForegroundColor Magenta
-
-if (Test-Path $brandLogo) {
-    Write-Host "  Adding brand logo overlay..." -ForegroundColor Cyan
-    # No scaling needed, video is already 1080 width from step 0
-    $filterComplex = '[0:v][1:v]overlay=16:16:format=auto'
-    $ffmpegArgs = @('-i', $currentInput, '-i', $brandLogo, '-filter_complex', $filterComplex, '-map', '[v]', '-map', '0:a', '-c:v', 'libx264', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '160k', $step1, '-y')
-    
-    Write-Host "  [DEBUG] Command: ffmpeg $($ffmpegArgs -join ' ')" -ForegroundColor DarkGray
+    $ffmpegArgs += @('-vf', $portraitFilter, '-c:v', 'libx264', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-c:a', 'copy', $step0, '-y')
     $output = & ffmpeg @ffmpegArgs 2>&1
-    
+
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "  Brand overlay added successfully" -ForegroundColor Green
+        Write-Host "  Portrait crop applied" -ForegroundColor Green
+        $currentInput = $step0
     } else {
-        Write-Host "  WARNING: Brand overlay failed, continuing without it" -ForegroundColor Yellow
-        Write-Host "  FFmpeg exit code: $LASTEXITCODE" -ForegroundColor Yellow
-        $step1 = $currentInput
+        Write-Host "  WARNING: Portrait conversion failed, using original" -ForegroundColor Yellow
+        $currentInput = $In
     }
 } else {
-    Write-Host "  Logo not found at: $brandLogo" -ForegroundColor Yellow
-    Write-Host "  Continuing without brand overlay" -ForegroundColor Yellow
-    $step1 = $currentInput
+    Write-Host "  Already portrait format - skipping crop" -ForegroundColor Green
+
+    # Still apply duration cut if needed
+    if ($Duration -gt 0) {
+        Write-Host "  Cutting video to $Duration seconds" -ForegroundColor Cyan
+        $ffmpegArgs = @('-i', $In, '-t', $Duration.ToString(), '-c:v', 'copy', '-c:a', 'copy', $step0, '-y')
+        $output = & ffmpeg @ffmpegArgs 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $currentInput = $step0
+        } else {
+            $currentInput = $In
+        }
+    } else {
+        $currentInput = $In
+    }
 }
 
-# Step 2: Skip music (now played live in Stream View and captured by OBS)
+# Step 1: Brand overlay (disabled - branding is now handled by HTML scenes)
+Write-Host ""
+Write-Host "Step 1: Brand overlay skipped (handled by stream-view scenes)" -ForegroundColor Yellow
+$step1 = $currentInput
+
+# Step 2: Add background music via FFmpeg
 Write-Host ""
 Write-Host "Step 2: Background music..." -ForegroundColor Yellow
-Write-Host "  Music is now played LIVE in the Stream View window" -ForegroundColor Cyan
-Write-Host "  OBS captures the audio directly during recording" -ForegroundColor Cyan
-Write-Host "  No post-processing needed for music" -ForegroundColor Green
-$step2 = $step1
+
+if ($Music -and (Test-Path $Music)) {
+    Write-Host "  Music file: $Music" -ForegroundColor Cyan
+    Write-Host "  Volume: $MusicVolume" -ForegroundColor Cyan
+    $step2 = "$outDir\step2_music.mp4"
+
+    # Check if input video has an audio stream
+    $hasAudio = $false
+    try {
+        $audioProbe = & ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of csv=p=0 $step1 2>&1
+        if ($audioProbe -match 'audio') {
+            $hasAudio = $true
+            Write-Host "  Input has audio track - will mix with music" -ForegroundColor Cyan
+        }
+    } catch {}
+
+    if ($hasAudio) {
+        # Mix original audio with background music
+        $musicFilter = "[1:a]volume=${MusicVolume}[bgm];[0:a][bgm]amix=inputs=2:duration=first[aout]"
+        $ffmpegArgs = @('-i', $step1, '-i', $Music, '-filter_complex', $musicFilter, '-map', '0:v', '-map', '[aout]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', $step2, '-y')
+    } else {
+        # No audio in video - add music as the only audio track
+        Write-Host "  No audio in recording - adding music as audio track" -ForegroundColor Yellow
+        $musicFilter = "[0:a]volume=${MusicVolume}"
+        $ffmpegArgs = @('-i', $step1, '-i', $Music, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', $step2, '-y')
+    }
+
+    Write-Host "  [DEBUG] Command: ffmpeg $($ffmpegArgs -join ' ')" -ForegroundColor DarkGray
+    $output = & ffmpeg @ffmpegArgs 2>&1
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  Background music added successfully" -ForegroundColor Green
+    } else {
+        Write-Host "  WARNING: Music mixing failed, continuing without music" -ForegroundColor Yellow
+        if ($output) {
+            $errorLines = $output | Select-Object -Last 5
+            $errorLines | ForEach-Object { Write-Host "    $_" -ForegroundColor Gray }
+        }
+        $step2 = $step1
+    }
+} else {
+    if ($Music) {
+        Write-Host "  WARNING: Music file not found: $Music" -ForegroundColor Yellow
+    } else {
+        Write-Host "  No music file specified" -ForegroundColor Yellow
+    }
+    $step2 = $step1
+}
 
 # Step 3: Normalize loudness for Instagram
 Write-Host ""

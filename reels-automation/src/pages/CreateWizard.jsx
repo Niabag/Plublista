@@ -1,25 +1,96 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Upload, Code, FileText, CheckCircle } from 'lucide-react'
+import { Upload, Code, FileText, CheckCircle, Sparkles, Loader2, ImageIcon, Eye, EyeOff } from 'lucide-react'
 import Card, { CardHeader, CardContent, CardTitle } from '../components/Card'
 import Button from '../components/Button'
 
 export default function CreateWizard() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
+  const [musicTracks, setMusicTracks] = useState([])
+
+  useEffect(() => {
+    fetch('/api/library/music')
+      .then(res => res.json())
+      .then(data => setMusicTracks(data))
+      .catch(err => console.error('Failed to load music:', err))
+  }, [])
+
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [aiReferenceImage, setAiReferenceImage] = useState(null)
+  const [aiImagePreview, setAiImagePreview] = useState(null)
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiConfigured, setAiConfigured] = useState(false)
+  const [showPreview, setShowPreview] = useState(true)
+  const previewRef = useRef(null)
+  const aiFileInputRef = useRef(null)
+
+  useEffect(() => {
+    fetch('/api/ai/status')
+      .then(res => res.json())
+      .then(data => setAiConfigured(data.configured))
+      .catch(() => setAiConfigured(false))
+  }, [])
+
+  const handleAiImageSelect = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setAiReferenceImage(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setAiImagePreview(ev.target.result)
+    reader.readAsDataURL(file)
+  }
+
+  const handleAiGenerate = async () => {
+    setAiGenerating(true)
+    setAiError('')
+    try {
+      const body = new FormData()
+      body.append('prompt', aiPrompt)
+      if (aiReferenceImage) {
+        body.append('referenceImage', aiReferenceImage)
+      }
+      const response = await fetch('/api/ai/generate', { method: 'POST', body })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Generation failed')
+      setFormData(prev => ({
+        ...prev,
+        code: data.code,
+        title: data.title || prev.title,
+        introTitle: data.introTitle || prev.introTitle,
+        hashtags: data.hashtags || prev.hashtags,
+      }))
+    } catch (error) {
+      setAiError(error.message)
+    } finally {
+      setAiGenerating(false)
+    }
+  }
+
   const [formData, setFormData] = useState({
     inputMode: 'paste',
     code: '',
     title: '',
     introTitle: '',
     hashtags: '',
-    musicStyle: 'tech/energetic',
+    musicStyle: '/assets/music/tech-energy.mp3',
     targetDuration: 45,
     brandOverlay: true,
     scheduleEnabled: false,
     scheduleDate: '',
     scheduleTime: '',
   })
+
+  const previewUrl = useMemo(() => {
+    if (!formData.code) return null
+    const blob = new Blob([formData.code], { type: 'text/html' })
+    return URL.createObjectURL(blob)
+  }, [formData.code])
+
+  useEffect(() => {
+    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl) }
+  }, [previewUrl])
 
   const handleSubmit = async () => {
     try {
@@ -42,11 +113,12 @@ export default function CreateWizard() {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Input Mode</label>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 {[
                   { value: 'paste', icon: FileText, label: 'Paste Code' },
                   { value: 'upload', icon: Upload, label: 'Upload File' },
                   { value: 'library', icon: Code, label: 'From Library' },
+                  { value: 'generate', icon: Sparkles, label: 'AI Generate' },
                 ].map((mode) => {
                   const Icon = mode.icon
                   return (
@@ -68,14 +140,165 @@ export default function CreateWizard() {
             </div>
 
             {formData.inputMode === 'paste' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Code Snippet</label>
-                <textarea
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm"
-                  placeholder="Paste your code here..."
-                />
+              <div className="space-y-3">
+                {formData.code && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">Apercu</label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPreview(!showPreview)}
+                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        {showPreview ? <EyeOff size={14} /> : <Eye size={14} />}
+                        {showPreview ? 'Masquer' : 'Afficher'}
+                      </button>
+                    </div>
+                    {showPreview && (
+                      <div className="border border-gray-300 rounded-lg overflow-hidden bg-black relative" style={{ width: 225, height: 400 }}>
+                        <iframe
+                          src={previewUrl}
+                          title="Preview"
+                          sandbox="allow-scripts allow-same-origin"
+                          style={{ width: '1080px', height: '1920px', transform: 'scale(0.2083)', transformOrigin: 'top left', position: 'absolute', top: 0, left: 0, border: 'none' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Code Snippet</label>
+                  <textarea
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm"
+                    placeholder="Paste your code here..."
+                  />
+                </div>
+              </div>
+            )}
+
+            {formData.inputMode === 'generate' && (
+              <div className="space-y-4">
+                {!aiConfigured && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="text-sm text-amber-800">
+                      Cle API Anthropic non configuree. Allez dans Settings pour ajouter votre cle.
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Decrivez ce que vous voulez creer
+                  </label>
+                  <textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg text-sm"
+                    placeholder="Exemple : Une animation neon avec le texte 'Hello World' sur fond sombre avec des particules..."
+                    disabled={aiGenerating}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Image de reference (optionnel)
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      ref={aiFileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/gif,image/webp"
+                      onChange={handleAiImageSelect}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => aiFileInputRef.current?.click()}
+                      disabled={aiGenerating}
+                      className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors text-sm text-gray-600"
+                    >
+                      <ImageIcon size={18} />
+                      {aiReferenceImage ? aiReferenceImage.name : 'Choisir une image'}
+                    </button>
+                    {aiImagePreview && (
+                      <div className="relative">
+                        <img src={aiImagePreview} alt="Reference" className="h-16 w-16 object-cover rounded-lg border" />
+                        <button
+                          type="button"
+                          onClick={() => { setAiReferenceImage(null); setAiImagePreview(null) }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                        >
+                          x
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAiGenerate}
+                  disabled={aiGenerating || !aiPrompt.trim() || !aiConfigured}
+                  className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                >
+                  {aiGenerating ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Generation en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={20} />
+                      Generer le code
+                    </>
+                  )}
+                </button>
+
+                {aiError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm text-red-800">{aiError}</p>
+                  </div>
+                )}
+
+                {formData.code && (
+                  <>
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-700">Apercu du rendu</label>
+                        <button
+                          type="button"
+                          onClick={() => setShowPreview(!showPreview)}
+                          className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+                        >
+                          {showPreview ? <EyeOff size={14} /> : <Eye size={14} />}
+                          {showPreview ? 'Masquer' : 'Afficher'}
+                        </button>
+                      </div>
+                      {showPreview && (
+                        <div className="border border-gray-300 rounded-lg overflow-hidden bg-black relative" style={{ width: 225, height: 400 }}>
+                          <iframe
+                            srcDoc={formData.code}
+                            title="Preview"
+                            sandbox="allow-scripts allow-same-origin"
+                            style={{ width: '1080px', height: '1920px', transform: 'scale(0.2083)', transformOrigin: 'top left', position: 'absolute', top: 0, left: 0, border: 'none' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Code genere (modifiable)
+                      </label>
+                      <textarea
+                        value={formData.code}
+                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                        className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -123,9 +346,20 @@ export default function CreateWizard() {
                   onChange={(e) => setFormData({ ...formData, musicStyle: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="tech/energetic">Tech/Energetic</option>
-                  <option value="chill">Chill</option>
-                  <option value="upbeat">Upbeat</option>
+                  {Object.entries(
+                    musicTracks.reduce((acc, t) => {
+                      ;(acc[t.mood] = acc[t.mood] || []).push(t)
+                      return acc
+                    }, {})
+                  ).map(([mood, tracks]) => (
+                    <optgroup key={mood} label={mood}>
+                      {tracks.map((t) => (
+                        <option key={t.id} value={t.url}>
+                          {t.title} ({t.bpm} BPM)
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </div>
               <div>

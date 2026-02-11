@@ -9,6 +9,7 @@ import jobsRouter from './routes/jobs.js'
 import libraryRouter from './routes/library.js'
 import settingsRouter from './routes/settings.js'
 import queueRouter from './routes/queue.js'
+import aiRouter from './routes/ai.js'
 import JobScheduler from './scheduler.js'
 
 dotenv.config()
@@ -27,12 +28,14 @@ app.use(express.urlencoded({ extended: true }))
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 app.use('/out', express.static(path.join(__dirname, '../out')))
+app.use('/assets', express.static(path.join(__dirname, '../assets')))
 
 // Routes
 app.use('/api/jobs', jobsRouter)
 app.use('/api/library', libraryRouter)
 app.use('/api/settings', settingsRouter)
 app.use('/api/queue', queueRouter)
+app.use('/api/ai', aiRouter)
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -99,6 +99,7 @@ if __name__ == "__main__":
     parser.add_argument('--music-style', default='tech/energetic', help='Music style')
     parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
     parser.add_argument('--intro-title', default='', help='Custom title to display in the intro screen')
+    parser.add_argument('--generate-only', action='store_true', help='Generate HTML file only, do not launch Chrome')
     args = parser.parse_args()
     
     file_path = Path(args.file_path).resolve()  # Convert to absolute path
@@ -137,20 +138,24 @@ if __name__ == "__main__":
     file_url_json = json.dumps(file_path.as_uri())
     filename_json = json.dumps(file_path.name)
     
-    # Map music styles to filenames
-    music_style_map = {
-        'tech/energetic': 'tech-energy.mp3',
-        'chill': 'chill-vibes.mp3',
-        'ambient': 'ambient-tech.mp3',
-        'upbeat': 'upbeat-coding.mp3'
-    }
+    # Resolve music filename from style argument
+    # Accept: URL path ("/assets/music/file.mp3"), filename ("file.mp3"), or legacy style name
+    if music_style.endswith('.mp3'):
+        # Direct filename or URL path like "/assets/music/cosmic-debug.mp3"
+        music_filename = Path(music_style).name
+    else:
+        # Legacy style name mapping
+        music_style_map = {
+            'tech/energetic': 'tech-energy.mp3',
+            'chill': 'chill-coding.mp3',
+            'ambient': 'zen-code.mp3',
+            'upbeat': 'upbeat-tutorial.mp3'
+        }
+        music_filename = music_style_map.get(music_style, 'tech-energy.mp3')
     
-    # Get music filename from style, default to tech-energy.mp3
-    music_filename = music_style_map.get(music_style, 'tech-energy.mp3')
-    
-    # Use direct file:// URL for music (works in Chrome app mode with --allow-file-access-from-files)
+    # Resolve music file path
     music_path = Path(__file__).parent.parent / "assets" / "music" / music_filename
-    
+
     # Fallback to tech-energy.mp3 if requested file doesn't exist
     if not music_path.exists():
         print(f"Warning: Music file not found: {music_filename}")
@@ -158,17 +163,14 @@ if __name__ == "__main__":
         if fallback_path.exists():
             print(f"Using fallback music: tech-energy.mp3")
             music_path = fallback_path
-    
+
     music_data_url = ""
-    
+
     if music_path.exists():
-        try:
-            # Convert to file:// URL
-            music_data_url = music_path.as_uri()
-            print(f"Music URL: {music_data_url}")
-            print(f"Music file: {music_path.name} ({music_path.stat().st_size/1024:.1f} KB)")
-        except Exception as e:
-            print(f"Warning: Could not load music: {e}")
+        # Use HTTP URL served by Express server (works in both Chrome and OBS browser_source)
+        music_data_url = f"http://localhost:3000/assets/music/{music_path.name}"
+        print(f"Music: {music_path.name} ({music_path.stat().st_size/1024:.1f} KB)")
+        print(f"Music URL: {music_data_url}")
     else:
         print(f"Info: No music file found at {music_path}")
         print(f"   Music style: {music_style}")
@@ -179,7 +181,46 @@ if __name__ == "__main__":
     # Encode intro title
     import json
     intro_title_json = json.dumps(args.intro_title)
-    
+
+    # Load brand assets as base64 data URLs
+    import yaml
+    config_path = Path(__file__).parent.parent / "config.yaml"
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    brand_config = config.get('brand', {})
+    assets_dir = Path(__file__).parent.parent
+
+    # Logo
+    logo_data_url = ""
+    logo_rel = brand_config.get('logo_path', 'assets/brand/logo.png').lstrip('/')
+    logo_path = assets_dir / logo_rel
+    if logo_path.exists():
+        logo_b64 = base64.b64encode(logo_path.read_bytes()).decode('ascii')
+        logo_data_url = f"data:image/png;base64,{logo_b64}"
+        print(f"Brand logo loaded: {logo_path.name} ({logo_path.stat().st_size/1024:.1f} KB)")
+    else:
+        print(f"Warning: Brand logo not found at {logo_path}")
+
+    # Brand name image
+    brand_name_data_url = ""
+    brand_name_rel = brand_config.get('name_image_path', 'assets/brand/brand-name.png').lstrip('/')
+    brand_name_path = assets_dir / brand_name_rel
+    if brand_name_path.exists():
+        brand_b64 = base64.b64encode(brand_name_path.read_bytes()).decode('ascii')
+        brand_name_data_url = f"data:image/png;base64,{brand_b64}"
+        print(f"Brand name loaded: {brand_name_path.name} ({brand_name_path.stat().st_size/1024:.1f} KB)")
+    else:
+        print(f"Warning: Brand name image not found at {brand_name_path}")
+
+    # Slogan
+    slogan = brand_config.get('slogan', '')
+
+    # Replace placeholders in template
+    template_content = template_content.replace('{{LOGO_DATA_URL}}', logo_data_url)
+    template_content = template_content.replace('{{BRAND_NAME_DATA_URL}}', brand_name_data_url)
+    template_content = template_content.replace('{{SLOGAN}}', slogan)
+
     injection = f"""
     <script>
       // Decode base64 to avoid any injection issues
@@ -224,7 +265,12 @@ if __name__ == "__main__":
         f.write(template_content)
     
     print(f"Generated temp file: {temp_file.name}")
-    
+
+    # If --generate-only, just print the path and exit (used by Playwright pipeline)
+    if args.generate_only:
+        print(f"HTML_PATH:{temp_file.resolve()}")
+        sys.exit(0)
+
     # Build URL to temp file
     template_url = temp_file.as_uri()
     

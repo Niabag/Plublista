@@ -24,6 +24,18 @@ router.get('/recent', async (req, res) => {
   }
 })
 
+// Get scheduled jobs (must be before /:id to avoid being caught by it)
+router.get('/scheduled', async (req, res) => {
+  try {
+    const scheduledJobs = Array.from(jobs.values())
+      .filter(job => job.publishStatus === 'scheduled' && job.scheduledFor)
+      .sort((a, b) => new Date(a.scheduledFor) - new Date(b.scheduledFor))
+    res.json(scheduledJobs)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Get job by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -68,14 +80,12 @@ router.post('/create', async (req, res) => {
       createdAt: new Date().toISOString(),
       logs: [],
       timeline: [
-        { name: 'Initialize workspace', status: 'pending', duration: 0 },
-        { name: 'Open VS Code', status: 'pending', duration: 3 },
-        { name: 'Paste code', status: 'pending', duration: 10 },
-        { name: 'Start OBS recording', status: 'pending', duration: 2 },
-        { name: 'Type code', status: 'pending', duration: 5 },
-        { name: 'Launch browser demo', status: 'pending', duration: 8 },
-        { name: 'Stop recording', status: 'pending', duration: 2 },
-        { name: 'Post-process video', status: 'pending', duration: 0 },
+        { name: 'Préparer l\'espace de travail', status: 'pending', duration: 0 },
+        { name: 'Générer la Stream View', status: 'pending', duration: 0 },
+        { name: 'Enregistrer avec Playwright', status: 'pending', duration: 0 },
+        { name: 'Capturer le contenu', status: 'pending', duration: 0 },
+        { name: 'Sauvegarder l\'enregistrement', status: 'pending', duration: 0 },
+        { name: 'Post-traitement vidéo', status: 'pending', duration: 0 },
       ],
     }
 
@@ -94,6 +104,7 @@ router.post('/create', async (req, res) => {
 async function processJob(job) {
   try {
     job.status = 'processing'
+    startStep(job, 0)
     addLog(job, '🚀 Démarrage de l\'automatisation...')
 
     // Create workspace
@@ -144,7 +155,8 @@ async function processJob(job) {
     const codePath = path.join(workspacePath, 'snippet.html')
     await fs.writeFile(codePath, htmlContent)
     
-    updateTimeline(job, 0, 'completed', 1)
+    completeStep(job, 0)
+    startStep(job, 1)
     addLog(job, '✅ Workspace créé')
 
     // Call the Python orchestrator script
@@ -157,6 +169,7 @@ async function processJob(job) {
     const { spawn } = await import('child_process')
     
     const pythonProcess = spawn(pythonPath, [
+      '-u',
       orchestratorPath,
       '--job-id', job.id.toString(),
       '--code-file', codePath,
@@ -173,65 +186,57 @@ async function processJob(job) {
       }
     })
 
-    let currentStep = 1
-    
     pythonProcess.stdout.on('data', (data) => {
       const output = data.toString()
       addLog(job, output.trim())
-      
-      // Update timeline based on log output
-      // STEP 1: Workspace (already done before Python starts)
-      if (output.includes('STEP 2')) {
-        // Open VS Code
-        updateTimeline(job, 0, 'completed', 3)
-        updateTimeline(job, 1, 'running', 0)
-        currentStep = 2
-      } else if (output.includes('STEP 3')) {
-        // Paste code
-        updateTimeline(job, 1, 'completed', 10)
-        updateTimeline(job, 2, 'running', 0)
-        currentStep = 3
-      } else if (output.includes('STEP 4')) {
-        // Start OBS recording
-        updateTimeline(job, 2, 'completed', 2)
-        updateTimeline(job, 3, 'running', 0)
-        currentStep = 4
-      } else if (output.includes('STEP 5')) {
-        // Simulate typing
-        updateTimeline(job, 3, 'completed', 5)
-        updateTimeline(job, 4, 'running', 0)
-        currentStep = 5
-      } else if (output.includes('STEP 6')) {
-        // Launch browser
-        updateTimeline(job, 4, 'completed', 8)
-        updateTimeline(job, 5, 'running', 0)
-        currentStep = 6
-      } else if (output.includes('STEP 7')) {
-        // Stop recording
-        updateTimeline(job, 5, 'completed', 2)
-        updateTimeline(job, 6, 'running', 0)
-        currentStep = 7
-      } else if (output.includes('STEP 8')) {
-        // Post-process
-        updateTimeline(job, 6, 'completed', 0)
-        updateTimeline(job, 7, 'running', 0)
-        currentStep = 8
+
+      // Map Python log output to timeline step transitions
+      // Timeline: [0]=Workspace, [1]=Generate HTML, [2]=Record, [3]=Capture, [4]=Save, [5]=Post-process
+      // Process each line individually (output may contain multiple lines)
+      const lines = output.split('\n')
+      for (const line of lines) {
+        // Step 0→1: Workspace done, HTML generation starting
+        if (line.includes('STEP 2') || line.includes('Generating Stream View HTML')) {
+          if (job.timeline[0]?.status === 'running') {
+            completeStep(job, 0)
+            startStep(job, 1)
+          }
+        }
+        // Step 1→2: HTML done, Playwright recording starting
+        if (line.includes('STEP 3') || line.includes('Recording with Playwright')) {
+          if (job.timeline[1]?.status === 'running') {
+            completeStep(job, 1)
+            startStep(job, 2)
+          }
+        }
+        // Step 2→3: Recording started, capturing content
+        if (line.includes('STEP 4') || line.includes('Recording content captured')) {
+          if (job.timeline[2]?.status === 'running') {
+            completeStep(job, 2)
+            startStep(job, 3)
+          }
+        }
+        // Step 3→4: Content captured, saving
+        if (line.includes('STEP 5') || line.includes('Recording saved')) {
+          if (job.timeline[3]?.status === 'running') {
+            completeStep(job, 3)
+            startStep(job, 4)
+          }
+        }
+        // Step 4→5: Saved, post-processing
+        if (line.includes('STEP 6') || line.includes('Post-processing video')) {
+          if (job.timeline[4]?.status === 'running') {
+            completeStep(job, 4)
+            startStep(job, 5)
+          }
+        }
       }
-      
+
       // Detect failures
       if (output.includes('[ERROR]') || output.includes('Pipeline failed')) {
-        // Mark current running step as failed
         const runningStep = job.timeline.findIndex(s => s.status === 'running')
         if (runningStep >= 0) {
           updateTimeline(job, runningStep, 'failed', 0)
-        }
-      }
-      
-      // Detect success completions
-      if (output.includes('[SUCCESS]')) {
-        const runningStep = job.timeline.findIndex(s => s.status === 'running')
-        if (runningStep >= 0 && runningStep < job.timeline.length - 1) {
-          updateTimeline(job, runningStep, 'completed', 0)
         }
       }
     })
@@ -242,13 +247,17 @@ async function processJob(job) {
 
     pythonProcess.on('close', (code) => {
       if (code === 0) {
-        updateTimeline(job, job.timeline.length - 1, 'completed', 0)
+        completeStep(job, job.timeline.length - 1)
         job.status = 'completed'
         job.videoUrl = `/out/final/job-${job.id}.mp4`
         job.duration = job.targetDuration || 45
         addLog(job, '✅ Vidéo créée avec succès!')
       } else {
         job.status = 'failed'
+        const runningStep = job.timeline.findIndex(s => s.status === 'running')
+        if (runningStep >= 0) {
+          updateTimeline(job, runningStep, 'failed', 0)
+        }
         addLog(job, `❌ Erreur: Le processus s'est terminé avec le code ${code}`)
       }
     })
@@ -266,6 +275,21 @@ function addLog(job, message) {
   })
 }
 
+const stepStartTimes = new Map()
+
+function startStep(job, index) {
+  stepStartTimes.set(`${job.id}-${index}`, Date.now())
+  updateTimeline(job, index, 'running', 0)
+}
+
+function completeStep(job, index) {
+  const key = `${job.id}-${index}`
+  const startTime = stepStartTimes.get(key)
+  const duration = startTime ? Math.round((Date.now() - startTime) / 1000) : 0
+  stepStartTimes.delete(key)
+  updateTimeline(job, index, 'completed', duration)
+}
+
 function updateTimeline(job, index, status, duration = 0) {
   if (job.timeline[index]) {
     job.timeline[index].status = status
@@ -275,13 +299,31 @@ function updateTimeline(job, index, status, duration = 0) {
   }
 }
 
-// Get scheduled jobs
-router.get('/scheduled', async (req, res) => {
+// Retry failed job
+router.post('/:id/retry', async (req, res) => {
   try {
-    const scheduledJobs = Array.from(jobs.values())
-      .filter(job => job.publishStatus === 'scheduled' && job.scheduledFor)
-      .sort((a, b) => new Date(a.scheduledFor) - new Date(b.scheduledFor))
-    res.json(scheduledJobs)
+    const job = jobs.get(parseInt(req.params.id))
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' })
+    }
+
+    // Reset job state
+    job.status = 'queued'
+    job.logs = []
+    job.videoUrl = null
+    job.timeline = [
+      { name: 'Préparer l\'espace de travail', status: 'pending', duration: 0 },
+      { name: 'Générer la Stream View', status: 'pending', duration: 0 },
+      { name: 'Enregistrer avec Playwright', status: 'pending', duration: 0 },
+      { name: 'Capturer le contenu', status: 'pending', duration: 0 },
+      { name: 'Sauvegarder l\'enregistrement', status: 'pending', duration: 0 },
+      { name: 'Post-traitement vidéo', status: 'pending', duration: 0 },
+    ]
+
+    addLog(job, '🔄 Relancement du job...')
+    processJob(job)
+
+    res.json({ success: true })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
