@@ -3,6 +3,8 @@ import { spawn } from 'child_process'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs/promises'
+import yaml from 'yaml'
+import Anthropic from '@anthropic-ai/sdk'
 
 const router = express.Router()
 const __filename = fileURLToPath(import.meta.url)
@@ -52,27 +54,32 @@ router.get('/:id', async (req, res) => {
 // Create new job
 router.post('/create', async (req, res) => {
   try {
-    const { code, title, introTitle, hashtags, musicStyle, targetDuration, brandOverlay, scheduleEnabled, scheduleDate, scheduleTime } = req.body
+    const { code, title, introTitle, hashtags, description, musicStyle, targetDuration, introDuration, resultDuration, brandDuration, ctaDuration, brandOverlay, scheduleEnabled, scheduleDate, scheduleTime } = req.body
 
     const jobId = jobIdCounter++
-    
+
     // Calculate scheduled date/time
     let scheduledFor = null
     let publishStatus = 'draft'
-    
+
     if (scheduleEnabled && scheduleDate && scheduleTime) {
       scheduledFor = new Date(`${scheduleDate}T${scheduleTime}`).toISOString()
       publishStatus = 'scheduled'
     }
-    
+
     const job = {
       id: jobId,
       title,
       introTitle,
       code,
       hashtags,
+      description: description || '',
       musicStyle,
       targetDuration,
+      introDuration: introDuration ?? 5,
+      resultDuration: resultDuration ?? 5,
+      brandDuration: brandDuration ?? 3,
+      ctaDuration: ctaDuration ?? 3,
       brandOverlay,
       status: 'queued',
       publishStatus,
@@ -177,7 +184,11 @@ async function processJob(job) {
       '--title', job.title,
       '--intro-title', job.introTitle || '',
       '--music-style', job.musicStyle || 'tech/energetic',
-      '--video-duration', (job.targetDuration || 17).toString()
+      '--video-duration', (job.targetDuration || 17).toString(),
+      '--intro-duration', (job.introDuration ?? 5).toString(),
+      '--result-duration', (job.resultDuration ?? 5).toString(),
+      '--brand-duration', (job.brandDuration ?? 3).toString(),
+      '--cta-duration', (job.ctaDuration ?? 3).toString(),
     ], {
       cwd: path.join(__dirname, '../../'),
       env: { 
@@ -253,6 +264,10 @@ async function processJob(job) {
         job.videoUrl = `/out/final/job-${job.id}.mp4`
         job.duration = job.targetDuration || 45
         addLog(job, '✅ Vidéo créée avec succès!')
+        // Generate Instagram description in background (only if not already provided)
+        if (!job.description) {
+          generateDescription(job)
+        }
       } else {
         job.status = 'failed'
         const runningStep = job.timeline.findIndex(s => s.status === 'running')
@@ -266,6 +281,56 @@ async function processJob(job) {
   } catch (error) {
     job.status = 'failed'
     addLog(job, `❌ Erreur: ${error.message}`)
+  }
+}
+
+async function generateDescription(job) {
+  try {
+    addLog(job, '📝 Génération de la description Instagram...')
+    const configPath = path.join(__dirname, '../../config.yaml')
+    const configFile = await fs.readFile(configPath, 'utf8')
+    const config = yaml.parse(configFile)
+    const apiKey = config.ai?.anthropic_api_key
+    if (!apiKey) {
+      addLog(job, '⚠️ Pas de clé API - description non générée')
+      return
+    }
+
+    const client = new Anthropic({ apiKey })
+    const codePreview = (job.code || '').substring(0, 200)
+
+    const prompt = `Genere une description Instagram optimisee pour un Reel de code/animation web.
+
+Informations sur la video:
+- Titre: ${job.title}
+${job.introTitle ? `- Accroche: ${job.introTitle}` : ''}
+${job.hashtags ? `- Hashtags fournis: ${job.hashtags}` : ''}
+${codePreview ? `- Le code montre: ${codePreview}...` : ''}
+
+Regles:
+- Description en FRANCAIS
+- 2-3 lignes max d'accroche engageante (avec emojis)
+- Pose une question ou un appel a l'action pour les commentaires
+- Ajoute les hashtags a la fin (garde ceux fournis + ajoute-en d'autres pertinents, 15-20 total)
+- Format Instagram: texte + ligne vide + hashtags
+- Sois creatif et engageant, style "tech influencer"
+- Ne mets PAS de guillemets autour de la reponse
+
+Reponds UNIQUEMENT avec la description prete a copier-coller, rien d'autre.`
+
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const description = response.content[0]?.text?.trim() || ''
+    if (description) {
+      job.description = description
+      addLog(job, '✅ Description Instagram générée!')
+    }
+  } catch (error) {
+    addLog(job, `⚠️ Description non générée: ${error.message}`)
   }
 }
 

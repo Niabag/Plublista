@@ -525,22 +525,24 @@
     let headContent = ''; // Store head content (styles, scripts, etc.)
     
     // Durée totale configurée (en secondes) - peut être injectée
-    let targetVideoDuration = window.injectedVideoDuration || 17; // Durée totale par défaut: 17s
-    
-    // Durées fixes
-    const introDuration = 5;           // 5 secondes d'écran intro (OBS démarre avec 3s de délai, donc 2s visible)
-    const finalDisplayDuration = 11;   // 11 secondes pour les scènes finales (résultat + brand + CTA)
-    
+    let targetVideoDuration = window.injectedVideoDuration || 17;
+
+    // Durées des scènes (configurables depuis le wizard)
+    const introDuration = window.injectedIntroDuration ?? 5;
+    const resultDuration = window.injectedResultDuration ?? 5;
+    const brandDuration = window.injectedBrandDuration ?? 3;
+    const ctaDuration = window.injectedCtaDuration ?? 3;
+    const finalDisplayDuration = resultDuration + brandDuration + ctaDuration;
+
     // Calculer la durée de typing disponible
-    // typingDuration = totalDuration - intro - finalScenes
-    // Exemple: 45s total = 5s intro + 32s code + 8s scènes finales (résultat + brand + CTA)
     const typingDuration = targetVideoDuration - introDuration - finalDisplayDuration;
-    
+
     console.log('=== TIMING CONFIGURATION ===');
     console.log(`Target video duration: ${targetVideoDuration}s`);
-    console.log(`Intro duration: ${introDuration}s`);
-    console.log(`Typing duration: ${typingDuration}s`);
-    console.log(`Final display duration: ${finalDisplayDuration}s`);
+    console.log(`Intro: ${introDuration}s`);
+    console.log(`Typing: ${typingDuration}s`);
+    console.log(`Result: ${resultDuration}s | Brand: ${brandDuration}s | CTA: ${ctaDuration}s`);
+    console.log(`Final scenes total: ${finalDisplayDuration}s`);
     console.log(`Total: ${introDuration + typingDuration + finalDisplayDuration}s`);
     console.log('==========================');
     
@@ -760,23 +762,34 @@
       // Cacher le header pour les scènes finales
       document.querySelector('.header').style.display = 'none';
 
-      // Après 5s : afficher la scène Brand (3s de résultat visible)
-      setTimeout(() => {
-        console.log('🎨 Showing brand scene...');
-        document.getElementById('brand-scene').classList.add('active');
-      }, 5000);
+      // Timing dynamique basé sur les durées configurées
+      const brandStart = resultDuration * 1000;
+      const ctaStart = (resultDuration + brandDuration) * 1000;
+      const ctaBlinkStart = ctaStart + Math.min(1500, ctaDuration * 500);
 
-      // Après 8.5s : afficher la scène CTA
-      setTimeout(() => {
-        console.log('📢 Showing CTA scene...');
-        document.getElementById('cta-scene').classList.add('active');
-      }, 8500);
+      console.log(`⏱️ Result: ${resultDuration}s | Brand at ${brandStart}ms | CTA at ${ctaStart}ms | Blink at ${ctaBlinkStart}ms`);
 
-      // Après 10s : démarrer le clignotement du bouton CTA
-      setTimeout(() => {
-        console.log('✨ CTA button blinking...');
-        document.getElementById('cta-btn').classList.add('blinking');
-      }, 10000);
+      // Afficher la scène Brand après resultDuration
+      if (brandDuration > 0) {
+        setTimeout(() => {
+          console.log('🎨 Showing brand scene...');
+          document.getElementById('brand-scene').classList.add('active');
+        }, brandStart);
+      }
+
+      // Afficher la scène CTA après resultDuration + brandDuration
+      if (ctaDuration > 0) {
+        setTimeout(() => {
+          console.log('📢 Showing CTA scene...');
+          document.getElementById('cta-scene').classList.add('active');
+        }, ctaStart);
+
+        // Démarrer le clignotement du bouton CTA un peu après
+        setTimeout(() => {
+          console.log('✨ CTA button blinking...');
+          document.getElementById('cta-btn').classList.add('blinking');
+        }, ctaBlinkStart);
+      }
     }
 
     function updateDisplay() {

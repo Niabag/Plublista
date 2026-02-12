@@ -68,13 +68,14 @@ def run_command(cmd, description):
         log(f"❌ {description} error: {e}", "ERROR")
         return False
 
-def generate_html(code_file, music_style, video_duration, intro_title, config):
+def generate_html(code_file, music_style, video_duration, intro_title, config, scene_durations=None):
     """Generate stream view HTML file (without launching Chrome)"""
     log("Running: Generate Stream View HTML")
     log(f"   Music style: {music_style}", "INFO")
     if intro_title:
         log(f"   Intro title: {intro_title}", "INFO")
     log(f"   Target video duration: {video_duration}s", "INFO")
+    sd = scene_durations or {}
     try:
         python_path = config.get('paths', {}).get('python', 'python')
         script_path = Path(__file__).parent / "launch_stream_view.py"
@@ -83,6 +84,10 @@ def generate_html(code_file, music_style, video_duration, intro_title, config):
                f'--music-style "{music_style}" '
                f'--video-duration {video_duration} '
                f'--intro-title "{intro_title}" '
+               f'--intro-duration {sd.get("intro", 5)} '
+               f'--result-duration {sd.get("result", 5)} '
+               f'--brand-duration {sd.get("brand", 3)} '
+               f'--cta-duration {sd.get("cta", 3)} '
                f'--generate-only')
 
         result = subprocess.run(
@@ -202,6 +207,10 @@ def main():
     parser.add_argument('--intro-title', default='', help='Custom intro title')
     parser.add_argument('--music-style', default='tech/energetic', help='Music style')
     parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
+    parser.add_argument('--intro-duration', type=int, default=5, help='Intro scene duration in seconds')
+    parser.add_argument('--result-duration', type=int, default=5, help='Result scene duration in seconds')
+    parser.add_argument('--brand-duration', type=int, default=3, help='Brand scene duration in seconds')
+    parser.add_argument('--cta-duration', type=int, default=3, help='CTA scene duration in seconds')
     args = parser.parse_args()
 
     log("=" * 60)
@@ -224,7 +233,13 @@ def main():
 
     # Step 2: Generate Stream View HTML
     log("\n🎬 STEP 2: Generating Stream View HTML")
-    html_path = generate_html(code_file, args.music_style, args.video_duration, args.intro_title, config)
+    scene_durations = {
+        'intro': args.intro_duration,
+        'result': args.result_duration,
+        'brand': args.brand_duration,
+        'cta': args.cta_duration,
+    }
+    html_path = generate_html(code_file, args.music_style, args.video_duration, args.intro_title, config, scene_durations)
     if not html_path:
         log("Pipeline failed at HTML generation", "ERROR")
         return 1
@@ -235,10 +250,9 @@ def main():
     raw_dir.mkdir(parents=True, exist_ok=True)
     raw_video = str(raw_dir / f"job-{args.job_id}-raw.mp4")
 
-    intro_duration = 5.0
-    final_duration = 8
-    typing_duration = args.video_duration - intro_duration - final_duration
-    log(f"   Intro: {intro_duration}s | Typing: {typing_duration}s | Scenes finales: {final_duration}s")
+    final_scenes = args.result_duration + args.brand_duration + args.cta_duration
+    typing_duration = args.video_duration - args.intro_duration - final_scenes
+    log(f"   Intro: {args.intro_duration}s | Typing: {typing_duration}s | Result: {args.result_duration}s | Brand: {args.brand_duration}s | CTA: {args.cta_duration}s")
     log(f"   Total: {args.video_duration}s")
 
     recorded_path = record_with_playwright(html_path, raw_video, args.video_duration, config)

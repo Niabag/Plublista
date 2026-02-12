@@ -137,14 +137,21 @@ export default function CreateWizard() {
     }
   }
 
+  const [descGenerating, setDescGenerating] = useState(false)
+
   const [formData, setFormData] = useState({
     inputMode: 'paste',
     code: '',
     title: '',
     introTitle: '',
     hashtags: '',
+    description: '',
     musicStyle: '/assets/music/tech-energy.mp3',
     targetDuration: 45,
+    introDuration: 5,
+    resultDuration: 5,
+    brandDuration: 3,
+    ctaDuration: 3,
     brandOverlay: true,
     scheduleEnabled: false,
     scheduleDate: '',
@@ -160,6 +167,32 @@ export default function CreateWizard() {
   useEffect(() => {
     return () => { if (previewUrl) URL.revokeObjectURL(previewUrl) }
   }, [previewUrl])
+
+  const handleGenerateDescription = async () => {
+    if (!formData.title.trim()) return
+    setDescGenerating(true)
+    try {
+      const res = await fetch('/api/ai/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          introTitle: formData.introTitle,
+          hashtags: formData.hashtags,
+          codeSnippet: formData.code?.substring(0, 200),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      if (data.description) {
+        setFormData(prev => ({ ...prev, description: data.description }))
+      }
+    } catch (err) {
+      console.error('Description generation failed:', err)
+    } finally {
+      setDescGenerating(false)
+    }
+  }
 
   const handleSubmit = async () => {
     try {
@@ -555,9 +588,43 @@ export default function CreateWizard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            {/* Instagram Description */}
+            <div className="border border-purple-200 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-purple-800">Description Instagram</label>
+                <button
+                  type="button"
+                  onClick={handleGenerateDescription}
+                  disabled={descGenerating || !formData.title.trim() || !aiConfigured}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {descGenerating ? (
+                    <>
+                      <Loader2 size={12} className="animate-spin" />
+                      Generation...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={12} />
+                      Generer
+                    </>
+                  )}
+                </button>
+              </div>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg text-sm"
+                placeholder="Cliquez sur 'Generer' pour creer une description Instagram automatiquement, ou ecrivez la votre..."
+              />
+              {!formData.title.trim() && (
+                <p className="text-xs text-gray-400">Remplissez le titre pour pouvoir generer la description</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Music Style</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Musique</label>
                 <select
                   value={formData.musicStyle}
                   onChange={(e) => setFormData({ ...formData, musicStyle: e.target.value })}
@@ -579,19 +646,6 @@ export default function CreateWizard() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Target Duration (s)
-                </label>
-                <input
-                  type="number"
-                  value={formData.targetDuration}
-                  onChange={(e) => setFormData({ ...formData, targetDuration: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  min="35"
-                  max="60"
-                />
-              </div>
               <div className="flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -602,6 +656,123 @@ export default function CreateWizard() {
                   />
                   <span className="text-sm font-medium text-gray-700">Brand Overlay</span>
                 </label>
+              </div>
+            </div>
+
+            {/* Scene Timeline */}
+            <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-gray-800">Timeline des scenes</label>
+                <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">
+                  Total: {formData.targetDuration}s
+                </span>
+              </div>
+
+              {/* Visual timeline bar */}
+              {(() => {
+                const total = formData.targetDuration
+                const intro = formData.introDuration
+                const result = formData.resultDuration
+                const cta1 = formData.brandDuration
+                const cta2 = formData.ctaDuration
+                const typing = Math.max(0, total - intro - result - cta1 - cta2)
+                const scenes = [
+                  { label: 'Intro', dur: intro, color: 'bg-blue-500' },
+                  { label: 'Code', dur: typing, color: 'bg-green-500' },
+                  { label: 'Resultat', dur: result, color: 'bg-orange-500' },
+                  { label: 'CTA 1', dur: cta1, color: 'bg-purple-500' },
+                  { label: 'CTA 2', dur: cta2, color: 'bg-red-500' },
+                ]
+                return (
+                  <>
+                    <div className="flex h-8 rounded-lg overflow-hidden text-[10px] font-semibold text-white">
+                      {scenes.map((s) => s.dur > 0 && (
+                        <div key={s.label} className={`flex items-center justify-center ${s.color}`} style={{ width: `${(s.dur / total) * 100}%` }} title={`${s.label}: ${s.dur}s`}>
+                          {s.dur}s
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex text-[10px] text-gray-500 px-0.5">
+                      {scenes.map((s) => s.dur > 0 && (
+                        <div key={s.label} style={{ width: `${(s.dur / total) * 100}%` }} className="text-center">{s.label}</div>
+                      ))}
+                    </div>
+                    {typing < 5 && (
+                      <p className="text-xs text-red-500 font-medium">
+                        Attention : seulement {typing}s pour le code. Augmentez la duree totale ou reduisez les scenes.
+                      </p>
+                    )}
+                  </>
+                )
+              })()}
+
+              {/* Duration controls */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Duree totale</label>
+                  <input
+                    type="number"
+                    value={formData.targetDuration}
+                    onChange={(e) => setFormData({ ...formData, targetDuration: Math.max(15, parseInt(e.target.value) || 15) })}
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-center"
+                    min="15"
+                    max="90"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-blue-600 mb-1">Intro</label>
+                  <input
+                    type="number"
+                    value={formData.introDuration}
+                    onChange={(e) => setFormData({ ...formData, introDuration: Math.max(0, parseInt(e.target.value) || 0) })}
+                    className="w-full px-2 py-1.5 border border-blue-200 rounded-lg text-sm text-center"
+                    min="0"
+                    max="15"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-orange-600 mb-1">Resultat</label>
+                  <input
+                    type="number"
+                    value={formData.resultDuration}
+                    onChange={(e) => setFormData({ ...formData, resultDuration: Math.max(0, parseInt(e.target.value) || 0) })}
+                    className="w-full px-2 py-1.5 border border-orange-200 rounded-lg text-sm text-center"
+                    min="0"
+                    max="15"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="border border-purple-100 rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-purple-700">CTA 1 - Services</label>
+                    <span className="text-[10px] text-purple-400">Logo + services</span>
+                  </div>
+                  <input
+                    type="number"
+                    value={formData.brandDuration}
+                    onChange={(e) => setFormData({ ...formData, brandDuration: Math.max(0, parseInt(e.target.value) || 0) })}
+                    className="w-full px-2 py-1.5 border border-purple-200 rounded-lg text-sm text-center"
+                    min="0"
+                    max="15"
+                  />
+                  <p className="text-[10px] text-gray-400">0 = desactiver cette scene</p>
+                </div>
+                <div className="border border-red-100 rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-red-700">CTA 2 - Action</label>
+                    <span className="text-[10px] text-red-400">Bouton + lien</span>
+                  </div>
+                  <input
+                    type="number"
+                    value={formData.ctaDuration}
+                    onChange={(e) => setFormData({ ...formData, ctaDuration: Math.max(0, parseInt(e.target.value) || 0) })}
+                    className="w-full px-2 py-1.5 border border-red-200 rounded-lg text-sm text-center"
+                    min="0"
+                    max="15"
+                  />
+                  <p className="text-[10px] text-gray-400">0 = desactiver cette scene</p>
+                </div>
               </div>
             </div>
 

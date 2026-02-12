@@ -99,6 +99,10 @@ if __name__ == "__main__":
     parser.add_argument('--music-style', default='tech/energetic', help='Music style')
     parser.add_argument('--video-duration', type=int, default=17, help='Target video duration in seconds (default: 17)')
     parser.add_argument('--intro-title', default='', help='Custom title to display in the intro screen')
+    parser.add_argument('--intro-duration', type=int, default=5, help='Intro scene duration in seconds')
+    parser.add_argument('--result-duration', type=int, default=5, help='Result scene duration in seconds')
+    parser.add_argument('--brand-duration', type=int, default=3, help='Brand scene duration in seconds')
+    parser.add_argument('--cta-duration', type=int, default=3, help='CTA scene duration in seconds')
     parser.add_argument('--generate-only', action='store_true', help='Generate HTML file only, do not launch Chrome')
     args = parser.parse_args()
     
@@ -230,6 +234,10 @@ if __name__ == "__main__":
       window.injectedMusicUrl = {music_url_json};
       window.injectedVideoDuration = {video_duration};
       window.injectedIntroTitle = {intro_title_json};
+      window.injectedIntroDuration = {args.intro_duration};
+      window.injectedResultDuration = {args.result_duration};
+      window.injectedBrandDuration = {args.brand_duration};
+      window.injectedCtaDuration = {args.cta_duration};
     </script>
     """
     

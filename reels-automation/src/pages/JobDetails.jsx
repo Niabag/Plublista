@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Play, Download, Share2, ArrowLeft, CheckCircle, XCircle, Clock, RotateCcw, Loader2, Zap, Sparkles } from 'lucide-react'
+import { Play, Download, Share2, ArrowLeft, CheckCircle, XCircle, Clock, RotateCcw, Loader2, Zap, Sparkles, Copy, Check } from 'lucide-react'
 import Card, { CardHeader, CardContent, CardTitle } from '../components/Card'
 import Button from '../components/Button'
 
@@ -9,6 +9,7 @@ export default function JobDetails() {
   const navigate = useNavigate()
   const [job, setJob] = useState(null)
   const [logs, setLogs] = useState([])
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetchJobDetails()
@@ -63,6 +64,25 @@ export default function JobDetails() {
       }
     } catch (error) {
       alert(`❌ Erreur: ${error.message}`)
+    }
+  }
+
+  const handleCopyDescription = async () => {
+    if (!job?.description) return
+    try {
+      await navigator.clipboard.writeText(job.description)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = job.description
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
   }
 
@@ -155,6 +175,43 @@ export default function JobDetails() {
                       Publié le {new Date(job.publishedAt).toLocaleString('fr-FR')}
                     </div>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Instagram Description */}
+          {job.description && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Description Instagram</CardTitle>
+                  <button
+                    onClick={handleCopyDescription}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      copied
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                    {copied ? 'Copié !' : 'Copier'}
+                  </button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-lg p-4 whitespace-pre-wrap text-sm text-gray-800 leading-relaxed">
+                  {job.description}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {job.status === 'completed' && !job.description && (
+            <Card>
+              <CardContent className="py-4">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Loader2 size={14} className="animate-spin" />
+                  Génération de la description Instagram...
                 </div>
               </CardContent>
             </Card>

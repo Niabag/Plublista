@@ -249,4 +249,56 @@ router.post('/generate', upload.single('referenceImage'), async (req, res) => {
   }
 })
 
+// Generate Instagram description from job metadata
+router.post('/generate-description', async (req, res) => {
+  try {
+    const { title, introTitle, hashtags, codeSnippet } = req.body
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' })
+    }
+
+    const configFile = await fs.readFile(configPath, 'utf8')
+    const config = yaml.parse(configFile)
+    const apiKey = config.ai?.anthropic_api_key
+    if (!apiKey) {
+      return res.status(400).json({ error: 'Anthropic API key not configured' })
+    }
+
+    const client = new Anthropic({ apiKey })
+
+    const prompt = `Genere une description Instagram optimisee pour un Reel de code/animation web.
+
+Informations sur la video:
+- Titre: ${title}
+${introTitle ? `- Accroche: ${introTitle}` : ''}
+${hashtags ? `- Hashtags fournis: ${hashtags}` : ''}
+${codeSnippet ? `- Le code montre: ${codeSnippet.substring(0, 200)}...` : ''}
+
+Regles:
+- Description en FRANCAIS
+- 2-3 lignes max d'accroche engageante (avec emojis)
+- Pose une question ou un appel a l'action pour les commentaires
+- Ajoute les hashtags a la fin (garde ceux fournis + ajoute-en d'autres pertinents, 15-20 total)
+- Format Instagram: texte + ligne vide + hashtags
+- Sois creatif et engageant, style "tech influencer"
+- Ne mets PAS de guillemets autour de la reponse
+
+Reponds UNIQUEMENT avec la description prete a copier-coller, rien d'autre.`
+
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const description = response.content[0]?.text?.trim() || ''
+    res.json({ description })
+  } catch (error) {
+    if (error.status === 401) {
+      return res.status(401).json({ error: 'Invalid API key' })
+    }
+    res.status(500).json({ error: error.message || 'Description generation failed' })
+  }
+})
+
 export default router
