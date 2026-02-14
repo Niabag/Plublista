@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plublista — UX Design Directions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --primary: #6366F1;
+    --primary-dark: #4338CA;
+    --primary-light: #A5B4FC;
+    --primary-subtle: #EEF2FF;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #F43F5E;
+    --info: #0EA5E9;
+    --gray-950: #0C0A09;
+    --gray-700: #44403C;
+    --gray-500: #78716C;
+    --gray-300: #D6D3D1;
+    --gray-100: #F5F5F4;
+    --gray-50: #FAFAF9;
+    --white: #FFFFFF;
+    --ig: #E4405F;
+    --yt: #FF0000;
+    --tt: #000000;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--gray-950); color: var(--white); }
+
+  /* Navigation */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(12,10,9,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .nav h1 { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-links button { background: none; border: 1px solid rgba(255,255,255,0.15); color: var(--gray-300); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; transition: all 0.2s; }
+  .nav-links button:hover, .nav-links button.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* Sections */
+  .section { min-height: 100vh; padding: 100px 32px 60px; display: none; }
+  .section.active { display: block; }
+  .section-title { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+  .section-subtitle { font-size: 16px; color: var(--gray-500); margin-bottom: 40px; max-width: 600px; }
+  .tag { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tag-primary { background: var(--primary-subtle); color: var(--primary); }
+
+  /* Direction Card Container */
+  .direction { background: var(--white); border-radius: 16px; overflow: hidden; margin-bottom: 48px; }
+
+  /* ====== DIRECTION 1: Clean Dashboard ====== */
+  .d1-app { display: flex; height: 640px; background: var(--gray-50); }
+  .d1-sidebar { width: 240px; background: var(--white); border-right: 1px solid var(--gray-100); padding: 20px 0; display: flex; flex-direction: column; }
+  .d1-logo { padding: 0 20px 20px; font-size: 18px; font-weight: 700; color: var(--primary); }
+  .d1-nav-item { padding: 10px 20px; font-size: 14px; color: var(--gray-500); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.15s; }
+  .d1-nav-item:hover { background: var(--gray-50); color: var(--gray-700); }
+  .d1-nav-item.active { background: var(--primary-subtle); color: var(--primary); font-weight: 500; border-right: 3px solid var(--primary); }
+  .d1-main { flex: 1; padding: 24px; overflow-y: auto; }
+  .d1-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .d1-topbar h2 { font-size: 24px; font-weight: 600; color: var(--gray-950); }
+  .d1-quick-actions { display: flex; gap: 8px; }
+  .d1-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .d1-btn-primary { background: var(--primary); color: white; }
+  .d1-btn-primary:hover { background: var(--primary-dark); }
+  .d1-btn-outline { background: transparent; color: var(--gray-700); border: 1px solid var(--gray-300); }
+  .d1-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .d1-stat-card { background: var(--white); border-radius: 12px; padding: 16px; border: 1px solid var(--gray-100); }
+  .d1-stat-label { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+  .d1-stat-value { font-size: 24px; font-weight: 700; color: var(--gray-950); }
+  .d1-stat-change { font-size: 12px; color: var(--success); margin-top: 4px; }
+  .d1-content-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .d1-content-card { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-100); overflow: hidden; transition: all 0.2s; cursor: pointer; }
+  .d1-content-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .d1-card-thumb { height: 160px; background: linear-gradient(135deg, var(--primary-subtle), #ddd5f3); display: flex; align-items: center; justify-content: center; position: relative; }
+  .d1-card-thumb span { font-size: 36px; }
+  .d1-card-badge { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; color: white; }
+  .d1-badge-published { background: var(--success); }
+  .d1-badge-scheduled { background: var(--info); }
+  .d1-badge-draft { background: var(--gray-500); }
+  .d1-card-body { padding: 12px; }
+  .d1-card-title { font-size: 14px; font-weight: 500; color: var(--gray-950); margin-bottom: 4px; }
+  .d1-card-meta { font-size: 12px; color: var(--gray-500); display: flex; align-items: center; gap: 8px; }
+  .d1-platform-dots { display: flex; gap: 4px; }
+  .d1-platform-dot { width: 14px; height: 14px; border-radius: 4px; font-size: 8px; display: flex; align-items: center; justify-content: center; color: white; }
+  .d1-quota { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--gray-100); }
+  .d1-quota-label { font-size: 12px; color: var(--gray-500); margin-bottom: 6px; }
+  .d1-quota-bar { height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+  .d1-quota-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+  .d1-quota-text { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+
+  /* ====== DIRECTION 2: Auto-Montage Focus ====== */
+  .d2-app { display: flex; height: 640px; background: var(--gray-50); }
+  .d2-sidebar { width: 64px; background: var(--gray-950); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; }
+  .d2-sidebar-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--gray-500); cursor: pointer; font-size: 18px; transition: all 0.15s; }
+  .d2-sidebar-icon:hover { background: rgba(255,255,255,0.1); color: white; }
+  .d2-sidebar-icon.active { background: var(--primary); color: white; }
+  .d2-main { flex: 1; display: flex; }
+  .d2-upload-area { flex: 1; padding: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .d2-dropzone { width: 100%; max-width: 600px; border: 2px dashed var(--gray-300); border-radius: 16px; padding: 48px; text-align: center; transition: all 0.2s; background: var(--white); }
+  .d2-dropzone:hover { border-color: var(--primary); background: var(--primary-subtle); }
+  .d2-dropzone-icon { font-size: 48px; margin-bottom: 16px; }
+  .d2-dropzone-text { font-size: 16px; color: var(--gray-700); font-weight: 500; margin-bottom: 8px; }
+  .d2-dropzone-sub { font-size: 13px; color: var(--gray-500); }
+  .d2-clips { display: flex; gap: 12px; margin-top: 24px; width: 100%; max-width: 600px; }
+  .d2-clip { flex: 1; background: var(--white); border-radius: 12px; border: 1px solid var(--gray-100); padding: 12px; text-align: center; }
+  .d2-clip-thumb { height: 80px; background: linear-gradient(135deg, #c7d2fe, #e0e7ff); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .d2-clip-name { font-size: 12px; color: var(--gray-700); font-weight: 500; }
+  .d2-clip-dur { font-size: 11px; color: var(--gray-500); }
+  .d2-generate-btn { margin-top: 24px; padding: 14px 32px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+  .d2-generate-btn:hover { background: var(--primary-dark); transform: scale(1.02); }
+  .d2-options { display: flex; gap: 12px; margin-top: 16px; }
+  .d2-option { padding: 8px 14px; background: var(--white); border: 1px solid var(--gray-300); border-radius: 8px; font-size: 13px; color: var(--gray-700); cursor: pointer; font-family: inherit; }
+  .d2-option:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ====== DIRECTION 3: Split Panel Result ====== */
+  .d3-app { display: flex; height: 640px; background: var(--white); }
+  .d3-sidebar { width: 240px; background: var(--gray-50); border-right: 1px solid var(--gray-100); padding: 20px; display: flex; flex-direction: column; }
+  .d3-preview { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--gray-950); position: relative; }
+  .d3-phone-frame { width: 270px; height: 480px; background: var(--gray-950); border-radius: 32px; border: 3px solid var(--gray-700); overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
+  .d3-phone-content { width: 100%; height: 100%; background: linear-gradient(180deg, #312e81, #4338CA, #6366F1); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .d3-phone-text { color: white; font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+  .d3-phone-sub { color: rgba(255,255,255,0.7); font-size: 12px; text-align: center; }
+  .d3-phone-play { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-top: 24px; font-size: 24px; color: white; cursor: pointer; }
+  .d3-panel { width: 340px; background: var(--white); border-left: 1px solid var(--gray-100); padding: 24px; overflow-y: auto; }
+  .d3-panel h3 { font-size: 18px; font-weight: 600; color: var(--gray-950); margin-bottom: 16px; }
+  .d3-field { margin-bottom: 16px; }
+  .d3-field label { font-size: 12px; color: var(--gray-500); font-weight: 500; display: block; margin-bottom: 6px; }
+  .d3-field textarea, .d3-field input { width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: 8px; font-family: inherit; font-size: 14px; color: var(--gray-950); resize: none; }
+  .d3-field textarea:focus, .d3-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-subtle); }
+  .d3-platforms { display: flex; gap: 8px; margin-bottom: 16px; }
+  .d3-platform-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--gray-300); font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; background: var(--white); }
+  .d3-platform-btn.selected { border-color: var(--primary); background: var(--primary-subtle); color: var(--primary); }
+  .d3-actions { display: flex; gap: 8px; margin-top: 20px; }
+
+  /* ====== DIRECTION 4: Calendar Command Center ====== */
+  .d4-app { display: flex; height: 640px; background: var(--white); }
+  .d4-sidebar { width: 200px; background: var(--gray-50); border-right: 1px solid var(--gray-100); padding: 16px 0; }
+  .d4-main { flex: 1; padding: 20px; display: flex; flex-direction: column; }
+  .d4-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .d4-header h2 { font-size: 20px; font-weight: 600; color: var(--gray-950); }
+  .d4-calendar-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--gray-100); border: 1px solid var(--gray-100); border-radius: 12px; overflow: hidden; }
+  .d4-day-header { background: var(--gray-50); padding: 8px; text-align: center; font-size: 12px; font-weight: 500; color: var(--gray-500); }
+  .d4-day { background: var(--white); padding: 8px; min-height: 80px; cursor: pointer; transition: all 0.15s; }
+  .d4-day:hover { background: var(--primary-subtle); }
+  .d4-day-num { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+  .d4-day-num.today { color: var(--primary); font-weight: 700; }
+  .d4-day-item { font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 3px; font-weight: 500; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .d4-item-reel { background: #EDE9FE; color: #7C3AED; }
+  .d4-item-carousel { background: #DBEAFE; color: #2563EB; }
+  .d4-item-post { background: #D1FAE5; color: #059669; }
+  .d4-item-failed { background: #FFE4E6; color: var(--error); }
+  .d4-mix { display: flex; gap: 16px; margin-top: 12px; padding: 12px 16px; background: var(--gray-50); border-radius: 8px; }
+  .d4-mix-item { font-size: 12px; color: var(--gray-700); display: flex; align-items: center; gap: 6px; }
+  .d4-mix-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ====== DIRECTION 5: Generation Progress ====== */
+  .d5-app { height: 640px; background: var(--gray-50); display: flex; align-items: center; justify-content: center; }
+  .d5-card { background: var(--white); border-radius: 20px; padding: 48px; width: 560px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); text-align: center; }
+  .d5-title { font-size: 24px; font-weight: 700; color: var(--gray-950); margin-bottom: 8px; }
+  .d5-subtitle { font-size: 14px; color: var(--gray-500); margin-bottom: 32px; }
+  .d5-steps { text-align: left; margin-bottom: 32px; }
+  .d5-step { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; }
+  .d5-step-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .d5-step-done .d5-step-icon { background: var(--success); color: white; }
+  .d5-step-active .d5-step-icon { background: var(--primary); color: white; animation: pulse 1.5s infinite; }
+  .d5-step-pending .d5-step-icon { background: var(--gray-100); color: var(--gray-500); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  .d5-step-text { flex: 1; }
+  .d5-step-label { font-size: 14px; font-weight: 500; color: var(--gray-950); }
+  .d5-step-detail { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .d5-step-done .d5-step-label { color: var(--success); }
+  .d5-progress-bar { height: 8px; background: var(--gray-100); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .d5-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 4px; transition: width 0.5s; }
+  .d5-progress-text { font-size: 13px; color: var(--gray-500); }
+
+  /* ====== DIRECTION 6: Publish Confirmation ====== */
+  .d6-app { height: 640px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; position: relative; }
+  .d6-bg { position: absolute; inset: 0; background: var(--gray-50); filter: blur(2px); opacity: 0.8; }
+  .d6-modal { position: relative; background: var(--white); border-radius: 20px; padding: 40px; width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); text-align: center; }
+  .d6-check { width: 64px; height: 64px; border-radius: 50%; background: #D1FAE5; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
+  .d6-title { font-size: 22px; font-weight: 700; color: var(--gray-950); margin-bottom: 8px; }
+  .d6-subtitle { font-size: 14px; color: var(--gray-500); margin-bottom: 24px; }
+  .d6-platforms { display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; }
+  .d6-platform-card { padding: 16px 20px; border-radius: 12px; border: 1px solid var(--gray-100); display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 100px; }
+  .d6-platform-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; }
+  .d6-platform-name { font-size: 12px; color: var(--gray-700); font-weight: 500; }
+  .d6-platform-status { font-size: 11px; color: var(--success); font-weight: 500; }
+  .d6-link { font-size: 13px; color: var(--primary); text-decoration: none; cursor: pointer; }
+  .d6-link:hover { text-decoration: underline; }
+  .d6-actions { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+
+  /* Direction Labels */
+  .dir-header { padding: 24px 28px; background: var(--gray-50); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-100); }
+  .dir-header h3 { font-size: 18px; font-weight: 600; color: var(--gray-950); }
+  .dir-header .tag { margin-left: 12px; }
+  .dir-desc { padding: 16px 28px; font-size: 14px; color: var(--gray-700); line-height: 1.6; border-bottom: 1px solid var(--gray-100); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <h1>Plublista Design Directions</h1>
+  <div class="nav-links">
+    <button class="active" onclick="showSection('overview')">Overview</button>
+    <button onclick="showSection('d1')">1. Dashboard</button>
+    <button onclick="showSection('d2')">2. Upload</button>
+    <button onclick="showSection('d3')">3. Result</button>
+    <button onclick="showSection('d4')">4. Calendar</button>
+    <button onclick="showSection('d5')">5. Progress</button>
+    <button onclick="showSection('d6')">6. Publish</button>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<div class="section active" id="overview">
+  <span class="tag tag-primary">UX Design Specification</span>
+  <h1 class="section-title" style="margin-top:12px;">Plublista Design Directions</h1>
+  <p class="section-subtitle">6 key screens showing the visual direction for Plublista's core experience. Each direction demonstrates our design foundation: Indigo primary, Inter typography, shadcn/ui components, sidebar+canvas layout.</p>
+
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1200px;">
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; cursor:pointer;" onclick="showSection('d1')">
+      <div style="font-size:36px; margin-bottom:12px;">📊</div>
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:6px;">1. Dashboard Hub</h3>
+      <p style="font-size:13px; color:var(--gray-500);">The command center. Stats, recent content, quick-create buttons. Sophie's Monday morning starting point.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; cursor:pointer;" onclick="showSection('d2')">
+      <div style="font-size:36px; margin-bottom:12px;">📤</div>
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:6px;">2. Auto-Montage Upload</h3>
+      <p style="font-size:13px; color:var(--gray-500);">The hero moment. Upload clips, select style, generate. Marc's first experience with Plublista.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; cursor:pointer;" onclick="showSection('d3')">
+      <div style="font-size:36px; margin-bottom:12px;">🎬</div>
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:6px;">3. Result Preview</h3>
+      <p style="font-size:13px; color:var(--gray-500);">Split-panel: phone preview + edit panel. The "Your Reel is ready!" moment.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; cursor:pointer;" onclick="showSection('d4')">
+      <div style="font-size:36px; margin-bottom:12px;">📅</div>
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:6px;">4. Calendar View</h3>
+      <p style="font-size:13px; color:var(--gray-500);">Content scheduling command center. Drag-and-drop. Content mix indicator. Sophie's weekly planning hub.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; cursor:pointer;" onclick="showSection('d5')">
+      <div style="font-size:36px; margin-bottom:12px;">⏳</div>
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:6px;">5. Generation Progress</h3>
+      <p style="font-size:13px; color:var(--gray-500);">Step-by-step AI progress. Builds excitement, kills anxiety. Shows AI decisions transparently.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; cursor:pointer;" onclick="showSection('d6')">
+      <div style="font-size:36px; margin-bottom:12px;">🎉</div>
+      <h3 style="font-size:16px; font-weight:600; margin-bottom:6px;">6. Publish Confirmation</h3>
+      <p style="font-size:13px; color:var(--gray-500);">The celebration moment. Multi-platform success. Links to live content. Trust builder.</p>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTION 1: Dashboard -->
+<div class="section" id="d1">
+  <div class="direction">
+    <div class="dir-header"><h3>Direction 1: Dashboard Hub <span class="tag tag-primary">Primary View</span></h3></div>
+    <div class="dir-desc">The dashboard is the landing page. Stats at the top, content grid below. Quick-create buttons for immediate action. Sidebar navigation. Quota indicator in sidebar footer. This is what Sophie sees every Monday morning.</div>
+    <div class="d1-app">
+      <div class="d1-sidebar">
+        <div class="d1-logo">Plublista</div>
+        <div class="d1-nav-item active">📊 Dashboard</div>
+        <div class="d1-nav-item">✨ Create</div>
+        <div class="d1-nav-item">📅 Calendar</div>
+        <div class="d1-nav-item">📚 Library</div>
+        <div class="d1-nav-item">⚙️ Settings</div>
+        <div style="flex:1;"></div>
+        <div class="d1-quota">
+          <div class="d1-quota-label">Reels this month</div>
+          <div class="d1-quota-bar"><div class="d1-quota-fill" style="width:34%;"></div></div>
+          <div class="d1-quota-text">17 / 50 used · Pro plan</div>
+        </div>
+      </div>
+      <div class="d1-main">
+        <div class="d1-topbar">
+          <h2>Dashboard</h2>
+          <div class="d1-quick-actions">
+            <button class="d1-btn d1-btn-primary">+ New Reel</button>
+            <button class="d1-btn d1-btn-outline">+ Carousel</button>
+            <button class="d1-btn d1-btn-outline">+ Post</button>
+          </div>
+        </div>
+        <div class="d1-stats">
+          <div class="d1-stat-card"><div class="d1-stat-label">Created this week</div><div class="d1-stat-value">12</div><div class="d1-stat-change">+3 from last week</div></div>
+          <div class="d1-stat-card"><div class="d1-stat-label">Published</div><div class="d1-stat-value">8</div><div class="d1-stat-change">95% success rate</div></div>
+          <div class="d1-stat-card"><div class="d1-stat-label">Scheduled</div><div class="d1-stat-value">4</div><div class="d1-stat-change">Next: Tomorrow 9am</div></div>
+          <div class="d1-stat-card"><div class="d1-stat-label">Time saved</div><div class="d1-stat-value">8h</div><div class="d1-stat-change">vs manual editing</div></div>
+        </div>
+        <div style="font-size:16px; font-weight:600; color:var(--gray-950); margin-bottom:12px;">Recent Content</div>
+        <div class="d1-content-grid">
+          <div class="d1-content-card">
+            <div class="d1-card-thumb"><span>🎬</span><div class="d1-card-badge d1-badge-published">Published</div></div>
+            <div class="d1-card-body"><div class="d1-card-title">Restaurant Daily Special</div><div class="d1-card-meta"><div class="d1-platform-dots"><div class="d1-platform-dot" style="background:var(--ig);">I</div><div class="d1-platform-dot" style="background:var(--tt);">T</div></div><span>2h ago</span></div></div>
+          </div>
+          <div class="d1-content-card">
+            <div class="d1-card-thumb" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);"><span>📸</span><div class="d1-card-badge d1-badge-scheduled">Scheduled</div></div>
+            <div class="d1-card-body"><div class="d1-card-title">Product Carousel — Sneakers</div><div class="d1-card-meta"><div class="d1-platform-dots"><div class="d1-platform-dot" style="background:var(--ig);">I</div></div><span>Tomorrow 10am</span></div></div>
+          </div>
+          <div class="d1-content-card">
+            <div class="d1-card-thumb" style="background:linear-gradient(135deg,#fef3c7,#fde68a);"><span>🎬</span><div class="d1-card-badge d1-badge-draft">Draft</div></div>
+            <div class="d1-card-body"><div class="d1-card-title">Behind the Scenes — Studio</div><div class="d1-card-meta"><span>Draft · Edited 1h ago</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTION 2: Upload -->
+<div class="section" id="d2">
+  <div class="direction">
+    <div class="dir-header"><h3>Direction 2: Auto-Montage Upload <span class="tag tag-primary">Hero Feature</span></h3></div>
+    <div class="dir-desc">Minimal, focused upload experience. Icon-only sidebar to maximize space. Large dropzone centered. Uploaded clips appear as cards below. Generate button is the dominant CTA. Optional settings collapsed. Zero-configuration by default.</div>
+    <div class="d2-app">
+      <div class="d2-sidebar">
+        <div class="d2-sidebar-icon" style="background:var(--primary); color:white; font-weight:700; font-size:14px; margin-bottom:16px;">P</div>
+        <div class="d2-sidebar-icon">📊</div>
+        <div class="d2-sidebar-icon active">✨</div>
+        <div class="d2-sidebar-icon">📅</div>
+        <div class="d2-sidebar-icon">📚</div>
+        <div style="flex:1;"></div>
+        <div class="d2-sidebar-icon">⚙️</div>
+      </div>
+      <div class="d2-upload-area">
+        <div class="d2-dropzone">
+          <div class="d2-dropzone-icon">📤</div>
+          <div class="d2-dropzone-text">Drop your video clips here</div>
+          <div class="d2-dropzone-sub">or click to browse · MP4, MOV, WebM · Up to 2GB total</div>
+        </div>
+        <div class="d2-clips">
+          <div class="d2-clip"><div class="d2-clip-thumb">🎬</div><div class="d2-clip-name">restaurant-01.mp4</div><div class="d2-clip-dur">0:42</div></div>
+          <div class="d2-clip"><div class="d2-clip-thumb">🎬</div><div class="d2-clip-name">restaurant-02.mov</div><div class="d2-clip-dur">1:15</div></div>
+          <div class="d2-clip"><div class="d2-clip-thumb">🎬</div><div class="d2-clip-name">restaurant-03.mp4</div><div class="d2-clip-dur">0:28</div></div>
+        </div>
+        <button class="d2-generate-btn">✨ Generate Auto-Montage</button>
+        <div class="d2-options">
+          <div class="d2-option">Style: Dynamic</div>
+          <div class="d2-option">Format: 9:16</div>
+          <div class="d2-option">Duration: 30s</div>
+          <div class="d2-option">Music: Auto</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTION 3: Result -->
+<div class="section" id="d3">
+  <div class="direction">
+    <div class="dir-header"><h3>Direction 3: Result Preview — Split Panel <span class="tag tag-primary">Core Flow</span></h3></div>
+    <div class="dir-desc">Phone-frame preview on the left (dark background for contrast). Edit panel on the right with caption, hashtags, platform selection, and action buttons. The user sees exactly what the Reel will look like on Instagram.</div>
+    <div class="d3-app">
+      <div class="d3-sidebar">
+        <div style="font-size:16px; font-weight:700; color:var(--primary); margin-bottom:20px;">Plublista</div>
+        <div class="d1-nav-item active">✨ Create</div>
+        <div class="d1-nav-item">📊 Dashboard</div>
+        <div class="d1-nav-item">📅 Calendar</div>
+        <div class="d1-nav-item">📚 Library</div>
+      </div>
+      <div class="d3-preview">
+        <div class="d3-phone-frame">
+          <div class="d3-phone-content">
+            <div class="d3-phone-text">These sneakers change everything</div>
+            <div class="d3-phone-sub">AI Auto-Montage · Dynamic · 30s</div>
+            <div class="d3-phone-play">▶</div>
+          </div>
+        </div>
+        <div style="position:absolute; bottom:20px; left:20px; color:rgba(255,255,255,0.5); font-size:12px;">9:16 · 1080×1920 · 30fps</div>
+      </div>
+      <div class="d3-panel">
+        <h3>Your Reel is ready! ✨</h3>
+        <div class="d3-field">
+          <label>Caption</label>
+          <textarea rows="3">These sneakers change everything. Comfort meets style in every step. 👟</textarea>
+        </div>
+        <div class="d3-field">
+          <label>Hashtags</label>
+          <input type="text" value="#sneakers #style #fashion #newkicks #streetstyle">
+        </div>
+        <div class="d3-field">
+          <label>Music</label>
+          <div style="display:flex; align-items:center; gap:8px; padding:10px; background:var(--gray-50); border-radius:8px;">
+            <span>🎵</span>
+            <div><div style="font-size:13px; font-weight:500; color:var(--gray-950);">Energetic Pop Beat</div><div style="font-size:11px; color:var(--gray-500);">Original · 30s · CassetteAI</div></div>
+          </div>
+        </div>
+        <label style="font-size:12px; color:var(--gray-500); font-weight:500; display:block; margin-bottom:8px;">Publish to</label>
+        <div class="d3-platforms">
+          <div class="d3-platform-btn selected" style="border-color:var(--ig); color:var(--ig); background:#FFF1F3;">IG ✓</div>
+          <div class="d3-platform-btn selected" style="border-color:#FF0000; color:#FF0000; background:#FFF5F5;">YT ✓</div>
+          <div class="d3-platform-btn selected" style="border-color:#000; color:#000; background:#F5F5F5;">TT ✓</div>
+          <div class="d3-platform-btn">FB</div>
+        </div>
+        <div class="d3-actions">
+          <button class="d1-btn d1-btn-primary" style="flex:1;">📤 Publish Now</button>
+          <button class="d1-btn d1-btn-outline" style="flex:1;">📅 Schedule</button>
+        </div>
+        <div style="text-align:center; margin-top:12px;">
+          <span style="font-size:13px; color:var(--gray-500); cursor:pointer;">🔄 Regenerate with different style</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTION 4: Calendar -->
+<div class="section" id="d4">
+  <div class="direction">
+    <div class="dir-header"><h3>Direction 4: Calendar Command Center <span class="tag tag-primary">Power User</span></h3></div>
+    <div class="dir-desc">Weekly calendar view with content cards color-coded by type. Content mix indicator at the bottom. Sophie's planning hub — see the whole week, spot gaps, drag to reschedule. Click "+" on any day to create new content for that date.</div>
+    <div class="d4-app">
+      <div class="d4-sidebar">
+        <div style="padding:0 16px 16px; font-size:16px; font-weight:700; color:var(--primary);">Plublista</div>
+        <div class="d1-nav-item">📊 Dashboard</div>
+        <div class="d1-nav-item">✨ Create</div>
+        <div class="d1-nav-item active">📅 Calendar</div>
+        <div class="d1-nav-item">📚 Library</div>
+        <div class="d1-nav-item">⚙️ Settings</div>
+      </div>
+      <div class="d4-main">
+        <div class="d4-header">
+          <h2>📅 February 2026</h2>
+          <div style="display:flex; gap:8px;">
+            <button class="d1-btn d1-btn-outline">← Prev</button>
+            <button class="d1-btn d1-btn-outline">Today</button>
+            <button class="d1-btn d1-btn-outline">Next →</button>
+            <button class="d1-btn d1-btn-primary">+ Create</button>
+          </div>
+        </div>
+        <div class="d4-calendar-grid">
+          <div class="d4-day-header">Mon</div><div class="d4-day-header">Tue</div><div class="d4-day-header">Wed</div><div class="d4-day-header">Thu</div><div class="d4-day-header">Fri</div><div class="d4-day-header">Sat</div><div class="d4-day-header">Sun</div>
+          <div class="d4-day"><div class="d4-day-num">9</div><div class="d4-day-item d4-item-reel">🎬 Restaurant Reel</div><div class="d4-day-item d4-item-carousel">📸 Product Slides</div></div>
+          <div class="d4-day"><div class="d4-day-num">10</div><div class="d4-day-item d4-item-reel">🎬 Sneaker Launch</div></div>
+          <div class="d4-day"><div class="d4-day-num">11</div><div class="d4-day-item d4-item-carousel">📸 Tips Carousel</div><div class="d4-day-item d4-item-post">🖼️ Motivational</div></div>
+          <div class="d4-day"><div class="d4-day-num">12</div><div class="d4-day-item d4-item-reel">🎬 BTS Studio</div></div>
+          <div class="d4-day"><div class="d4-day-num today">13</div><div class="d4-day-item d4-item-reel">🎬 Tutorial: Lacing</div><div class="d4-day-item d4-item-failed">⚠️ Failed: YT token</div></div>
+          <div class="d4-day"><div class="d4-day-num">14</div><div class="d4-day-item d4-item-carousel">📸 Weekend Vibes</div></div>
+          <div class="d4-day"><div class="d4-day-num">15</div><div class="d4-day-item d4-item-post">🖼️ Sunday Quote</div></div>
+          <div class="d4-day"><div class="d4-day-num">16</div></div>
+          <div class="d4-day"><div class="d4-day-num">17</div><div class="d4-day-item d4-item-reel">🎬 New Arrivals</div></div>
+          <div class="d4-day"><div class="d4-day-num">18</div></div>
+          <div class="d4-day"><div class="d4-day-num">19</div><div class="d4-day-item d4-item-carousel">📸 How-to Guide</div></div>
+          <div class="d4-day"><div class="d4-day-num">20</div></div>
+          <div class="d4-day"><div class="d4-day-num">21</div></div>
+          <div class="d4-day"><div class="d4-day-num">22</div></div>
+        </div>
+        <div class="d4-mix">
+          <div class="d4-mix-item"><div class="d4-mix-dot" style="background:#7C3AED;"></div> Reels: 5/4 ✓</div>
+          <div class="d4-mix-item"><div class="d4-mix-dot" style="background:#2563EB;"></div> Carousels: 4/3 ✓</div>
+          <div class="d4-mix-item"><div class="d4-mix-dot" style="background:#059669;"></div> Posts: 2/2 ✓</div>
+          <div class="d4-mix-item" style="color:var(--error);"><div class="d4-mix-dot" style="background:var(--error);"></div> 1 Failed — click to retry</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTION 5: Progress -->
+<div class="section" id="d5">
+  <div class="direction">
+    <div class="dir-header"><h3>Direction 5: Generation Progress <span class="tag tag-primary">Emotional Design</span></h3></div>
+    <div class="dir-desc">Centered card with step-by-step AI progress. Each step shows what the AI is doing and its decisions. Builds excitement through transparency. This is the "magic" moment — the UI must make the wait feel exciting, not anxious.</div>
+    <div class="d5-app">
+      <div class="d5-card">
+        <div class="d5-title">Creating your Reel...</div>
+        <div class="d5-subtitle">AI is editing 3 clips into a 30-second Dynamic Reel</div>
+        <div class="d5-steps">
+          <div class="d5-step d5-step-done"><div class="d5-step-icon">✓</div><div class="d5-step-text"><div class="d5-step-label">Analyzing clips</div><div class="d5-step-detail">3 clips uploaded · 2:25 total footage</div></div></div>
+          <div class="d5-step d5-step-done"><div class="d5-step-icon">✓</div><div class="d5-step-text"><div class="d5-step-label">Selecting best moments</div><div class="d5-step-detail">Hook: clip2 at 0:03 — high energy, clear subject</div></div></div>
+          <div class="d5-step d5-step-done"><div class="d5-step-icon">✓</div><div class="d5-step-text"><div class="d5-step-label">Matching music</div><div class="d5-step-detail">Selected: Energetic Pop Beat (30s) — matches content mood</div></div></div>
+          <div class="d5-step d5-step-active"><div class="d5-step-icon">⚡</div><div class="d5-step-text"><div class="d5-step-label">Rendering final video</div><div class="d5-step-detail">Applying Dynamic style · Jump cuts every 3-5s · 9:16 format</div></div></div>
+          <div class="d5-step d5-step-pending"><div class="d5-step-icon">○</div><div class="d5-step-text"><div class="d5-step-label">Adding text overlays</div><div class="d5-step-detail">Hook text + CTA + hashtags</div></div></div>
+        </div>
+        <div class="d5-progress-bar"><div class="d5-progress-fill" style="width:72%;"></div></div>
+        <div class="d5-progress-text">72% complete · ~45 seconds remaining</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTION 6: Publish -->
+<div class="section" id="d6">
+  <div class="direction">
+    <div class="dir-header"><h3>Direction 6: Publish Confirmation <span class="tag tag-primary">Celebration</span></h3></div>
+    <div class="dir-desc">The celebration moment. Modal overlay showing success across all platforms. Each platform shows status and a direct link. "Create another?" drives the batch loop. This is the moment that builds trust and drives retention.</div>
+    <div class="d6-app">
+      <div class="d6-bg"></div>
+      <div class="d6-modal">
+        <div class="d6-check">✓</div>
+        <div class="d6-title">Published successfully!</div>
+        <div class="d6-subtitle">Your Reel is now live on 3 platforms</div>
+        <div class="d6-platforms">
+          <div class="d6-platform-card">
+            <div class="d6-platform-icon" style="background:var(--ig);">IG</div>
+            <div class="d6-platform-name">Instagram</div>
+            <div class="d6-platform-status">✓ Live</div>
+            <a class="d6-link">View post →</a>
+          </div>
+          <div class="d6-platform-card">
+            <div class="d6-platform-icon" style="background:var(--yt);">YT</div>
+            <div class="d6-platform-name">YouTube</div>
+            <div class="d6-platform-status">✓ Live</div>
+            <a class="d6-link">View short →</a>
+          </div>
+          <div class="d6-platform-card">
+            <div class="d6-platform-icon" style="background:var(--tt);">TT</div>
+            <div class="d6-platform-name">TikTok</div>
+            <div class="d6-platform-status">✓ Live</div>
+            <a class="d6-link">View video →</a>
+          </div>
+        </div>
+        <div class="d6-actions">
+          <button class="d1-btn d1-btn-primary" style="flex:1;">✨ Create Another</button>
+          <button class="d1-btn d1-btn-outline" style="flex:1;">📅 View Calendar</button>
+        </div>
+        <div style="margin-top:12px; font-size:12px; color:var(--gray-500);">Undo publish (5s)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

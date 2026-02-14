@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "ayrshare_profile_key" text;
