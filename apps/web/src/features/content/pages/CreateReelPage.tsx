@@ -17,6 +17,7 @@ import { MontageSettings } from '../components/MontageSettings';
 import type { MontageSettingsValues } from '../components/MontageSettings';
 import { apiPost } from '@/lib/apiClient';
 import { Button } from '@/components/ui/button';
+import { QuotaWarningBanner } from '@/features/auth/components/QuotaWarningBanner';
 
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
 const MAX_CLIPS = 10;
@@ -217,8 +218,15 @@ export function CreateReelPage() {
         music: currentSettings.music,
       });
       navigate(`/create/reel/${result.data.id}/progress`);
-    } catch {
-      toast.error('Failed to create Auto-Montage. Please try again.');
+    } catch (err) {
+      const apiError = err as { code?: string; message?: string };
+      if (apiError.code === 'QUOTA_EXCEEDED') {
+        toast.error(apiError.message ?? 'Not enough credits. Upgrade your plan for more.');
+      } else if (apiError.code === 'ACCOUNT_SUSPENDED') {
+        toast.error(apiError.message ?? 'Account suspended. Please update your payment method.');
+      } else {
+        toast.error('Failed to create Auto-Montage. Please try again.');
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -233,6 +241,8 @@ export function CreateReelPage() {
           New Auto-Montage
         </h1>
       </div>
+
+      <QuotaWarningBanner />
 
       {/* Upload zone — only show if under max clips */}
       {clips.length < MAX_CLIPS && (

@@ -4,3 +4,7 @@ export * from './contentItems';
 export * from './quotaUsage';
 export * from './apiCostLogs';
 export * from './publishJobs';
+export * from './subscriptions';
+export * from './tvScans';
+export * from './stripeEvents';
+export * from './auditLogs';

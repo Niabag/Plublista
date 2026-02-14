@@ -18,6 +18,11 @@ vi.mock('@sentry/react', () => ({
   replayIntegration: vi.fn(),
 }));
 
+// Mock PaymentFailedBanner to avoid QueryClient issues in layout tests
+vi.mock('@/features/billing/components/PaymentFailedBanner', () => ({
+  PaymentFailedBanner: () => null,
+}));
+
 import { apiGet } from '@/lib/apiClient';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';

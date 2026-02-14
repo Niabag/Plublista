@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { withRetry, withTimeout } from '../lib/resilience';
 import { AppError } from '../lib/errors';
+
 import { logCost } from './costTracker';
 
 let client: Anthropic | null = null;
@@ -10,6 +11,12 @@ function getClient(): Anthropic {
     client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
   return client;
+}
+
+/** Strip markdown code fences (```json ... ```) that Claude may wrap around JSON. */
+function stripCodeFences(text: string): string {
+  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  return match ? match[1].trim() : text.trim();
 }
 
 export interface ClipAnalysis {
@@ -49,8 +56,9 @@ Respond with ONLY valid JSON, no markdown.`,
           throw new AppError('EXTERNAL_API_ERROR', 'Claude returned empty response', 502);
         }
 
-        const text =
+        const raw =
           response.content[0].type === 'text' ? response.content[0].text : '';
+        const text = stripCodeFences(raw);
 
         let parsed: unknown;
         try {
@@ -128,8 +136,9 @@ Respond with ONLY valid JSON, no markdown.`,
           throw new AppError('EXTERNAL_API_ERROR', 'Claude returned empty response', 502);
         }
 
-        const text =
+        const raw =
           response.content[0].type === 'text' ? response.content[0].text : '';
+        const text = stripCodeFences(raw);
 
         let parsed: unknown;
         try {

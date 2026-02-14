@@ -25,6 +25,7 @@ const mockItem: ContentItem = {
   ctaText: null,
   musicUrl: null,
   musicPrompt: null,
+  scheduledAt: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };

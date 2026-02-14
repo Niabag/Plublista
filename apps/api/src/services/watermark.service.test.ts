@@ -15,6 +15,12 @@ vi.mock('sharp', () => {
   return { default: sharpFn };
 });
 
+vi.mock('qrcode', () => ({
+  default: {
+    toBuffer: vi.fn().mockResolvedValue(Buffer.from('qr-png')),
+  },
+}));
+
 const mockDownloadBuffer = vi.fn().mockResolvedValue(Buffer.from('original'));
 const mockUploadBuffer = vi.fn().mockResolvedValue(undefined);
 
@@ -40,7 +46,7 @@ describe('applyWatermark', () => {
     vi.clearAllMocks();
   });
 
-  it('downloads, composites watermark, and uploads to R2', async () => {
+  it('downloads, composites watermark with QR, and uploads to R2', async () => {
     const result = await applyWatermark('users/u1/uploads/photo.jpg', 'user1', 'content1');
 
     expect(mockDownloadBuffer).toHaveBeenCalledWith('users/u1/uploads/photo.jpg');

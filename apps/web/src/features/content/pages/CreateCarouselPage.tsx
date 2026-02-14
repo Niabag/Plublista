@@ -12,6 +12,7 @@ import { SlideCard } from '../components/SlideCard';
 import { FormatPreview } from '../components/FormatPreview';
 import { apiPost } from '@/lib/apiClient';
 import { Button } from '@/components/ui/button';
+import { QuotaWarningBanner } from '@/features/auth/components/QuotaWarningBanner';
 
 export function CreateCarouselPage() {
   const {
@@ -84,8 +85,15 @@ export function CreateCarouselPage() {
         format,
       });
       navigate(`/create/carousel/${result.data.id}/preview`);
-    } catch {
-      toast.error('Failed to create carousel. Please try again.');
+    } catch (err) {
+      const apiError = err as { code?: string; message?: string };
+      if (apiError.code === 'QUOTA_EXCEEDED') {
+        toast.error(apiError.message ?? 'Not enough credits. Upgrade your plan for more.');
+      } else if (apiError.code === 'ACCOUNT_SUSPENDED') {
+        toast.error(apiError.message ?? 'Account suspended. Please update your payment method.');
+      } else {
+        toast.error('Failed to create carousel. Please try again.');
+      }
     } finally {
       setIsCreating(false);
     }
@@ -106,6 +114,8 @@ export function CreateCarouselPage() {
           {readyCount} / {slides.length} slides ready
         </span>
       </div>
+
+      <QuotaWarningBanner />
 
       {/* Format selector */}
       <FormatPreview

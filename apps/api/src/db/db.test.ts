@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { users, userRoleEnum, subscriptionTierEnum, contentItems, contentTypeEnum, contentStatusEnum, quotaUsage } from './schema/index';
+import { users, userRoleEnum, subscriptionTierEnum, contentItems, contentTypeEnum, contentStatusEnum, quotaUsage, subscriptions, subscriptionStatusEnum, stripeEvents } from './schema/index';
 import { getTableColumns } from 'drizzle-orm';
 
 describe('Database schema', () => {
@@ -116,6 +116,84 @@ describe('Database schema', () => {
     });
   });
 
+  describe('subscriptionStatusEnum', () => {
+    it('has correct enum values', () => {
+      expect(subscriptionStatusEnum.enumValues).toEqual([
+        'trialing',
+        'active',
+        'past_due',
+        'canceled',
+        'incomplete',
+      ]);
+    });
+  });
+
+  describe('subscriptions table', () => {
+    it('has all required columns', () => {
+      const columns = getTableColumns(subscriptions);
+      const columnNames = Object.keys(columns);
+
+      expect(columnNames).toContain('id');
+      expect(columnNames).toContain('userId');
+      expect(columnNames).toContain('stripeCustomerId');
+      expect(columnNames).toContain('stripeSubscriptionId');
+      expect(columnNames).toContain('tier');
+      expect(columnNames).toContain('status');
+      expect(columnNames).toContain('trialEndsAt');
+      expect(columnNames).toContain('currentPeriodStart');
+      expect(columnNames).toContain('currentPeriodEnd');
+      expect(columnNames).toContain('pendingTier');
+      expect(columnNames).toContain('pendingTierEffectiveDate');
+      expect(columnNames).toContain('failedPaymentRetries');
+      expect(columnNames).toContain('suspendedAt');
+      expect(columnNames).toContain('createdAt');
+      expect(columnNames).toContain('updatedAt');
+      expect(columnNames).toHaveLength(15);
+    });
+
+    it('maps to correct SQL column names', () => {
+      const columns = getTableColumns(subscriptions);
+
+      expect(columns.id.name).toBe('id');
+      expect(columns.userId.name).toBe('user_id');
+      expect(columns.stripeCustomerId.name).toBe('stripe_customer_id');
+      expect(columns.stripeSubscriptionId.name).toBe('stripe_subscription_id');
+      expect(columns.tier.name).toBe('tier');
+      expect(columns.status.name).toBe('status');
+      expect(columns.trialEndsAt.name).toBe('trial_ends_at');
+      expect(columns.currentPeriodStart.name).toBe('current_period_start');
+      expect(columns.currentPeriodEnd.name).toBe('current_period_end');
+      expect(columns.pendingTier.name).toBe('pending_tier');
+      expect(columns.pendingTierEffectiveDate.name).toBe('pending_tier_effective_date');
+      expect(columns.failedPaymentRetries.name).toBe('failed_payment_retries');
+      expect(columns.suspendedAt.name).toBe('suspended_at');
+      expect(columns.createdAt.name).toBe('created_at');
+      expect(columns.updatedAt.name).toBe('updated_at');
+    });
+  });
+
+  describe('stripeEvents table', () => {
+    it('has all required columns', () => {
+      const columns = getTableColumns(stripeEvents);
+      const columnNames = Object.keys(columns);
+
+      expect(columnNames).toContain('id');
+      expect(columnNames).toContain('stripeEventId');
+      expect(columnNames).toContain('eventType');
+      expect(columnNames).toContain('processedAt');
+      expect(columnNames).toHaveLength(4);
+    });
+
+    it('maps to correct SQL column names', () => {
+      const columns = getTableColumns(stripeEvents);
+
+      expect(columns.id.name).toBe('id');
+      expect(columns.stripeEventId.name).toBe('stripe_event_id');
+      expect(columns.eventType.name).toBe('event_type');
+      expect(columns.processedAt.name).toBe('processed_at');
+    });
+  });
+
   describe('quotaUsage table', () => {
     it('has all required columns', () => {
       const columns = getTableColumns(quotaUsage);
@@ -125,15 +203,11 @@ describe('Database schema', () => {
       expect(columnNames).toContain('userId');
       expect(columnNames).toContain('periodStart');
       expect(columnNames).toContain('periodEnd');
-      expect(columnNames).toContain('reelsUsed');
-      expect(columnNames).toContain('reelsLimit');
-      expect(columnNames).toContain('carouselsUsed');
-      expect(columnNames).toContain('carouselsLimit');
-      expect(columnNames).toContain('aiImagesUsed');
-      expect(columnNames).toContain('aiImagesLimit');
+      expect(columnNames).toContain('creditsUsed');
+      expect(columnNames).toContain('creditsLimit');
       expect(columnNames).toContain('platformsConnected');
       expect(columnNames).toContain('platformsLimit');
-      expect(columnNames).toHaveLength(12);
+      expect(columnNames).toHaveLength(8);
     });
 
     it('maps to correct SQL column names', () => {
@@ -142,12 +216,8 @@ describe('Database schema', () => {
       expect(columns.userId.name).toBe('user_id');
       expect(columns.periodStart.name).toBe('period_start');
       expect(columns.periodEnd.name).toBe('period_end');
-      expect(columns.reelsUsed.name).toBe('reels_used');
-      expect(columns.reelsLimit.name).toBe('reels_limit');
-      expect(columns.carouselsUsed.name).toBe('carousels_used');
-      expect(columns.carouselsLimit.name).toBe('carousels_limit');
-      expect(columns.aiImagesUsed.name).toBe('ai_images_used');
-      expect(columns.aiImagesLimit.name).toBe('ai_images_limit');
+      expect(columns.creditsUsed.name).toBe('credits_used');
+      expect(columns.creditsLimit.name).toBe('credits_limit');
       expect(columns.platformsConnected.name).toBe('platforms_connected');
       expect(columns.platformsLimit.name).toBe('platforms_limit');
     });

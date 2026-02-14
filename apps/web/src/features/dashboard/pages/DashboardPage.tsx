@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Film, Images, ImageIcon, Plus, AlertCircle } from 'lucide-react';
 import { useContentList } from '@/features/content/hooks/useContentList';
+import { useDeleteContent } from '@/features/content/hooks/useDeleteContent';
+import { useDuplicateContent } from '@/features/content/hooks/useDuplicateContent';
 import { ContentCard } from '@/features/content/components/ContentCard';
 import { QuotaIndicator } from '@/features/auth/components/QuotaIndicator';
+import { QuotaWarningBanner } from '@/features/auth/components/QuotaWarningBanner';
 
 const QUICK_CREATE_ITEMS = [
   {
@@ -81,12 +84,16 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 
 export function DashboardPage() {
   const { items, isPending, isError, refetch } = useContentList();
+  const { deleteContent } = useDeleteContent();
+  const { duplicateContent } = useDuplicateContent();
 
   const recentItems = items.slice(0, MAX_RECENT_ITEMS);
   const hasMore = items.length > MAX_RECENT_ITEMS;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 p-4 sm:p-6">
+      <QuotaWarningBanner />
+
       {/* Quick Create */}
       <section>
         <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -134,7 +141,12 @@ export function DashboardPage() {
         {!isPending && !isError && recentItems.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {recentItems.map((item) => (
-              <ContentCard key={item.id} item={item} />
+              <ContentCard
+                key={item.id}
+                item={item}
+                onDuplicate={duplicateContent}
+                onDelete={deleteContent}
+              />
             ))}
           </div>
         )}

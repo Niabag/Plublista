@@ -1,10 +1,9 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../../db/index';
 import { quotaUsage } from '../../db/schema/index';
-import { QUOTA_LIMITS } from '@plublista/shared';
+import { CREDIT_LIMITS } from '@plublista/shared';
 import type { SubscriptionTier } from '@plublista/shared';
 
-/** Platform limits per tier (stored in quota_usage for future use) */
 const PLATFORM_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
   starter: 3,
@@ -23,9 +22,8 @@ function getCurrentPeriod() {
   };
 }
 
-export async function getOrCreateQuotaUsage(userId: string, tier: SubscriptionTier) {
+export async function getOrCreateCreditUsage(userId: string, tier: SubscriptionTier) {
   const { periodStart, periodEnd } = getCurrentPeriod();
-  const limits = QUOTA_LIMITS[tier];
 
   const [existing] = await db
     .select()
@@ -41,12 +39,8 @@ export async function getOrCreateQuotaUsage(userId: string, tier: SubscriptionTi
       userId,
       periodStart,
       periodEnd,
-      reelsUsed: 0,
-      reelsLimit: limits.reels,
-      carouselsUsed: 0,
-      carouselsLimit: limits.carousels,
-      aiImagesUsed: 0,
-      aiImagesLimit: limits.aiImages,
+      creditsUsed: 0,
+      creditsLimit: CREDIT_LIMITS[tier],
       platformsConnected: 0,
       platformsLimit: PLATFORM_LIMITS[tier],
     })
@@ -64,33 +58,4 @@ export async function getOrCreateQuotaUsage(userId: string, tier: SubscriptionTi
   }
 
   return record;
-}
-
-export type QuotaResourceName = 'reels' | 'carousels' | 'aiImages';
-
-export async function incrementUsage(userId: string, tier: SubscriptionTier, resource: QuotaResourceName) {
-  const usage = await getOrCreateQuotaUsage(userId, tier);
-
-  const updateMap = {
-    reels: { reelsUsed: sql`${quotaUsage.reelsUsed} + 1` },
-    carousels: { carouselsUsed: sql`${quotaUsage.carouselsUsed} + 1` },
-    aiImages: { aiImagesUsed: sql`${quotaUsage.aiImagesUsed} + 1` },
-  } as const;
-
-  await db
-    .update(quotaUsage)
-    .set(updateMap[resource])
-    .where(eq(quotaUsage.id, usage.id));
-}
-
-export async function checkQuota(userId: string, tier: SubscriptionTier, resource: QuotaResourceName): Promise<boolean> {
-  const usage = await getOrCreateQuotaUsage(userId, tier);
-
-  const checks: Record<QuotaResourceName, () => boolean> = {
-    reels: () => usage.reelsUsed < usage.reelsLimit,
-    carousels: () => usage.carouselsUsed < usage.carouselsLimit,
-    aiImages: () => usage.aiImagesUsed < usage.aiImagesLimit,
-  };
-
-  return checks[resource]();
 }

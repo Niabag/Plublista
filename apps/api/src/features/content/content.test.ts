@@ -97,12 +97,12 @@ vi.mock('../../services/fal.service', () => ({
   generateImage: (...args: unknown[]) => mockGenerateImage(...args),
 }));
 
-// Mock quota service
-const mockCheckAndDecrementQuota = vi.hoisted(() => vi.fn());
-const mockRestoreQuota = vi.hoisted(() => vi.fn());
+// Mock quota service (credit-based)
+const mockCheckAndDecrementCredits = vi.hoisted(() => vi.fn());
+const mockRestoreCredits = vi.hoisted(() => vi.fn());
 vi.mock('../../services/quota.service', () => ({
-  checkAndDecrementQuota: (...args: unknown[]) => mockCheckAndDecrementQuota(...args),
-  restoreQuota: (...args: unknown[]) => mockRestoreQuota(...args),
+  checkAndDecrementCredits: (...args: unknown[]) => mockCheckAndDecrementCredits(...args),
+  restoreCredits: (...args: unknown[]) => mockRestoreCredits(...args),
 }));
 
 // Mock rate limiter
@@ -777,7 +777,7 @@ describe('Content Items API', () => {
         imageUrl: 'https://fal.ai/output/generated.webp',
         costUsd: 0.05,
       });
-      mockCheckAndDecrementQuota.mockResolvedValue(undefined);
+      mockCheckAndDecrementCredits.mockResolvedValue(undefined);
       // Mock global fetch for downloading generated image from Fal.ai
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
         ok: true,
@@ -871,7 +871,7 @@ describe('Content Items API', () => {
       const { db } = await import('../../db/index');
       const { AppError: AppErrorClass } = await import('../../lib/errors');
 
-      mockCheckAndDecrementQuota.mockRejectedValueOnce(
+      mockCheckAndDecrementCredits.mockRejectedValueOnce(
         new AppErrorClass('QUOTA_EXCEEDED', 'Monthly AI image quota reached', 429),
       );
 
@@ -1128,7 +1128,7 @@ describe('Content Items API', () => {
         imageUrl: 'https://fal.ai/output/generated.webp',
         costUsd: 0.05,
       });
-      mockCheckAndDecrementQuota.mockResolvedValue(undefined);
+      mockCheckAndDecrementCredits.mockResolvedValue(undefined);
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
         ok: true,
         headers: { get: () => null },
@@ -1179,7 +1179,7 @@ describe('Content Items API', () => {
       const { db } = await import('../../db/index');
       const { AppError: AppErrorClass } = await import('../../lib/errors');
 
-      mockCheckAndDecrementQuota.mockRejectedValueOnce(
+      mockCheckAndDecrementCredits.mockRejectedValueOnce(
         new AppErrorClass('QUOTA_EXCEEDED', 'Monthly AI image quota reached', 429),
       );
 
@@ -1223,6 +1223,178 @@ describe('Content Items API', () => {
 
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+  });
+
+  describe('credit enforcement on content creation', () => {
+    it('should return 429 when reel quota is exceeded', async () => {
+      const { agent, csrfToken } = await getAuthenticatedAgent();
+      const { AppError: AppErrorClass } = await import('../../lib/errors');
+
+      mockCheckAndDecrementCredits.mockRejectedValueOnce(
+        new AppErrorClass('QUOTA_EXCEEDED', 'Not enough credits. Upgrade your plan for more.', 429),
+      );
+
+      const res = await agent
+        .post('/api/content-items')
+        .set('X-CSRF-Token', csrfToken)
+        .send({
+          type: 'reel',
+          mediaUrls: ['users/test/uploads/video.mp4'],
+        });
+
+      expect(res.status).toBe(429);
+      expect(res.body.error.code).toBe('QUOTA_EXCEEDED');
+    });
+
+    it('should return 429 when carousel quota is exceeded', async () => {
+      const { agent, csrfToken } = await getAuthenticatedAgent();
+      const { AppError: AppErrorClass } = await import('../../lib/errors');
+
+      mockCheckAndDecrementCredits.mockRejectedValueOnce(
+        new AppErrorClass('QUOTA_EXCEEDED', 'Not enough credits. Upgrade your plan for more.', 429),
+      );
+
+      const res = await agent
+        .post('/api/content-items')
+        .set('X-CSRF-Token', csrfToken)
+        .send({
+          type: 'carousel',
+          mediaUrls: ['users/test/uploads/img1.jpg', 'users/test/uploads/img2.jpg'],
+          format: '1:1',
+        });
+
+      expect(res.status).toBe(429);
+      expect(res.body.error.code).toBe('QUOTA_EXCEEDED');
+    });
+
+    it('should call checkAndDecrementCredits with createReel for reel creation', async () => {
+      const { agent, csrfToken } = await getAuthenticatedAgent();
+      const { db } = await import('../../db/index');
+
+      (db.insert as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([mockContentItem]),
+        }),
+      });
+
+      await agent
+        .post('/api/content-items')
+        .set('X-CSRF-Token', csrfToken)
+        .send({
+          type: 'reel',
+          mediaUrls: ['users/test/uploads/video.mp4'],
+        });
+
+      expect(mockCheckAndDecrementCredits).toHaveBeenCalledWith('test-uuid-123', 'createReel');
+    });
+
+    it('should call checkAndDecrementCredits with createCarousel for carousel creation', async () => {
+      const { agent, csrfToken } = await getAuthenticatedAgent();
+      const { db } = await import('../../db/index');
+
+      const mockCarouselItem = {
+        ...mockContentItem,
+        type: 'carousel',
+        format: '1:1',
+        mediaUrls: ['users/test/uploads/img1.jpg', 'users/test/uploads/img2.jpg'],
+      };
+
+      (db.insert as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([mockCarouselItem]),
+        }),
+      });
+
+      (db.update as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue(undefined),
+        }),
+      });
+
+      await agent
+        .post('/api/content-items')
+        .set('X-CSRF-Token', csrfToken)
+        .send({
+          type: 'carousel',
+          mediaUrls: ['users/test/uploads/img1.jpg', 'users/test/uploads/img2.jpg'],
+          format: '1:1',
+        });
+
+      expect(mockCheckAndDecrementCredits).toHaveBeenCalledWith('test-uuid-123', 'createCarousel');
+    });
+
+    it('should not check credits for post creation', async () => {
+      const { agent, csrfToken } = await getAuthenticatedAgent();
+      const { db } = await import('../../db/index');
+
+      const mockPostItem = {
+        ...mockContentItem,
+        type: 'post',
+        format: '1:1',
+        mediaUrls: ['users/test/uploads/photo.jpg'],
+      };
+
+      (db.insert as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([mockPostItem]),
+        }),
+      });
+
+      (db.update as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue(undefined),
+        }),
+      });
+
+      await agent
+        .post('/api/content-items')
+        .set('X-CSRF-Token', csrfToken)
+        .send({
+          type: 'post',
+          mediaUrls: ['users/test/uploads/photo.jpg'],
+          format: '1:1',
+        });
+
+      expect(mockCheckAndDecrementCredits).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('POST /api/content-items/:id/duplicate', () => {
+    it('should return 429 when duplicating with exceeded quota', async () => {
+      const { agent, csrfToken } = await getAuthenticatedAgent();
+      const { db } = await import('../../db/index');
+      const { AppError: AppErrorClass } = await import('../../lib/errors');
+
+      // Mock getContentItem for the original item
+      (db.select as ReturnType<typeof vi.fn>)
+        .mockReturnValueOnce({
+          // deserializeUser
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([mockUser]),
+            }),
+          }),
+        })
+        .mockReturnValueOnce({
+          // getContentItem
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([mockContentItem]),
+            }),
+          }),
+        });
+
+      mockCheckAndDecrementCredits.mockRejectedValueOnce(
+        new AppErrorClass('QUOTA_EXCEEDED', 'Not enough credits. Upgrade your plan for more.', 429),
+      );
+
+      const res = await agent
+        .post('/api/content-items/content-uuid-1/duplicate')
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(429);
+      expect(res.body.error.code).toBe('QUOTA_EXCEEDED');
     });
   });
 });

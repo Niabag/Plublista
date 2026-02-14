@@ -3,7 +3,8 @@ import { db } from '../db/index';
 import { quotaUsage } from '../db/schema/index';
 import { users } from '../db/schema/users';
 import { AppError } from '../lib/errors';
-import { QUOTA_LIMITS, type SubscriptionTier } from '@plublista/shared';
+import { CREDIT_COSTS, CREDIT_LIMITS } from '@plublista/shared';
+import type { CreditOperation, SubscriptionTier } from '@plublista/shared';
 
 const PLATFORM_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,
@@ -31,37 +32,13 @@ function getValidatedTier(raw: string): SubscriptionTier {
   throw new AppError('INTERNAL_ERROR', `Invalid subscription tier: ${raw}`, 500);
 }
 
-type QuotaResource = 'ai_images' | 'carousels';
-
-function getQuotaColumn(resource: QuotaResource) {
-  if (resource === 'ai_images') {
-    return {
-      used: quotaUsage.aiImagesUsed,
-      limit: quotaUsage.aiImagesLimit,
-      jsKey: 'aiImagesUsed' as const,
-      label: 'Monthly AI image quota reached',
-    };
-  }
-  return {
-    used: quotaUsage.carouselsUsed,
-    limit: quotaUsage.carouselsLimit,
-    jsKey: 'carouselsUsed' as const,
-    label: 'Monthly carousel quota reached',
-  };
-}
-
-function getInitialUsage(resource: QuotaResource, amount: number) {
-  if (resource === 'ai_images') {
-    return { aiImagesUsed: amount, carouselsUsed: 0 };
-  }
-  return { aiImagesUsed: 0, carouselsUsed: amount };
-}
-
-export async function checkAndDecrementQuota(
+export async function checkAndDecrementCredits(
   userId: string,
-  resource: QuotaResource,
-  amount: number,
+  operation: CreditOperation,
+  multiplier = 1,
 ): Promise<void> {
+  const cost = CREDIT_COSTS[operation] * multiplier;
+
   // 1. Get user's subscription tier
   const [user] = await db
     .select({ subscriptionTier: users.subscriptionTier })
@@ -74,20 +51,17 @@ export async function checkAndDecrementQuota(
   }
 
   const tier = getValidatedTier(user.subscriptionTier);
-  const limits = QUOTA_LIMITS[tier];
-  const col = getQuotaColumn(resource);
-
   const { periodStart, periodEnd } = getCurrentPeriod();
 
   // 2. Try atomic increment with WHERE guard (prevents TOCTOU race)
   const updated = await db
     .update(quotaUsage)
-    .set({ [col.jsKey]: sql`${col.used} + ${amount}` })
+    .set({ creditsUsed: sql`${quotaUsage.creditsUsed} + ${cost}` })
     .where(
       and(
         eq(quotaUsage.userId, userId),
         eq(quotaUsage.periodStart, periodStart),
-        sql`${col.used} + ${amount} <= ${col.limit}`,
+        sql`${quotaUsage.creditsUsed} + ${cost} <= ${quotaUsage.creditsLimit}`,
       ),
     )
     .returning({ id: quotaUsage.id });
@@ -97,19 +71,14 @@ export async function checkAndDecrementQuota(
   }
 
   // 3. Row might not exist yet — create with onConflictDoNothing to handle races
-  const initialUsage = getInitialUsage(resource, amount);
   const [inserted] = await db
     .insert(quotaUsage)
     .values({
       userId,
       periodStart,
       periodEnd,
-      reelsUsed: 0,
-      reelsLimit: limits.reels,
-      carouselsUsed: initialUsage.carouselsUsed,
-      carouselsLimit: limits.carousels,
-      aiImagesUsed: initialUsage.aiImagesUsed,
-      aiImagesLimit: limits.aiImages,
+      creditsUsed: cost,
+      creditsLimit: CREDIT_LIMITS[tier],
       platformsConnected: 0,
       platformsLimit: PLATFORM_LIMITS[tier],
     })
@@ -123,32 +92,32 @@ export async function checkAndDecrementQuota(
   // 4. Row exists but INSERT raced — retry atomic increment
   const retried = await db
     .update(quotaUsage)
-    .set({ [col.jsKey]: sql`${col.used} + ${amount}` })
+    .set({ creditsUsed: sql`${quotaUsage.creditsUsed} + ${cost}` })
     .where(
       and(
         eq(quotaUsage.userId, userId),
         eq(quotaUsage.periodStart, periodStart),
-        sql`${col.used} + ${amount} <= ${col.limit}`,
+        sql`${quotaUsage.creditsUsed} + ${cost} <= ${quotaUsage.creditsLimit}`,
       ),
     )
     .returning({ id: quotaUsage.id });
 
   if (retried.length === 0) {
-    throw new AppError('QUOTA_EXCEEDED', col.label, 429);
+    throw new AppError('QUOTA_EXCEEDED', 'Not enough credits. Upgrade your plan for more.', 429);
   }
 }
 
-export async function restoreQuota(
+export async function restoreCredits(
   userId: string,
-  resource: QuotaResource,
-  amount: number,
+  operation: CreditOperation,
+  multiplier = 1,
 ): Promise<void> {
+  const cost = CREDIT_COSTS[operation] * multiplier;
   const { periodStart } = getCurrentPeriod();
-  const col = getQuotaColumn(resource);
 
   await db
     .update(quotaUsage)
-    .set({ [col.jsKey]: sql`GREATEST(${col.used} - ${amount}, 0)` })
+    .set({ creditsUsed: sql`GREATEST(${quotaUsage.creditsUsed} - ${cost}, 0)` })
     .where(
       and(
         eq(quotaUsage.userId, userId),

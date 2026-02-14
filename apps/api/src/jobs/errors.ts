@@ -5,6 +5,13 @@ export class PermanentPublishError extends Error {
   }
 }
 
+export class PermanentRenderError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PermanentRenderError';
+  }
+}
+
 export class MediaFormatError extends Error {
   public readonly originalFileKey: string;
   public readonly suggestedFormat: string;
@@ -40,6 +47,15 @@ const FORMAT_PATTERNS = [
   /webp.*not.*supported/i,
 ];
 
+const FFMPEG_PERMANENT_PATTERNS = [
+  /Invalid data found/i,
+  /Codec.*not found/i,
+  /No such file or directory/i,
+  /Invalid argument/i,
+  /does not contain any stream/i,
+  /Output file.*is empty/i,
+];
+
 const PERMANENT_PATTERNS = [
   /invalid.*credentials/i,
   /unauthorized/i,
@@ -55,12 +71,16 @@ export type ErrorCategory = 'transient' | 'format' | 'permanent' | 'unknown';
 
 export function classifyError(error: Error): ErrorCategory {
   if (error instanceof PermanentPublishError) return 'permanent';
+  if (error instanceof PermanentRenderError) return 'permanent';
   if (error instanceof MediaFormatError) return 'format';
 
   const msg = error.message;
 
   for (const pattern of FORMAT_PATTERNS) {
     if (pattern.test(msg)) return 'format';
+  }
+  for (const pattern of FFMPEG_PERMANENT_PATTERNS) {
+    if (pattern.test(msg)) return 'permanent';
   }
   for (const pattern of PERMANENT_PATTERNS) {
     if (pattern.test(msg)) return 'permanent';

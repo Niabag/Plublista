@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Film, Images, ImageIcon, Music, RefreshCw, Calendar, Send, CheckCircle, ExternalLink, Loader2, XCircle } from 'lucide-react';
+import { Film, Images, ImageIcon, Music, RefreshCw, Calendar, Send, CheckCircle, ExternalLink, Loader2, XCircle, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { apiPost } from '@/lib/apiClient';
@@ -16,6 +16,7 @@ import { PublishProgressDialog } from '../components/PublishProgressDialog';
 import { ScheduleDialog } from '../components/ScheduleDialog';
 import { CaptionEditor } from '../components/CaptionEditor';
 import { HashtagEditor } from '../components/HashtagEditor';
+import { useVideoPreview } from '../hooks/useVideoPreview';
 
 export function ContentPreviewPage() {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +29,10 @@ export function ContentPreviewPage() {
     user?.subscriptionTier,
   );
   const { schedule, isScheduling, cancelSchedule, isCancelling } = useScheduleContent(id ?? '');
+  const { previewUrl, isLoading: isPreviewLoading } = useVideoPreview(
+    id ?? '',
+    !!(item?.generatedMediaUrl),
+  );
   const isPublishable = item?.status === 'draft' || item?.status === 'failed';
   const isInProgress = item?.status === 'scheduled' || item?.status === 'generating';
   const { jobs, latestJob } = usePublishStatus(id ?? '', isInProgress || item?.status === 'published');
@@ -187,15 +192,49 @@ export function ContentPreviewPage() {
             </div>
           ) : (
             <>
-              <div className="mx-auto flex aspect-[9/16] max-w-xs items-center justify-center rounded-2xl border-2 border-dashed border-gray-400 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-                <div className="space-y-2 text-center">
-                  <Film className="mx-auto size-12 text-indigo-300 dark:text-gray-600" />
-                  <p className="text-sm text-muted-foreground">Video preview</p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.format ?? '9:16'} &middot; {item.duration ?? 30}s
-                  </p>
+              {previewUrl ? (
+                <div className={`mx-auto max-w-xs overflow-hidden rounded-2xl border border-gray-200 bg-black dark:border-gray-700`}>
+                  <video
+                    src={previewUrl}
+                    controls
+                    playsInline
+                    className={`w-full ${
+                      item.format === '16:9'
+                        ? 'aspect-video'
+                        : item.format === '1:1'
+                          ? 'aspect-square'
+                          : 'aspect-[9/16]'
+                    }`}
+                  />
                 </div>
-              </div>
+              ) : item.status === 'generating' ? (
+                <div className="mx-auto flex aspect-[9/16] max-w-xs items-center justify-center rounded-2xl border-2 border-dashed border-gray-400 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+                  <div className="space-y-2 text-center">
+                    <Loader2 className="mx-auto size-12 animate-spin text-indigo-400" />
+                    <p className="text-sm text-muted-foreground">Rendering video...</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.format ?? '9:16'} &middot; {item.duration ?? 30}s
+                    </p>
+                  </div>
+                </div>
+              ) : isPreviewLoading ? (
+                <div className="mx-auto flex aspect-[9/16] max-w-xs items-center justify-center rounded-2xl border-2 border-dashed border-gray-400 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+                  <div className="space-y-2 text-center">
+                    <Loader2 className="mx-auto size-8 animate-spin text-indigo-400" />
+                    <p className="text-sm text-muted-foreground">Loading preview...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="mx-auto flex aspect-[9/16] max-w-xs items-center justify-center rounded-2xl border-2 border-dashed border-gray-400 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+                  <div className="space-y-2 text-center">
+                    <Film className="mx-auto size-12 text-indigo-300 dark:text-gray-600" />
+                    <p className="text-sm text-muted-foreground">Video preview</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.format ?? '9:16'} &middot; {item.duration ?? 30}s
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Music Info */}
               {item.musicPrompt && (

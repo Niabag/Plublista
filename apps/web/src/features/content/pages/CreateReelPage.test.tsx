@@ -9,6 +9,11 @@ vi.mock('sonner', () => ({
   toast: { error: vi.fn(), success: vi.fn() },
 }));
 
+// Mock QuotaWarningBanner (uses useQuota which requires QueryClientProvider)
+vi.mock('@/features/auth/components/QuotaWarningBanner', () => ({
+  QuotaWarningBanner: () => null,
+}));
+
 // Mock apiClient
 const mockApiPost = vi.fn().mockResolvedValue({ data: { id: 'item-1' } });
 vi.mock('@/lib/apiClient', () => ({

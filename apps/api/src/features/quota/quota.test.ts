@@ -17,12 +17,8 @@ const mockQuotaUsage = {
   userId: 'test-uuid-123',
   periodStart: '2025-05-01',
   periodEnd: '2025-05-31',
-  reelsUsed: 0,
-  reelsLimit: 3,
-  carouselsUsed: 0,
-  carouselsLimit: 3,
-  aiImagesUsed: 0,
-  aiImagesLimit: 5,
+  creditsUsed: 0,
+  creditsLimit: 35,
   platformsConnected: 0,
   platformsLimit: 1,
 };
@@ -55,17 +51,13 @@ vi.mock('../../db/index', () => {
 
 // Mock quotaUsage service to isolate quota endpoint testing
 vi.mock('./quotaUsage.service', () => ({
-  getOrCreateQuotaUsage: vi.fn().mockResolvedValue({
+  getOrCreateCreditUsage: vi.fn().mockResolvedValue({
     id: 'quota-uuid-1',
     userId: 'test-uuid-123',
     periodStart: '2025-05-01',
     periodEnd: '2025-05-31',
-    reelsUsed: 0,
-    reelsLimit: 3,
-    carouselsUsed: 0,
-    carouselsLimit: 3,
-    aiImagesUsed: 0,
-    aiImagesLimit: 5,
+    creditsUsed: 0,
+    creditsLimit: 35,
     platformsConnected: 0,
     platformsLimit: 1,
   }),
@@ -147,49 +139,37 @@ describe('GET /api/quotas', () => {
     expect(res.status).toBe(200);
     expect(res.body.data).toBeDefined();
     expect(res.body.data.tier).toBe('free');
-    expect(res.body.data.quotas).toHaveLength(3);
+    expect(res.body.data.creditsUsed).toBe(0);
+    expect(res.body.data.creditsLimit).toBe(35);
+    expect(res.body.data.percentage).toBe(0);
     expect(res.body.data.period).toBeDefined();
     expect(res.body.data.period.start).toBeDefined();
     expect(res.body.data.period.end).toBeDefined();
   });
 
-  it('should return correct free tier limits', async () => {
+  it('should return correct free tier credit limits', async () => {
     const { agent } = await getAuthenticatedAgent();
 
     const res = await agent.get('/api/quotas');
 
-    const quotas = res.body.data.quotas;
-    const reels = quotas.find((q: { resource: string }) => q.resource === 'reels');
-    const carousels = quotas.find((q: { resource: string }) => q.resource === 'carousels');
-    const aiImages = quotas.find((q: { resource: string }) => q.resource === 'aiImages');
-
-    expect(reels).toEqual({ resource: 'reels', used: 0, limit: 3, percentage: 0 });
-    expect(carousels).toEqual({ resource: 'carousels', used: 0, limit: 3, percentage: 0 });
-    expect(aiImages).toEqual({ resource: 'aiImages', used: 0, limit: 5, percentage: 0 });
+    expect(res.body.data.tier).toBe('free');
+    expect(res.body.data.creditsUsed).toBe(0);
+    expect(res.body.data.creditsLimit).toBe(35);
+    expect(res.body.data.percentage).toBe(0);
   });
 
   it('should return correct percentage when usage exists', async () => {
-    const { getOrCreateQuotaUsage } = await import('./quotaUsage.service');
-    (getOrCreateQuotaUsage as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    const { getOrCreateCreditUsage } = await import('./quotaUsage.service');
+    (getOrCreateCreditUsage as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ...mockQuotaUsage,
-      reelsUsed: 1,
-      carouselsUsed: 2,
-      aiImagesUsed: 3,
+      creditsUsed: 10,
     });
 
     const { agent } = await getAuthenticatedAgent();
     const res = await agent.get('/api/quotas');
 
-    const quotas = res.body.data.quotas;
-    const reels = quotas.find((q: { resource: string }) => q.resource === 'reels');
-    const carousels = quotas.find((q: { resource: string }) => q.resource === 'carousels');
-    const aiImages = quotas.find((q: { resource: string }) => q.resource === 'aiImages');
-
-    expect(reels.used).toBe(1);
-    expect(reels.percentage).toBe(33);
-    expect(carousels.used).toBe(2);
-    expect(carousels.percentage).toBe(67);
-    expect(aiImages.used).toBe(3);
-    expect(aiImages.percentage).toBe(60);
+    expect(res.body.data.creditsUsed).toBe(10);
+    expect(res.body.data.creditsLimit).toBe(35);
+    expect(res.body.data.percentage).toBe(29);
   });
 });

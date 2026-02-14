@@ -27,6 +27,15 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
+  --color-pub-bg: var(--pub-bg);
+  --color-pub-card: var(--pub-card);
+  --color-pub-card-hover: var(--pub-card-hover);
+  --color-pub-border: var(--pub-border);
+  --color-pub-text: var(--pub-text);
+  --color-pub-text-secondary: var(--pub-text-secondary);
+  --color-pub-text-muted: var(--pub-text-muted);
+  --color-pub-accent: var(--pub-accent);
+  --color-pub-accent-hover: var(--pub-accent-hover);
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -36,6 +45,16 @@
 
 :root {
   --radius: 0.625rem;
+  /* Public marketing pages — always dark */
+  --pub-bg: #09090b;
+  --pub-card: #18181b;
+  --pub-card-hover: #27272a;
+  --pub-border: #27272a;
+  --pub-text: #fafafa;
+  --pub-text-secondary: #a1a1aa;
+  --pub-text-muted: #71717a;
+  --pub-accent: #7c3aed;
+  --pub-accent-hover: #6d28d9;
   /* Light mode */
   --background: oklch(0.97 0 0);
   --foreground: oklch(0.145 0 0);
@@ -197,4 +216,48 @@
   top: 50%;
   left: 50%;
   animation: lava-move-5 22s ease-in-out infinite;
+}
+
+/* Marquee infinite scroll */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+  .animate-tv-glow,
+  .animate-tv-flicker {
+    animation: none;
+  }
+}
+
+/* TV Logo animations */
+@keyframes tv-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(124, 58, 237, 0.3)); }
+  50% { filter: drop-shadow(0 0 12px rgba(124, 58, 237, 0.6)); }
+}
+
+@keyframes tv-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+  25%, 75% { opacity: 0.85; }
+}
+
+.animate-tv-glow {
+  animation: tv-glow 3s ease-in-out infinite;
+}
+
+.animate-tv-flicker {
+  animation: tv-flicker 1.5s ease-in-out infinite;
 }

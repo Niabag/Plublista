@@ -5,12 +5,14 @@ import { Sidebar, SidebarContent } from './Sidebar';
 import { TopBar } from './TopBar';
 import { useUiStore } from '@/stores/useUiStore';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { PaymentFailedBanner } from '@/features/billing/components/PaymentFailedBanner';
 
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/create': 'Create',
   '/calendar': 'Calendar',
   '/library': 'Library',
+  '/billing': 'Billing',
   '/settings': 'Settings',
 };
 
@@ -81,6 +83,7 @@ export function AppLayout() {
         <TopBar title={pageTitle} />
         <main className="relative z-20 flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-7xl p-6">
+            <PaymentFailedBanner />
             <Outlet />
           </div>
         </main>

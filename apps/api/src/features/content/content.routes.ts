@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { createContentItemSchema, updateContentTextSchema, imageGenerationSchema, publishContentSchema, scheduleContentSchema } from '@plublista/shared';
+import { createContentItemSchema, updateContentTextSchema, imageGenerationSchema, publishContentSchema, scheduleContentSchema, rescheduleContentSchema } from '@plublista/shared';
 import { requireAuth } from '../../middleware/requireAuth.middleware';
+import { requireActiveSubscription } from '../../middleware/requireActiveSubscription.middleware';
 import { csrfSynchronisedProtection } from '../../config/csrf';
 import { validate } from '../../middleware/validate.middleware';
-import { create, get, list, update, remove, getStatus, regenerateCopy, generateImageHandler, generateStandaloneImageHandler } from './content.controller';
+import { create, get, list, update, remove, duplicate, reschedule, getStatus, getPreviewUrl, regenerateCopy, generateImageHandler, generateStandaloneImageHandler } from './content.controller';
 import { publishContentHandler, getPublishStatusHandler, getAyrshareConnectionUrlHandler, scheduleContentHandler, cancelScheduleHandler } from '../publishing/publishing.controller';
 
 const contentLimiter = rateLimit({
@@ -69,6 +70,7 @@ router.post(
   '/',
   contentLimiter,
   requireAuth,
+  requireActiveSubscription,
   csrfSynchronisedProtection,
   validate(createContentItemSchema),
   create,
@@ -84,15 +86,26 @@ router.post(
   '/generate-image',
   imageGenerateLimiter,
   requireAuth,
+  requireActiveSubscription,
   csrfSynchronisedProtection,
   validate(imageGenerationSchema),
   generateStandaloneImageHandler,
 );
 
 router.post(
+  '/:id/duplicate',
+  contentLimiter,
+  requireAuth,
+  requireActiveSubscription,
+  csrfSynchronisedProtection,
+  duplicate,
+);
+
+router.post(
   '/:id/generate-copy',
   copyGenerateLimiter,
   requireAuth,
+  requireActiveSubscription,
   csrfSynchronisedProtection,
   regenerateCopy,
 );
@@ -101,9 +114,20 @@ router.post(
   '/:id/generate-image',
   imageGenerateLimiter,
   requireAuth,
+  requireActiveSubscription,
   csrfSynchronisedProtection,
   validate(imageGenerationSchema),
   generateImageHandler,
+);
+
+router.patch(
+  '/:id/reschedule',
+  contentLimiter,
+  requireAuth,
+  requireActiveSubscription,
+  csrfSynchronisedProtection,
+  validate(rescheduleContentSchema),
+  reschedule,
 );
 
 router.patch(
@@ -119,6 +143,7 @@ router.post(
   '/:id/publish',
   publishLimiter,
   requireAuth,
+  requireActiveSubscription,
   csrfSynchronisedProtection,
   validate(publishContentSchema),
   publishContentHandler,
@@ -128,6 +153,7 @@ router.post(
   '/:id/schedule',
   publishLimiter,
   requireAuth,
+  requireActiveSubscription,
   csrfSynchronisedProtection,
   validate(scheduleContentSchema),
   scheduleContentHandler,
@@ -141,6 +167,7 @@ router.delete(
   cancelScheduleHandler,
 );
 
+router.get('/:id/preview-url', contentLimiter, requireAuth, getPreviewUrl);
 router.get('/:id/publish-status', contentLimiter, requireAuth, getPublishStatusHandler);
 router.get('/:id/status', contentLimiter, requireAuth, getStatus);
 router.get('/:id', contentLimiter, requireAuth, get);

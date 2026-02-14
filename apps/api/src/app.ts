@@ -10,6 +10,10 @@ import platformConnectionRoutes from './features/auth/platformConnection.routes'
 import quotaRoutes from './features/quota/quota.routes';
 import uploadRoutes from './features/upload/upload.routes';
 import contentRoutes from './features/content/content.routes';
+import billingRoutes from './features/billing/billing.routes';
+import toolsRoutes from './features/tools/tools.routes';
+import tvRoutes from './features/tv/tv.routes';
+import adminRoutes from './features/admin/admin.routes';
 import { errorHandler } from './middleware/errorHandler.middleware';
 
 const app = express();
@@ -33,6 +37,9 @@ const corsOrigin =
       };
 
 app.use(cors({ origin: corsOrigin, credentials: true }));
+
+// Stripe webhook needs raw body for signature verification — must be before express.json()
+app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
 
 // Body parsing
 app.use(express.json());
@@ -82,6 +89,10 @@ app.use('/api/auth', platformConnectionRoutes);
 app.use('/api/quotas', quotaRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/content-items', contentRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/tools', toolsRoutes);
+app.use('/api/tv', tvRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

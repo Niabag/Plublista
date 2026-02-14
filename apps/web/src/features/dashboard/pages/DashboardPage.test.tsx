@@ -9,8 +9,20 @@ vi.mock('@/features/content/hooks/useContentList', () => ({
   useContentList: (...args: unknown[]) => mockUseContentList(...args),
 }));
 
+vi.mock('@/features/content/hooks/useDeleteContent', () => ({
+  useDeleteContent: () => ({ deleteContent: vi.fn(), isDeleting: false }),
+}));
+
+vi.mock('@/features/content/hooks/useDuplicateContent', () => ({
+  useDuplicateContent: () => ({ duplicateContent: vi.fn(), isDuplicating: false }),
+}));
+
 vi.mock('@/features/auth/components/QuotaIndicator', () => ({
   QuotaIndicator: () => <div data-testid="quota-indicator">Quota</div>,
+}));
+
+vi.mock('@/features/auth/components/QuotaWarningBanner', () => ({
+  QuotaWarningBanner: () => null,
 }));
 
 vi.mock('@/features/content/components/ContentCard', () => ({

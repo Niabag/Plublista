@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import crypto from 'node:crypto';
 
@@ -110,4 +110,35 @@ export async function deleteFile(fileKey: string): Promise<void> {
   });
 
   await getS3Client().send(command);
+}
+
+export async function deleteUserFiles(userId: string): Promise<number> {
+  const client = getS3Client();
+  const bucket = getBucket();
+  const prefix = `users/${userId}/`;
+  let deleted = 0;
+  let continuationToken: string | undefined;
+
+  do {
+    const list = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      }),
+    );
+
+    if (list.Contents) {
+      await Promise.all(
+        list.Contents.map((obj) =>
+          client.send(new DeleteObjectCommand({ Bucket: bucket, Key: obj.Key! })),
+        ),
+      );
+      deleted += list.Contents.length;
+    }
+
+    continuationToken = list.IsTruncated ? list.NextContinuationToken : undefined;
+  } while (continuationToken);
+
+  return deleted;
 }

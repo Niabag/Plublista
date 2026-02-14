@@ -1,5 +1,4 @@
-import { createConnection } from 'net';
-import { connect as tlsConnect } from 'tls';
+import Redis from 'ioredis';
 
 export interface RedisConnectionConfig {
   host: string;
@@ -49,48 +48,31 @@ export function isRedisAvailable(): boolean {
 }
 
 /**
- * Probe Redis connectivity with a TCP/TLS check.
+ * Probe Redis connectivity with an ioredis PING.
  * Sets the availability flag for the lifetime of the process.
  */
-export function probeRedis(): Promise<boolean> {
-  return new Promise((resolve) => {
-    const redisUrl = process.env.REDIS_URL;
-    if (!redisUrl) {
-      _redisAvailable = false;
-      resolve(false);
-      return;
-    }
+export async function probeRedis(): Promise<boolean> {
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    _redisAvailable = false;
+    return false;
+  }
 
-    const url = new URL(redisUrl);
-    const port = Number(url.port) || 6379;
-    const host = url.hostname;
-    const useTls = url.protocol === 'rediss:';
-
-    const sock = useTls
-      ? tlsConnect({ host, port, timeout: 5000 })
-      : createConnection(port, host);
-
-    sock.setTimeout(5000);
-    sock.once('connect', () => {
-      sock.destroy();
-      _redisAvailable = true;
-      resolve(true);
+  try {
+    const probe = new Redis(redisUrl, {
+      maxRetriesPerRequest: 1,
+      connectTimeout: 15000,
+      lazyConnect: true,
     });
-    // TLS sockets emit 'secureConnect' after handshake
-    sock.once('secureConnect', () => {
-      sock.destroy();
-      _redisAvailable = true;
-      resolve(true);
-    });
-    sock.once('error', () => {
-      sock.destroy();
-      _redisAvailable = false;
-      resolve(false);
-    });
-    sock.once('timeout', () => {
-      sock.destroy();
-      _redisAvailable = false;
-      resolve(false);
-    });
-  });
+    // Suppress unhandled error events during probe
+    probe.on('error', () => {});
+    await probe.connect();
+    await probe.ping();
+    probe.disconnect();
+    _redisAvailable = true;
+    return true;
+  } catch {
+    _redisAvailable = false;
+    return false;
+  }
 }

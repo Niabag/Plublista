@@ -1,6 +1,9 @@
 import sharp from 'sharp';
 import crypto from 'node:crypto';
+import QRCode from 'qrcode';
 import { downloadBuffer, uploadBuffer } from './r2.service';
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 export function buildWatermarkedKey(
   userId: string,
@@ -11,23 +14,36 @@ export function buildWatermarkedKey(
   return `users/${userId}/watermarked/${contentItemId}/${uuid}.${ext}`;
 }
 
-function createWatermarkSvg(imageWidth: number, imageHeight: number): Buffer {
-  const fontSize = Math.max(14, Math.min(48, Math.round(imageWidth * 0.025)));
-  const paddingRight = Math.round(imageWidth * 0.03);
-  const paddingBottom = Math.round(imageHeight * 0.03);
-  const text = 'Made with Plublista';
+/**
+ * Generate a QR code as a PNG buffer pointing to /tv with UTM params.
+ */
+async function generateQrPng(contentItemId: string, size: number): Promise<Buffer> {
+  const url = `${FRONTEND_URL}/tv?utm_source=qr_logo&utm_medium=watermark&utm_campaign=${contentItemId}`;
+  return QRCode.toBuffer(url, {
+    width: size,
+    margin: 1,
+    color: { dark: '#FFFFFFA6', light: '#00000000' }, // white on transparent
+    errorCorrectionLevel: 'M',
+  });
+}
 
-  const x = imageWidth - paddingRight;
-  const y = imageHeight - paddingBottom;
+function createTextSvg(
+  imageWidth: number,
+  imageHeight: number,
+  textX: number,
+  textY: number,
+): Buffer {
+  const fontSize = Math.max(12, Math.min(36, Math.round(imageWidth * 0.018)));
+  const text = 'Made with Publista';
 
   const svg = `
     <svg width="${imageWidth}" height="${imageHeight}" xmlns="http://www.w3.org/2000/svg">
-      <text x="${x + 1}" y="${y + 1}" text-anchor="end"
+      <text x="${textX + 1}" y="${textY + 1}" text-anchor="end"
         font-family="Arial, Helvetica, sans-serif" font-size="${fontSize}" font-weight="600"
         fill="rgba(0,0,0,0.35)">${text}</text>
-      <text x="${x}" y="${y}" text-anchor="end"
+      <text x="${textX}" y="${textY}" text-anchor="end"
         font-family="Arial, Helvetica, sans-serif" font-size="${fontSize}" font-weight="600"
-        fill="rgba(255,255,255,0.65)">${text}</text>
+        fill="rgba(255,255,255,0.55)">${text}</text>
     </svg>
   `;
 
@@ -45,10 +61,28 @@ export async function applyWatermark(
   const width = metadata.width ?? 1080;
   const height = metadata.height ?? 1080;
 
-  const watermarkSvg = createWatermarkSvg(width, height);
+  // QR code size: ~6% of image width, clamped to 48-80px
+  const qrSize = Math.max(48, Math.min(80, Math.round(width * 0.06)));
+  const padding = Math.round(width * 0.025);
+
+  // QR position: bottom-right corner
+  const qrLeft = width - qrSize - padding;
+  const qrTop = height - qrSize - padding;
+
+  // Text position: above QR code, right-aligned
+  const textX = width - padding;
+  const textY = qrTop - Math.round(padding * 0.4);
+
+  const [qrPng, textSvg] = await Promise.all([
+    generateQrPng(contentItemId, qrSize),
+    Promise.resolve(createTextSvg(width, height, textX, textY)),
+  ]);
 
   const watermarkedBuffer = await sharp(originalBuffer)
-    .composite([{ input: watermarkSvg, top: 0, left: 0 }])
+    .composite([
+      { input: textSvg, top: 0, left: 0 },
+      { input: qrPng, top: qrTop, left: qrLeft },
+    ])
     .jpeg({ quality: 92 })
     .toBuffer();
 

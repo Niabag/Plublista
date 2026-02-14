@@ -1,12 +1,7 @@
-export interface QuotaResource {
-  resource: 'reels' | 'carousels' | 'aiImages';
-  used: number;
-  limit: number;
-  percentage: number;
-}
-
-export interface QuotaUsage {
+export interface CreditUsage {
   tier: string;
-  quotas: QuotaResource[];
+  creditsUsed: number;
+  creditsLimit: number;
+  percentage: number;
   period: { start: string; end: string };
 }

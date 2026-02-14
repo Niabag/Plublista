@@ -1,13 +1,13 @@
 import crypto from 'node:crypto';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, gte, lte, isNotNull } from 'drizzle-orm';
 import { db } from '../../db/index';
-import { contentItems } from '../../db/schema/index';
+import { contentItems, publishJobs } from '../../db/schema/index';
 import { AppError } from '../../lib/errors';
 import { deleteFile, uploadBuffer, buildGeneratedImageKey, generatePresignedDownloadUrl } from '../../services/r2.service';
 import { addRenderJob } from '../../jobs/queues';
 import { generateCopy } from '../../services/claude.service';
 import { generateImage } from '../../services/fal.service';
-import { checkAndDecrementQuota, restoreQuota } from '../../services/quota.service';
+import { checkAndDecrementCredits, restoreCredits } from '../../services/quota.service';
 import type { CreateContentItemInput, UpdateContentTextInput, ImageGenerationInput } from '@plublista/shared';
 
 const contentItemColumns = {
@@ -27,75 +27,93 @@ const contentItemColumns = {
   ctaText: contentItems.ctaText,
   musicUrl: contentItems.musicUrl,
   musicPrompt: contentItems.musicPrompt,
+  scheduledAt: contentItems.scheduledAt,
   createdAt: contentItems.createdAt,
   updatedAt: contentItems.updatedAt,
 };
 
 export async function createContentItem(userId: string, data: CreateContentItemInput) {
-  const [item] = await db
-    .insert(contentItems)
-    .values({
-      userId,
-      type: data.type,
-      title: data.title ?? null,
-      mediaUrls: data.mediaUrls,
-      style: data.style ?? null,
-      format: data.format ?? null,
-      duration: data.duration ?? null,
-      musicPrompt: data.music ?? null,
-    })
-    .returning(contentItemColumns);
+  // Credit check before creation
+  if (data.type === 'reel') {
+    await checkAndDecrementCredits(userId, 'createReel');
+  } else if (data.type === 'carousel') {
+    await checkAndDecrementCredits(userId, 'createCarousel');
+  }
 
-  // Queue render job for reels
-  if (data.type === 'reel' && item) {
-    try {
-      await addRenderJob({
+  try {
+    const [item] = await db
+      .insert(contentItems)
+      .values({
         userId,
-        contentItemId: item.id,
-        contentType: data.type,
-        clipUrls: data.mediaUrls,
-        style: data.style ?? 'dynamic',
-        format: data.format ?? '9:16',
-        duration: data.duration ?? 30,
-        musicPrompt: data.music ?? 'auto-match',
-      });
+        type: data.type,
+        title: data.title ?? null,
+        mediaUrls: data.mediaUrls,
+        style: data.style ?? null,
+        format: data.format ?? null,
+        duration: data.duration ?? null,
+        musicPrompt: data.music ?? null,
+      })
+      .returning(contentItemColumns);
 
-      // Update status to generating
-      await db
-        .update(contentItems)
-        .set({ status: 'generating', updatedAt: new Date() })
-        .where(eq(contentItems.id, item.id));
+    // Queue render job for reels
+    if (data.type === 'reel' && item) {
+      try {
+        await addRenderJob({
+          userId,
+          contentItemId: item.id,
+          contentType: data.type,
+          clipUrls: data.mediaUrls,
+          style: data.style ?? 'dynamic',
+          format: data.format ?? '9:16',
+          duration: data.duration ?? 30,
+          musicPrompt: data.music ?? 'auto-match',
+        });
 
-      return { ...item, status: 'generating' as const };
-    } catch {
-      // Redis/queue unavailable — keep item as draft so it's not lost
-      console.warn(`Render job skipped for ${item.id} — Redis not available`);
-      return item;
+        // Update status to generating
+        await db
+          .update(contentItems)
+          .set({ status: 'generating', updatedAt: new Date() })
+          .where(eq(contentItems.id, item.id));
+
+        return { ...item, status: 'generating' as const };
+      } catch {
+        // Redis/queue unavailable — keep item as draft so it's not lost
+        console.warn(`Render job skipped for ${item.id} — Redis not available`);
+        return item;
+      }
     }
-  }
 
-  // Auto-generate AI copy for carousels and posts
-  if ((data.type === 'carousel' || data.type === 'post') && item) {
-    try {
-      const copy = await generateCopy(userId, data.type, data.style ?? 'dynamic');
-      await db
-        .update(contentItems)
-        .set({
-          caption: copy.caption,
-          hashtags: copy.hashtags,
-          hookText: copy.hookText,
-          ctaText: copy.ctaText,
-          updatedAt: new Date(),
-        })
-        .where(and(eq(contentItems.id, item.id), eq(contentItems.userId, userId)));
-      return { ...item, ...copy };
-    } catch {
-      // Copy generation failure is non-fatal — user can regenerate later
-      return item;
+    // Auto-generate AI copy for carousels and posts
+    if ((data.type === 'carousel' || data.type === 'post') && item) {
+      try {
+        const copy = await generateCopy(userId, data.type, data.style ?? 'dynamic');
+        await db
+          .update(contentItems)
+          .set({
+            caption: copy.caption,
+            hashtags: copy.hashtags,
+            hookText: copy.hookText,
+            ctaText: copy.ctaText,
+            updatedAt: new Date(),
+          })
+          .where(and(eq(contentItems.id, item.id), eq(contentItems.userId, userId)));
+        return { ...item, ...copy };
+      } catch {
+        // Copy generation failure is non-fatal — user can regenerate later
+        return item;
+      }
     }
-  }
 
-  return item;
+    return item;
+  } catch (err) {
+    // Restore credits on failure
+    if (data.type === 'reel') {
+      await restoreCredits(userId, 'createReel');
+    } else if (data.type === 'carousel') {
+      await restoreCredits(userId, 'createCarousel');
+    }
+    throw err;
+  }
 }
 
 export async function getContentItem(userId: string, itemId: string) {
@@ -112,11 +130,24 @@ export async function getContentItem(userId: string, itemId: string) {
   return item;
 }
 
-export async function listContentItems(userId: string) {
+export async function listContentItems(
+  userId: string,
+  options?: { from?: string; to?: string },
+) {
+  const conditions = [eq(contentItems.userId, userId)];
+
+  if (options?.from) {
+    conditions.push(gte(contentItems.scheduledAt, new Date(options.from)));
+    conditions.push(isNotNull(contentItems.scheduledAt));
+  }
+  if (options?.to) {
+    conditions.push(lte(contentItems.scheduledAt, new Date(options.to)));
+  }
+
   const items = await db
     .select(contentItemColumns)
     .from(contentItems)
-    .where(eq(contentItems.userId, userId))
+    .where(and(...conditions))
     .orderBy(desc(contentItems.createdAt));
 
   return items;
@@ -160,6 +191,77 @@ export async function deleteContentItem(userId: string, itemId: string) {
   return { id: itemId };
 }
 
+export async function rescheduleContentItem(userId: string, itemId: string, scheduledAt: string) {
+  const item = await getContentItem(userId, itemId);
+
+  if (item.status !== 'draft' && item.status !== 'scheduled') {
+    throw new AppError('VALIDATION_ERROR', 'Only draft or scheduled content can be rescheduled', 400);
+  }
+
+  const newDate = new Date(scheduledAt);
+
+  await db
+    .update(contentItems)
+    .set({ scheduledAt: newDate, updatedAt: new Date() })
+    .where(and(eq(contentItems.id, itemId), eq(contentItems.userId, userId)));
+
+  // Also update pending publish jobs if content is scheduled
+  if (item.status === 'scheduled') {
+    await db
+      .update(publishJobs)
+      .set({ scheduledAt: newDate })
+      .where(
+        and(
+          eq(publishJobs.contentItemId, itemId),
+          eq(publishJobs.userId, userId),
+          eq(publishJobs.status, 'pending'),
+        ),
+      );
+  }
+
+  return getContentItem(userId, itemId);
+}
+
+export async function duplicateContentItem(userId: string, itemId: string) {
+  const original = await getContentItem(userId, itemId);
+
+  // Credit check for reels and carousels (posts have no credit cost)
+  const creditOp = original.type === 'reel' ? 'createReel' : original.type === 'carousel' ? 'createCarousel' : null;
+  if (creditOp) {
+    await checkAndDecrementCredits(userId, creditOp);
+  }
+
+  try {
+    const [copy] = await db
+      .insert(contentItems)
+      .values({
+        userId,
+        type: original.type,
+        title: original.title ? `${original.title} (copy)` : 'Untitled (copy)',
+        status: 'draft',
+        style: original.style,
+        format: original.format,
+        duration: original.duration,
+        mediaUrls: original.mediaUrls as string[],
+        generatedMediaUrl: original.generatedMediaUrl,
+        caption: original.caption,
+        hashtags: original.hashtags as string[],
+        hookText: original.hookText,
+        ctaText: original.ctaText,
+        musicUrl: original.musicUrl,
+        musicPrompt: original.musicPrompt,
+      })
+      .returning(contentItemColumns);
+
+    return copy;
+  } catch (err) {
+    if (creditOp) {
+      await restoreCredits(userId, creditOp);
+    }
+    throw err;
+  }
+}
+
 export async function updateContentText(userId: string, itemId: string, data: UpdateContentTextInput) {
   const item = await getContentItem(userId, itemId);
 
@@ -187,6 +289,8 @@ export async function regenerateContentCopy(userId: string, itemId: string) {
   if (item.status !== 'draft') {
     throw new AppError('VALIDATION_ERROR', 'Copy can only be regenerated for draft content', 400);
   }
+
+  await checkAndDecrementCredits(userId, 'regenerateCopy');
 
   const copy = await generateCopy(userId, item.type, item.style ?? 'dynamic');
 
@@ -221,8 +325,8 @@ export async function generateContentImage(
   // 1. Ownership check
   await getContentItem(userId, itemId);
 
-  // 2. Quota check — atomic decrement before generation
-  await checkAndDecrementQuota(userId, 'ai_images', 1);
+  // 2. Credit check — atomic decrement before generation
+  await checkAndDecrementCredits(userId, 'generateAiImage');
 
   try {
     // 3. Generate image via Fal.ai
@@ -265,8 +369,7 @@ export async function generateContentImage(
 
     return { imageUrl };
   } catch (err) {
-    // H5: Restore quota on downstream failure
-    await restoreQuota(userId, 'ai_images', 1);
+    await restoreCredits(userId, 'generateAiImage');
     throw err;
   }
 }
@@ -275,8 +378,8 @@ export async function generateStandaloneImage(
   userId: string,
   data: ImageGenerationInput,
 ): Promise<{ imageUrl: string; fileKey: string }> {
-  // 1. Quota check — atomic decrement before generation
-  await checkAndDecrementQuota(userId, 'ai_images', 1);
+  // 1. Credit check — atomic decrement before generation
+  await checkAndDecrementCredits(userId, 'generateAiImage');
 
   try {
     // 2. Generate image via Fal.ai
@@ -315,7 +418,7 @@ export async function generateStandaloneImage(
 
     return { imageUrl, fileKey };
   } catch (err) {
-    await restoreQuota(userId, 'ai_images', 1);
+    await restoreCredits(userId, 'generateAiImage');
     throw err;
   }
 }

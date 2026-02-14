@@ -5,11 +5,13 @@ import {
   PlusCircle,
   CalendarDays,
   Grid3X3,
+  CreditCard,
   Settings,
+  Shield,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/cn';
-import { useUiStore } from '@/stores/useUiStore';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
@@ -18,7 +20,10 @@ const navItems = [
   { label: 'Library', icon: Grid3X3, to: '/library' },
 ] as const;
 
-const bottomItems = [{ label: 'Settings', icon: Settings, to: '/settings' }] as const;
+const bottomItems = [
+  { label: 'Billing', icon: CreditCard, to: '/billing' },
+  { label: 'Settings', icon: Settings, to: '/settings' },
+] as const;
 
 function NavItem({
   item,
@@ -35,23 +40,18 @@ function NavItem({
       onClick={onClick}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium transition-all duration-300 ease-in-out',
+          'flex items-center rounded-md text-sm font-medium transition-all duration-300 ease-in-out',
+          collapsed
+            ? 'mx-auto h-11 w-11 justify-center p-0'
+            : 'gap-3 border-l-2 px-3 py-2',
           isActive
             ? 'border-primary bg-primary/10 text-primary dark:bg-indigo-950 dark:text-indigo-400'
             : 'border-transparent text-sidebar-foreground/80 hover:bg-sidebar-accent',
-          collapsed && 'justify-center px-0',
         )
       }
     >
       <item.icon className="size-5 shrink-0" />
-      <span
-        className={cn(
-          'whitespace-nowrap transition-all duration-300 ease-in-out',
-          collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100',
-        )}
-      >
-        {item.label}
-      </span>
+      {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
     </NavLink>
   );
 
@@ -71,6 +71,8 @@ const HOVER_OPEN_DELAY = 200;
 const HOVER_CLOSE_DELAY = 400;
 
 export function Sidebar() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [hovered, setHovered] = useState(false);
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -151,14 +153,17 @@ export function Sidebar() {
       </div>
 
       {/* Main nav items */}
-      <div className="flex flex-1 flex-col gap-1 p-2">
+      <div className={cn('flex flex-1 flex-col gap-1', collapsed ? 'items-center py-2' : 'p-2')}>
         {navItems.map((item) => (
           <NavItem key={item.to} item={item} collapsed={collapsed} />
         ))}
       </div>
 
       {/* Bottom nav items */}
-      <div className="flex flex-col gap-1 border-t p-2">
+      <div className={cn('flex flex-col gap-1 border-t', collapsed ? 'items-center py-2' : 'p-2')}>
+        {isAdmin && (
+          <NavItem item={{ label: 'Admin', icon: Shield, to: '/admin' }} collapsed={collapsed} />
+        )}
         {bottomItems.map((item) => (
           <NavItem key={item.to} item={item} collapsed={collapsed} />
         ))}
@@ -169,6 +174,9 @@ export function Sidebar() {
 
 /** Sidebar content for mobile Sheet — full-screen style */
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   return (
     <nav role="navigation" aria-label="Main navigation" className="flex h-full flex-col">
       {/* Logo — centered */}
@@ -202,6 +210,23 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* Bottom — Settings */}
       <div className="flex flex-col items-center border-t border-sidebar-border px-8 py-4">
+        {isAdmin && (
+          <NavLink
+            to="/admin"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              cn(
+                'flex w-48 items-center gap-4 rounded-lg border-l-2 px-4 py-3 text-base font-medium transition-colors',
+                isActive
+                  ? 'border-primary bg-primary/10 text-primary dark:bg-indigo-950 dark:text-indigo-400'
+                  : 'border-transparent text-sidebar-foreground/80 hover:bg-sidebar-accent',
+              )
+            }
+          >
+            <Shield className="size-5 shrink-0" />
+            <span>Admin</span>
+          </NavLink>
+        )}
         {bottomItems.map((item) => (
           <NavLink
             key={item.to}

@@ -9,6 +9,7 @@ import { useStandaloneImageGeneration } from '../hooks/useStandaloneImageGenerat
 import { FormatPreview } from '../components/FormatPreview';
 import { apiPost } from '@/lib/apiClient';
 import { Button } from '@/components/ui/button';
+import { QuotaWarningBanner } from '@/features/auth/components/QuotaWarningBanner';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PROMPT_LENGTH = 1000;
@@ -112,6 +113,8 @@ export function CreatePostPage() {
           const apiError = err as { code?: string; message?: string };
           if (apiError.code === 'QUOTA_EXCEEDED') {
             toast.error('Monthly AI image quota reached. Upgrade your plan for more.');
+          } else if (apiError.code === 'ACCOUNT_SUSPENDED') {
+            toast.error(apiError.message ?? 'Account suspended. Please update your payment method.');
           } else {
             toast.error(apiError.message ?? 'Image generation failed');
           }
@@ -159,6 +162,8 @@ export function CreatePostPage() {
           New Post
         </h1>
       </div>
+
+      <QuotaWarningBanner />
 
       {/* Format selector */}
       <FormatPreview selected={format} onSelect={(f) => setFormat(f)} />

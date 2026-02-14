@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/apiClient';
-import type { QuotaUsage } from '@plublista/shared';
+import type { CreditUsage } from '@plublista/shared';
 
 interface QuotaResponse {
-  data: QuotaUsage;
+  data: CreditUsage;
 }
 
 export const QUOTA_QUERY_KEY = ['quotas'] as const;

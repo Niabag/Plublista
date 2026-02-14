@@ -80,21 +80,21 @@ development_status:
   epic-4-retrospective: done
 
   # Epic 5: Calendar, Scheduling & Content Management
-  epic-5: in-progress
+  epic-5: done
   5-1-dashboard-with-quick-create-and-recent-content: done
   5-2-content-scheduling: done
-  5-3-calendar-view: backlog
-  5-4-content-duplication-and-deletion: backlog
+  5-3-calendar-view: done
+  5-4-content-duplication-and-deletion: done
   epic-5-retrospective: optional
 
   # Epic 6: Billing, Subscriptions & Quota Management
-  epic-6: backlog
-  6-1-stripe-integration-and-plan-checkout: backlog
-  6-2-subscription-management: backlog
-  6-3-invoice-and-payment-history: backlog
-  6-4-quota-enforcement-system: backlog
-  6-5-quota-notifications: backlog
-  6-6-stripe-webhook-processing: backlog
+  epic-6: in-progress
+  6-1-stripe-integration-and-plan-checkout: done
+  6-2-subscription-management: done
+  6-3-invoice-and-payment-history: done
+  6-4-quota-enforcement-system: done
+  6-5-quota-notifications: done
+  6-6-stripe-webhook-processing: done
   6-7-failed-payment-and-account-suspension: backlog
   epic-6-retrospective: optional
 

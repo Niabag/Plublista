@@ -41,3 +41,9 @@ export const scheduleContentSchema = z.object({
 });
 
 export type ScheduleContentInput = z.infer<typeof scheduleContentSchema>;
+
+export const rescheduleContentSchema = z.object({
+  scheduledAt: z.string().datetime(),
+});
+
+export type RescheduleContentInput = z.infer<typeof rescheduleContentSchema>;

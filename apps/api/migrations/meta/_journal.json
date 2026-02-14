@@ -57,6 +57,20 @@
       "when": 1771100961809,
       "tag": "0007_wealthy_kabuki",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1771200000000,
+      "tag": "0008_tv_scans",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1771200100000,
+      "tag": "0009_audit_logs",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock apiClient
@@ -38,64 +38,95 @@ function renderQuotaIndicator() {
   );
 }
 
+const mockCreditUsage = (overrides: Record<string, unknown> = {}) => ({
+  data: {
+    tier: 'free',
+    creditsUsed: 10,
+    creditsLimit: 35,
+    percentage: 29,
+    period: { start: '2026-02-01', end: '2026-02-28' },
+    ...overrides,
+  },
+});
+
 describe('QuotaIndicator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders quota bars when data is loaded', async () => {
-    vi.mocked(apiGet).mockResolvedValue({
-      data: {
-        tier: 'free',
-        quotas: [
-          { resource: 'reels', used: 1, limit: 3, percentage: 33 },
-          { resource: 'carousels', used: 2, limit: 3, percentage: 67 },
-          { resource: 'aiImages', used: 4, limit: 5, percentage: 80 },
-        ],
-        period: { start: '2026-02-01', end: '2026-02-28' },
-      },
-    });
+  it('renders credit usage bar when data is loaded', async () => {
+    vi.mocked(apiGet).mockResolvedValue(mockCreditUsage());
 
     renderQuotaIndicator();
 
-    // Wait for data-only element (loading skeleton doesn't have resource labels)
-    expect(await screen.findByText('AI Reels')).toBeInTheDocument();
+    expect(await screen.findByText('Credits')).toBeInTheDocument();
     expect(screen.getByText('Usage This Month')).toBeInTheDocument();
-    expect(screen.getByText('1/3')).toBeInTheDocument();
-    expect(screen.getByText('Carousels')).toBeInTheDocument();
-    expect(screen.getByText('2/3')).toBeInTheDocument();
-    expect(screen.getByText('AI Images')).toBeInTheDocument();
-    expect(screen.getByText('4/5')).toBeInTheDocument();
+    expect(screen.getByText('10 / 35')).toBeInTheDocument();
+    expect(screen.getByText('25 credits remaining')).toBeInTheDocument();
+    expect(screen.getByText('free')).toBeInTheDocument();
   });
 
-  it('renders accessible progress bars', async () => {
-    vi.mocked(apiGet).mockResolvedValue({
-      data: {
-        tier: 'free',
-        quotas: [
-          { resource: 'reels', used: 1, limit: 3, percentage: 33 },
-          { resource: 'carousels', used: 0, limit: 3, percentage: 0 },
-          { resource: 'aiImages', used: 0, limit: 5, percentage: 0 },
-        ],
-        period: { start: '2026-02-01', end: '2026-02-28' },
-      },
-    });
+  it('renders a single accessible progress bar', async () => {
+    vi.mocked(apiGet).mockResolvedValue(mockCreditUsage({ creditsUsed: 20, percentage: 57 }));
 
     renderQuotaIndicator();
-
-    // Wait for data-only element instead of skeleton-shared text
-    await screen.findByText('AI Reels');
+    await screen.findByText('Credits');
 
     const progressBars = screen.getAllByRole('progressbar');
-    expect(progressBars).toHaveLength(3);
-    expect(progressBars[0]).toHaveAttribute('aria-valuenow', '1');
-    expect(progressBars[0]).toHaveAttribute('aria-valuemax', '3');
+    expect(progressBars).toHaveLength(1);
+    expect(progressBars[0]).toHaveAttribute('aria-valuenow', '20');
+    expect(progressBars[0]).toHaveAttribute('aria-valuemax', '35');
+    expect(progressBars[0]).toHaveAttribute('aria-label', 'Credits: 20 of 35 used');
+  });
+
+  it('shows green bar when usage is below 60%', async () => {
+    vi.mocked(apiGet).mockResolvedValue(mockCreditUsage());
+
+    renderQuotaIndicator();
+    await screen.findByText('Credits');
+
+    const bar = screen.getByRole('progressbar').firstChild as HTMLElement;
+    expect(bar.className).toContain('bg-emerald-500');
+  });
+
+  it('shows amber bar when usage is 60-79%', async () => {
+    vi.mocked(apiGet).mockResolvedValue(
+      mockCreditUsage({ tier: 'starter', creditsUsed: 140, creditsLimit: 200, percentage: 70 }),
+    );
+
+    renderQuotaIndicator();
+    await screen.findByText('Credits');
+
+    const bar = screen.getByRole('progressbar').firstChild as HTMLElement;
+    expect(bar.className).toContain('bg-amber-500');
+  });
+
+  it('shows rose bar when usage is 80% or above', async () => {
+    vi.mocked(apiGet).mockResolvedValue(
+      mockCreditUsage({ creditsUsed: 28, percentage: 80 }),
+    );
+
+    renderQuotaIndicator();
+    await screen.findByText('Credits');
+
+    const bar = screen.getByRole('progressbar').firstChild as HTMLElement;
+    expect(bar.className).toContain('bg-rose-500');
   });
 
   it('renders loading skeleton initially', () => {
-    vi.mocked(apiGet).mockReturnValue(new Promise(() => {})); // Never resolves
-    renderQuotaIndicator();
+    vi.mocked(apiGet).mockReturnValue(new Promise(() => {}));
+    const { container } = renderQuotaIndicator();
 
-    expect(screen.getByText('Usage This Month')).toBeInTheDocument();
+    const pulses = container.querySelectorAll('.animate-pulse');
+    expect(pulses.length).toBeGreaterThan(0);
+  });
+
+  it('renders nothing on error', async () => {
+    vi.mocked(apiGet).mockRejectedValue(new Error('fail'));
+    const { container } = renderQuotaIndicator();
+
+    await waitFor(() => {
+      expect(container.innerHTML).toBe('');
+    });
   });
 });
