@@ -14,11 +14,13 @@ app.listen(port, async () => {
     const { startRenderWorker } = await import('./jobs/render.job.js');
     const { startPublishWorker, startAyrshareWorker } = await import('./jobs/publish.job.js');
     const { startScheduleWorker } = await import('./jobs/schedule.job.js');
+    const { startCleanupWorker } = await import('./jobs/cleanup.job.js');
     startRenderWorker();
     startPublishWorker();
     startAyrshareWorker();
     startScheduleWorker();
-    console.log('[api] BullMQ workers started (render, publish, ayrshare, schedule)');
+    startCleanupWorker();
+    console.log('[api] BullMQ workers started (render, publish, ayrshare, schedule, cleanup)');
   } else {
     console.warn('[api] Redis not reachable — BullMQ workers & job queuing disabled');
   }

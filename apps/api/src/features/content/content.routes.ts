@@ -50,6 +50,21 @@ const imageGenerateLimiter = rateLimit({
   },
 });
 
+// Higher limit for status polling (frontend polls every ~2s during renders)
+const statusPollLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 600,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: {
+    error: {
+      code: 'RATE_LIMITED',
+      message: 'Too many status requests, please try again later',
+      statusCode: 429,
+    },
+  },
+});
+
 const publishLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,
@@ -168,8 +183,8 @@ router.delete(
 );
 
 router.get('/:id/preview-url', contentLimiter, requireAuth, getPreviewUrl);
-router.get('/:id/publish-status', contentLimiter, requireAuth, getPublishStatusHandler);
-router.get('/:id/status', contentLimiter, requireAuth, getStatus);
+router.get('/:id/publish-status', statusPollLimiter, requireAuth, getPublishStatusHandler);
+router.get('/:id/status', statusPollLimiter, requireAuth, getStatus);
 router.get('/:id', contentLimiter, requireAuth, get);
 
 router.delete(

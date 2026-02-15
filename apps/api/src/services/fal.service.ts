@@ -51,6 +51,78 @@ export async function generateImage(
   return result;
 }
 
+export interface WhisperXWord {
+  word: string;
+  start: number;
+  end: number;
+  score: number;
+}
+
+export interface WhisperXSegment {
+  text: string;
+  start: number;
+  end: number;
+  words: WhisperXWord[];
+}
+
+export interface WhisperXResult {
+  segments: WhisperXSegment[];
+  language: string;
+}
+
+export async function transcribeAudio(
+  userId: string,
+  audioUrl: string,
+): Promise<WhisperXResult> {
+  ensureConfigured();
+
+  const result = await withRetry(
+    () =>
+      withTimeout(async () => {
+        const response = await fal.subscribe('fal-ai/whisper', {
+          input: {
+            audio_url: audioUrl,
+            task: 'transcribe',
+            chunk_level: 'segment',
+            version: '3',
+          },
+        });
+
+        const data = response.data as Record<string, unknown> | undefined;
+        const chunks = Array.isArray(data?.chunks) ? data.chunks : [];
+        const language = typeof data?.language === 'string' ? data.language : 'unknown';
+
+        const segments: WhisperXSegment[] = chunks.map(
+          (chunk: Record<string, unknown>) => {
+            const timestamp = Array.isArray(chunk.timestamp) ? chunk.timestamp : [];
+            const rawWords = Array.isArray(chunk.words) ? chunk.words : [];
+
+            return {
+              text: typeof chunk.text === 'string' ? chunk.text : '',
+              start: typeof timestamp[0] === 'number' ? timestamp[0] : 0,
+              end: typeof timestamp[1] === 'number' ? timestamp[1] : 0,
+              words: rawWords.map((w: Record<string, unknown>) => ({
+                word: typeof w.word === 'string' ? w.word : '',
+                start: typeof w.start === 'number' ? w.start : 0,
+                end: typeof w.end === 'number' ? w.end : 0,
+                score: typeof w.score === 'number' ? w.score : 0,
+              })),
+            };
+          },
+        );
+
+        // ~$0.01 per minute of audio (flat estimate per call)
+        const costUsd = 0.01;
+        await logCost(userId, 'fal', 'whisperx', costUsd);
+
+        return { segments, language };
+      }, 120_000),
+    { maxRetries: 2, backoffMs: 2000 },
+  );
+
+  return result;
+}
+
 export interface MusicResult {
   musicUrl: string;
   costUsd: number;
@@ -66,7 +138,7 @@ export async function generateMusic(
   const result = await withRetry(
     () =>
       withTimeout(async () => {
-        const response = await fal.subscribe('cassetteai/music-gen', {
+        const response = await fal.subscribe('cassetteai/music-generator', {
           input: {
             prompt: `${mood} background music for social media content`,
             duration: durationSec,

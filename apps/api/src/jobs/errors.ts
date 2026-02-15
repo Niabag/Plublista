@@ -56,6 +56,13 @@ const FFMPEG_PERMANENT_PATTERNS = [
   /Output file.*is empty/i,
 ];
 
+const GEMINI_PERMANENT_PATTERNS = [
+  /blocked.*safety/i,
+  /HARM_CATEGORY/i,
+  /video.*too.*long/i,
+  /file.*processing.*failed/i,
+];
+
 const PERMANENT_PATTERNS = [
   /invalid.*credentials/i,
   /unauthorized/i,
@@ -80,6 +87,9 @@ export function classifyError(error: Error): ErrorCategory {
     if (pattern.test(msg)) return 'format';
   }
   for (const pattern of FFMPEG_PERMANENT_PATTERNS) {
+    if (pattern.test(msg)) return 'permanent';
+  }
+  for (const pattern of GEMINI_PERMANENT_PATTERNS) {
     if (pattern.test(msg)) return 'permanent';
   }
   for (const pattern of PERMANENT_PATTERNS) {

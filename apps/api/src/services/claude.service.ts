@@ -24,81 +24,6 @@ function stripCodeFences(text: string): string {
   return text.trim();
 }
 
-export interface ClipAnalysis {
-  hookClip: string;
-  bestMoments: Array<{ clipUrl: string; startSec: number; endSec: number; score: number }>;
-  qualityScores: Array<{ clipUrl: string; score: number }>;
-}
-
-export async function analyzeClips(
-  userId: string,
-  clipUrls: string[],
-  style: string,
-): Promise<ClipAnalysis> {
-  const result = await withRetry(
-    () =>
-      withTimeout(async () => {
-        const response = await getClient().messages.create({
-          model: 'claude-sonnet-4-5-20250929',
-          max_tokens: 4096,
-          messages: [
-            {
-              role: 'user',
-              content: `Analyze these video clips for an auto-montage in "${style}" style.
-Clip URLs: ${clipUrls.join(', ')}
-
-Return a JSON object with:
-- hookClip: URL of the clip with the best hook potential (first 1.7s)
-- bestMoments: array of {clipUrl, startSec, endSec, score} for the best segments
-- qualityScores: array of {clipUrl, score} rating each clip 0-100
-
-Respond with ONLY valid JSON, no markdown.`,
-            },
-          ],
-        });
-
-        if (!response.content.length) {
-          throw new AppError('EXTERNAL_API_ERROR', 'Claude returned empty response', 502);
-        }
-
-        const raw =
-          response.content[0].type === 'text' ? response.content[0].text : '';
-        const text = stripCodeFences(raw);
-
-        let parsed: unknown;
-        try {
-          parsed = JSON.parse(text);
-        } catch {
-          console.error('[Claude] Invalid JSON response:', raw.slice(0, 500));
-          throw new AppError('EXTERNAL_API_ERROR', 'Claude returned invalid JSON', 502);
-        }
-
-        const obj = parsed as Record<string, unknown>;
-        if (
-          typeof obj?.hookClip !== 'string' ||
-          !Array.isArray(obj?.bestMoments) ||
-          !Array.isArray(obj?.qualityScores)
-        ) {
-          throw new AppError('EXTERNAL_API_ERROR', 'Claude returned unexpected response structure', 502);
-        }
-
-        const analysis = parsed as ClipAnalysis;
-
-        // Estimate cost: ~$0.003 per 1K input tokens, ~$0.015 per 1K output tokens
-        const inputTokens = response.usage.input_tokens;
-        const outputTokens = response.usage.output_tokens;
-        const estimatedCost = (inputTokens * 0.003 + outputTokens * 0.015) / 1000;
-
-        await logCost(userId, 'claude', 'messages', estimatedCost);
-
-        return analysis;
-      }, 30000),
-    { maxRetries: 2, backoffMs: 1000 },
-  );
-
-  return result;
-}
-
 export interface GeneratedCopy {
   caption: string;
   hashtags: string[];
@@ -110,11 +35,17 @@ export async function generateCopy(
   userId: string,
   contentType: string,
   style: string,
-  clipAnalysis?: ClipAnalysis,
+  context?: {
+    narrative?: string;
+    transcript?: string;
+    suggestedMood?: string;
+  },
 ): Promise<GeneratedCopy> {
-  const clipContext = clipAnalysis
-    ? `\nContext: The video features a hook from "${clipAnalysis.hookClip}" with ${clipAnalysis.bestMoments.length} key segments.`
-    : '';
+  const contextParts: string[] = [];
+  if (context?.narrative) contextParts.push(`Narrative: ${context.narrative}`);
+  if (context?.transcript) contextParts.push(`Transcript excerpt: ${context.transcript.slice(0, 500)}`);
+  if (context?.suggestedMood) contextParts.push(`Mood: ${context.suggestedMood}`);
+  const contextBlock = contextParts.length > 0 ? `\n\nContext:\n${contextParts.join('\n')}` : '';
 
   const result = await withRetry(
     () =>
@@ -125,7 +56,7 @@ export async function generateCopy(
           messages: [
             {
               role: 'user',
-              content: `Generate social media copy for a ${contentType} in "${style}" style.${clipContext}
+              content: `Generate social media copy for a ${contentType} in "${style}" style.${contextBlock}
 
 Return ONLY valid JSON with these exact fields:
 - caption: engaging caption for Instagram (max 2200 characters)

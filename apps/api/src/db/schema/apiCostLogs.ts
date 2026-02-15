@@ -7,6 +7,7 @@ export const apiServiceEnum = pgEnum('api_service', [
   'stripe',
   'claude',
   'instagram',
+  'gemini',
 ]);
 
 export const apiCostLogs = pgTable(

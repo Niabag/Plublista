@@ -202,7 +202,61 @@ publista-v2/
 | **Job queue** | BullMQ + Redis | Latest | Required for Auto-Montage rendering pipeline: retry, priority queues, concurrency control, progress tracking. Supports 10+ concurrent renders (NFR6) | Rendering, publishing, scheduled posts |
 | **Error handling** | Centralized error middleware + typed error classes | N/A | AppError base class with HTTP status, error code, user-facing message. Consistent error responses across all endpoints | All API endpoints |
 | **API documentation** | swagger-jsdoc + swagger-ui-express | Latest | Auto-generated OpenAPI spec from route annotations, prepares for Public API in Phase 2 | API development, testing |
-| **External API resilience** | Unified service wrapper with retry (exponential backoff), circuit breaker, 30s timeout | Custom | Single pattern for all 7 external APIs: Fal.ai, Ayrshare, Stripe, Claude, Instagram Graph API, Neon, Cloudflare R2 | All external integrations |
+| **External API resilience** | Unified service wrapper with retry (exponential backoff), circuit breaker, 30s timeout | Custom | Single pattern for all 9 external APIs: Fal.ai, Ayrshare, Stripe, Claude, Gemini, WhisperX, Instagram Graph API, Neon, Cloudflare R2 | All external integrations |
+
+### Auto-Montage v2 Pipeline (Updated 2026-02-15)
+
+| Decision | Choice | Version | Rationale | Affects |
+|----------|--------|---------|-----------|---------|
+| **Video analysis** | Gemini 2.5 Pro (Google AI) | Latest | Native video understanding (not frame-by-frame). Identifies scenes, narrative thread, energy levels, best takes across multiple rushes. Replaces Claude text-based URL analysis which was blind to actual content | `render.job.ts`, `gemini.service.ts` |
+| **Transcription** | WhisperX via Fal.ai | Latest | Word-level timestamps with wav2vec2 alignment. Enables cutting at word/silence boundaries (never mid-word). Detects pauses for natural cut points | `render.job.ts`, `fal.service.ts` |
+| **Audio energy analysis** | FFmpeg `silencedetect` + `astats` (RMS) | Native | Measures energy per segment to drive adaptive transition selection. No external API cost | `ffmpeg.service.ts` |
+| **Transitions** | Adaptive (energy-based automatic selection) | N/A | Low energy → dissolve/fade (0.8–1.2s), Medium → slide (0.3–0.5s), High → hard cut (0s), Topic change → fadeblack (0.4–0.6s). Replaces static per-style transitions | `ffmpeg.service.ts` |
+| **Audio/video integrity** | Atomic clip processing (never separate A/V) | N/A | Original voice always preserved with lip sync. Music mixed as background layer at -15dB below voice. No voice replacement or AI dubbing | `ffmpeg.service.ts`, `render.job.ts` |
+| **Audio normalization** | FFmpeg loudnorm -14 LUFS | Native | Broadcast/streaming standard (Spotify, YouTube). Consistent volume across clips | `ffmpeg.service.ts` |
+| **Render quality** | H.264 High Profile, CRF 18, AAC 192kbps | Native | Near-lossless video + broadcast audio quality. Native framerate preserved (no judder) | `ffmpeg.service.ts` |
+| **Rush cleanup** | Delete raw clips from R2 after successful render | N/A | Eliminates unbounded storage growth. Raw clips not accessible in UI post-render. `mediaUrls` kept in DB for audit. Cleanup job for orphans > 24h | `render.job.ts`, `cleanup.job.ts` |
+| **Copy generation** | Claude Haiku 4.5 (captions, hashtags, hooks) | Latest | Remains on Claude — text generation is Claude's strength. Receives Whisper transcript as context for better captions | `claude.service.ts` |
+
+**Auto-Montage v2 Pipeline Flow:**
+```
+STEP 1 — PARALLEL EXTRACTION (per clip):
+  ├─ WhisperX (Fal.ai): transcription + word timestamps
+  ├─ FFmpeg silencedetect: pause/silence points
+  └─ FFmpeg astats: RMS energy per second
+
+STEP 2 — NARRATIVE ANALYSIS (Gemini 2.5 Pro):
+  Input: raw video files + transcriptions + energy data
+  Output:
+  ├─ Narrative thread identified across all rushes
+  ├─ Best take selected per segment/question
+  ├─ Logical ordering of segments
+  ├─ Moments to cut (hesitations, false starts, retakes)
+  └─ Energy classification per segment (calm/medium/intense)
+
+STEP 3 — INTELLIGENT TIMELINE:
+  ├─ Align cuts to silence/word boundaries (WhisperX)
+  ├─ Select transition type by RMS energy at cut point
+  └─ Assemble final timeline with adaptive transitions
+
+STEP 4 — PRO RENDER (FFmpeg):
+  ├─ Original audio PRESERVED (atomic clip units)
+  ├─ Adaptive transitions (xfade by energy level)
+  ├─ Audio normalization (loudnorm -14 LUFS)
+  ├─ Background music at -15dB below voice level
+  ├─ H.264 High Profile, CRF 18, native framerate
+  └─ AAC 192kbps stereo
+
+STEP 5 — FINALIZATION:
+  ├─ Upload rendered video → R2
+  ├─ DELETE raw rush files from R2
+  ├─ Generate captions + hashtags (Claude, using transcript)
+  └─ Update DB: status = 'draft', generatedMediaUrl set
+```
+
+**Cost per Auto-Montage v2:** ~$0.08–0.10/reel (vs $0.05 v1)
+- Gemini 2.5 Pro: $0.02–0.05 | WhisperX: $0.01–0.02 | CassetteAI: $0.01 | Claude captions: $0.003 | FFmpeg compute: $0.03
+- Margin impact: -1 to -2 points per plan (negligible)
 
 ### Frontend Architecture
 
@@ -615,15 +669,17 @@ publista-v2/
 │           │       └── admin.test.ts
 │           ├── jobs/                          # BullMQ job processors
 │           │   ├── queues.ts                  # Queue definitions + connection
-│           │   ├── render.job.ts              # Auto-montage: Remotion + FFmpeg
+│           │   ├── render.job.ts              # Auto-montage v2: Gemini + WhisperX + FFmpeg
 │           │   ├── publish.job.ts             # Scheduled + immediate publishing
 │           │   ├── schedule.job.ts            # Cron-based schedule checker
+│           │   ├── cleanup.job.ts             # Periodic orphan rush cleanup (every 6h)
 │           │   └── tokenRefresh.job.ts        # Proactive OAuth token refresh (NFR27)
 │           ├── services/                      # External API wrappers
-│           │   ├── fal.service.ts             # Fal.ai: Flux 2.0, CassetteAI, (future: Kling 3.0)
+│           │   ├── fal.service.ts             # Fal.ai: Flux 2.0, CassetteAI, WhisperX, (future: Kling 3.0)
+│           │   ├── gemini.service.ts          # Google AI Gemini 2.5 Pro: video analysis + narrative
 │           │   ├── ayrshare.service.ts        # Multi-platform publishing
 │           │   ├── stripe.service.ts          # Billing, subscriptions
-│           │   ├── claude.service.ts          # AI copy generation
+│           │   ├── claude.service.ts          # AI copy generation (captions, hashtags, hooks)
 │           │   ├── instagram.service.ts       # Direct Graph API (free tier)
 │           │   └── r2.service.ts              # Cloudflare R2 file storage
 │           ├── middleware/
@@ -725,14 +781,15 @@ publista-v2/
 **External Integrations:**
 | Service | Backend File | Endpoints Called | Auth |
 |---------|-------------|-----------------|------|
-| Fal.ai (Flux 2.0, CassetteAI) | `fal.service.ts` | Image gen, music gen | API key (server env) |
+| Fal.ai (Flux 2.0, CassetteAI, WhisperX) | `fal.service.ts` | Image gen, music gen, transcription | API key (server env) |
+| Google AI (Gemini 2.5 Pro) | `gemini.service.ts` | Video analysis, narrative understanding | API key (server env) |
 | Ayrshare | `ayrshare.service.ts` | Multi-platform publish | API key (server env) |
 | Stripe | `stripe.service.ts` + `stripe.webhook.ts` | Checkout, subscriptions, webhooks | API key + webhook secret |
-| Claude (Anthropic) | `claude.service.ts` | Text generation | API key (server env) |
+| Claude (Anthropic) | `claude.service.ts` | Text generation (captions, hashtags, copy) | API key (server env) |
 | Instagram Graph API | `instagram.service.ts` | Free tier publishing | User OAuth token (encrypted in DB) |
 | Cloudflare R2 | `r2.service.ts` | File upload/download, presigned URLs | API key (server env) |
 
-**Data Flow — Auto-Montage (most complex pipeline):**
+**Data Flow — Auto-Montage v2 (most complex pipeline):**
 ```
 Frontend                    Backend                        External
 ─────────                   ───────                        ────────
@@ -743,12 +800,35 @@ Upload clips ──────────→ POST /api/content-items
                            → BullMQ: render queue
 
                          render.job.ts picks up:
-                           → claude.service (analyze clips)    → Anthropic API
+
+                         STEP 1 — Parallel extraction (per clip):
+                           → fal.service (WhisperX transcribe) → Fal.ai WhisperX
+                           → ffmpeg.service (silencedetect)    → local FFmpeg
+                           → ffmpeg.service (astats RMS)       → local FFmpeg
+
+                         STEP 2 — Narrative analysis:
+                           → gemini.service (analyze videos     → Google AI Gemini
+                              + transcripts + energy data)         2.5 Pro
+
+                         STEP 3 — Timeline + music:
+                           → Build intelligent timeline
+                              (cuts at word/silence boundaries,
+                               adaptive transitions by energy)
                            → fal.service (generate music)      → Fal.ai CassetteAI
-                           → Remotion render + FFmpeg
+
+                         STEP 4 — Pro render:
+                           → ffmpeg.service (compose video)    → local FFmpeg
+                              (atomic A/V, adaptive xfade,
+                               loudnorm -14 LUFS, music -15dB,
+                               H.264 CRF 18, AAC 192kbps)
+
+                         STEP 5 — Finalization:
                            → r2.service (upload result)        → Cloudflare R2
-                           → costTracker (log API costs)
-                           → Update DB status: ready
+                           → r2.service (DELETE raw rushes)    → Cloudflare R2
+                           → claude.service (captions/hashtags → Anthropic Claude
+                              using transcript context)
+                           → costTracker (log all API costs)
+                           → Update DB status: draft
 
 Poll progress ←────────← GET /api/content-items/:id/status
 Preview ←──────────────← Presigned R2 URL
@@ -761,6 +841,10 @@ Publish ───────────────→ POST /api/publish
                            OR instagram.service (free)         → Graph API
                            → costTracker (log costs)
                            → Update DB status: published
+
+                         cleanup.job.ts (periodic, every 6h):
+                           → Find orphaned rushes (failed renders > 24h)
+                           → r2.service (DELETE orphan files)  → Cloudflare R2
 ```
 
 ### Development Workflow Integration
@@ -810,7 +894,7 @@ All technology choices are compatible and well-integrated:
 **Functional Requirements Coverage:**
 All 51 FRs (FR1-FR51) are architecturally supported:
 - FR1-FR8 Content Creation → `features/content/` front + back + `render.job.ts`
-- FR9-FR13 AI Generation → `montage.service.ts` + external API service wrappers
+- FR9-FR13 AI Generation → `montage.service.ts` + `gemini.service.ts` (video analysis) + `fal.service.ts` (WhisperX, music) + `claude.service.ts` (copy)
 - FR14-FR21 Publishing → `features/publishing/` + `publish.job.ts` + `schedule.job.ts`
 - FR22-FR29 User Management → `features/auth/` + Passport.js + GDPR cascade
 - FR30-FR37 Billing → `features/billing/` + `stripe.webhook.ts` + `quota.service.ts`
@@ -852,7 +936,7 @@ All 33 NFRs (NFR1-NFR33) are architecturally addressed:
 **Important Gaps (Non-blocking):**
 1. **No UX Design specification** — Frontend components are defined but without wireframes. UX Designer agent should be consulted before implementing complex pages (AutoMontageUploader, CarouselBuilder, CalendarGrid)
 2. **Database columns not detailed** — Tables are named but exact column definitions will be resolved during Drizzle schema implementation
-3. **Remotion rendering configuration** — Architecture mentions Remotion for preview/render but Lambda/CLI config details deferred to first technical spike
+3. **Remotion rendering configuration** — Architecture mentions Remotion for preview/render but Lambda/CLI config details deferred to first technical spike. Note: Auto-Montage v2 pipeline uses FFmpeg directly for render (Remotion for preview only)
 
 **Nice-to-Have Gaps:**
 - No feature flag strategy (not needed at MVP)
@@ -870,7 +954,7 @@ All 33 NFRs (NFR1-NFR33) are architecturally addressed:
 **✅ Architectural Decisions**
 - [x] Critical decisions documented with versions (30+ decisions)
 - [x] Technology stack fully specified (frontend, backend, infra)
-- [x] Integration patterns defined (resilience wrapper for 7 APIs)
+- [x] Integration patterns defined (resilience wrapper for 9 APIs including Gemini + WhisperX)
 - [x] Performance considerations addressed (BullMQ, caching, R2)
 
 **✅ Implementation Patterns**
@@ -895,7 +979,7 @@ All 33 NFRs (NFR1-NFR33) are architecturally addressed:
 - Coherent, battle-tested technology stack (React + Express + PostgreSQL)
 - Pragmatic architecture for solo developer (no over-engineering)
 - Excellent financial margins (67-71% without AI Video)
-- Hero feature (Auto-Montage) costs ~$0.05/Reel — nearly free to deliver
+- Hero feature (Auto-Montage v2) costs ~$0.08–0.10/Reel — nearly free to deliver with pro-quality output
 - Clear patterns and enforcement rules for AI agent consistency
 - Complete FR-to-structure mapping ensures no requirements are missed
 

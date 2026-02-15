@@ -19,6 +19,8 @@ relatedDocuments:
 | **Fal.ai** | CassetteAI Music | per minute of output | $0.02 |
 | **Anthropic** | Claude Haiku 4.5 (production) | per MTok in/out | $1.00 / $5.00 |
 | **Anthropic** | Claude Sonnet 4.5 (complex tasks) | per MTok in/out | $3.00 / $15.00 |
+| **Google AI** | Gemini 2.5 Pro (video analysis) | per MTok in/out | ~$1.25 / $5.00 |
+| **Fal.ai** | WhisperX (transcription) | per minute of audio | ~$0.01 |
 | **HeyGen** | Avatar Engine III (Scale plan) | per minute | $0.50 (1 credit) |
 | **HeyGen** | Avatar Engine IV (Scale plan) | per minute | $3.00 (6 credits) |
 | **Ayrshare** | Business plan base | monthly | $599 (30 profiles incl.) |
@@ -63,7 +65,7 @@ This eliminates the ~$4/user Ayrshare cost for free users who only need Instagra
 
 | Operation | APIs Used | Estimated Cost |
 |-----------|----------|----------------|
-| **1 Auto-Montage Reel** | Claude (analysis + copy) + CassetteAI + Server compute | $0.05 |
+| **1 Auto-Montage Reel (v2)** | Gemini 2.5 Pro (video analysis) + WhisperX (transcription) + CassetteAI (music) + Claude Haiku (captions) + FFmpeg compute | $0.08–0.10 |
 | **1 Carousel (8 slides, 50% AI images)** | Claude (copy) + Flux 2.0 (4 images) + Server | $0.19 |
 | **1 Carousel (8 slides, 100% AI images)** | Claude (copy) + Flux 2.0 (8 images) + Server | $0.37 |
 | **1 Single Post (AI image)** | Claude (copy) + Flux 2.0 (1 image) + Server | $0.06 |
@@ -79,7 +81,7 @@ This eliminates the ~$4/user Ayrshare cost for free users who only need Instagra
 
 | Feature | Input Tokens | Output Tokens | Cost (Haiku 4.5) |
 |---------|-------------|---------------|-------------------|
-| Reel analysis (video content) | ~3,000 | ~1,500 | $0.011 |
+| Reel analysis (video content) | Moved to Gemini 2.5 Pro | — | $0.02–0.05 (Gemini) |
 | Instagram caption + hashtags | ~1,500 | ~500 | $0.004 |
 | Carousel slide copy (8 slides) | ~2,000 | ~2,000 | $0.012 |
 | Hook text generation | ~800 | ~200 | $0.002 |
@@ -216,7 +218,7 @@ This eliminates the ~$4/user Ayrshare cost for free users who only need Instagra
 | **Business** | $219 | $69.70 | $149.30 | **68%** |
 | **Agency** | $549 | $157.00 | $392.00 | **71%** |
 
-> **MVP Launch margins are excellent at 67-71%.** AI Video Generation (Kling 3.0) and AI Avatars (HeyGen) are the most expensive features. Deferring them to Phase 2 is the right financial decision.
+> **MVP Launch margins are excellent at 65-70%.** Auto-Montage v2 adds ~$0.03-0.05/reel for pro-quality output (Gemini + WhisperX), reducing margins by only 1-2 points. AI Video Generation (Kling 3.0) and AI Avatars (HeyGen) remain the most expensive features. Deferring them to Phase 2 is the right financial decision.
 
 ---
 
@@ -236,17 +238,21 @@ This eliminates the ~$4/user Ayrshare cost for free users who only need Instagra
 |---------|-------------|--------|
 | AI Copy (Claude Haiku 4.5) | $0.006/request | Negligible |
 | AI Music (CassetteAI) | $0.01/30s track | Negligible |
-| Auto-Montage (uploaded clips) | ~$0.05/reel (compute only) | Very low — hero feature is cheap! |
+| Auto-Montage v2 (uploaded clips) | ~$0.08–0.10/reel (Gemini + WhisperX + FFmpeg) | Very low — hero feature is cheap with pro quality! |
 
-### Critical Insight: Auto-Montage is Nearly Free
+### Critical Insight: Auto-Montage v2 is Still Nearly Free
 
-The hero feature (AI Auto-Montage) uses:
-- Claude Haiku for clip analysis: ~$0.01
+The hero feature (AI Auto-Montage v2) uses:
+- Gemini 2.5 Pro for video analysis + narrative: ~$0.02–0.05
+- WhisperX for word-level transcription: ~$0.01–0.02
 - CassetteAI for music: ~$0.01
-- Remotion + FFmpeg for rendering: ~$0.03 (server compute)
-- **Total: ~$0.05 per Reel**
+- Claude Haiku for captions/hashtags: ~$0.003
+- FFmpeg for pro render: ~$0.03 (server compute)
+- **Total: ~$0.08–0.10 per Reel**
 
-This means the core value proposition costs almost nothing to deliver. Users can create unlimited Reels from their own clips at negligible cost. The expensive features (AI video generation, AI avatars) are add-ons for power users.
+Cost doubled vs v1 ($0.05) but quality is now professional-grade (adaptive transitions, narrative coherence, perfect lip-sync, broadcast audio). The core value proposition still costs nearly nothing to deliver. Margin impact: -1 to -2 points per plan (negligible).
+
+**Storage savings (rush cleanup):** Raw rushes are now deleted after successful render. At ~5GB/user average, this saves $0.075/user/month in R2 storage ($0.015/GB/month), partially offsetting the increased API cost. At 320 users: ~$24/month saved.
 
 ---
 

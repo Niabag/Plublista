@@ -47,6 +47,24 @@ describe('classifyError', () => {
     expect(classifyError(new Error(message))).toBe('permanent');
   });
 
+  it.each([
+    'Content blocked by safety filters',
+    'HARM_CATEGORY_DANGEROUS_CONTENT',
+    'Video is too long for processing',
+    'File processing failed during upload',
+  ])('classifies Gemini permanent error: "%s"', (message) => {
+    expect(classifyError(new Error(message))).toBe('permanent');
+  });
+
+  it.each([
+    'Invalid data found when processing input',
+    'Codec not found in available codecs',
+    'No such file or directory',
+    'Output file is empty',
+  ])('classifies FFmpeg permanent error: "%s"', (message) => {
+    expect(classifyError(new Error(message))).toBe('permanent');
+  });
+
   it('returns unknown for unrecognized errors', () => {
     expect(classifyError(new Error('Something weird happened'))).toBe('unknown');
   });

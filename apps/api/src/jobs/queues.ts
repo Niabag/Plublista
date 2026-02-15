@@ -97,3 +97,27 @@ export async function addAyrsharePublishJob(data: AyrsharePublishJobData): Promi
   const job = await getAyrshareQueue().add('publish:ayrshare', data);
   return job.id ?? '';
 }
+
+// --- Cleanup Queue ---
+
+export interface CleanupJobData {
+  type: 'orphan-rushes';
+}
+
+let cleanupQueue: Queue<CleanupJobData> | null = null;
+
+export function getCleanupQueue(): Queue<CleanupJobData> {
+  if (!isRedisAvailable()) {
+    throw new Error('Redis is not available — cannot queue jobs');
+  }
+  if (!cleanupQueue) {
+    cleanupQueue = new Queue<CleanupJobData>('cleanup', {
+      connection: getRedisConfig(),
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    });
+  }
+  return cleanupQueue;
+}
