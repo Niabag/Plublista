@@ -286,7 +286,7 @@ export interface User {
 Ensure the DATABASE_URL line uses Neon format:
 ```bash
 # Database (Neon PostgreSQL)
-DATABASE_URL=postgresql://user:password@ep-xxx-yyy.eu-central-1.aws.neon.tech/plublista?sslmode=require
+DATABASE_URL=postgresql://user:password@ep-xxx-yyy.eu-central-1.aws.neon.tech/publista?sslmode=require
 ```
 
 ## Testing Requirements

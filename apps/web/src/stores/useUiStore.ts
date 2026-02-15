@@ -21,7 +21,7 @@ export const useUiStore = create<UiState>()(
       toggleDarkMode: () => set((s) => ({ darkMode: !s.darkMode })),
     }),
     {
-      name: 'plublista-ui',
+      name: 'publista-ui',
       partialize: (state) => ({
         sidebarCollapsed: state.sidebarCollapsed,
         darkMode: state.darkMode,

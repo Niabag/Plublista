@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ErrorDetailDialog } from './ErrorDetailDialog';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({

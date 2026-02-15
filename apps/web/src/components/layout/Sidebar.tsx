@@ -147,9 +147,9 @@ export function Sidebar() {
               collapsed ? 'pointer-events-none h-0 scale-90 opacity-0' : 'h-auto scale-100 opacity-100',
             )}
           >
-            <img src="/logo-light.png" alt="Plublista" className="h-[160px] dark:hidden" />
-            <img src="/logo.png" alt="Plublista" className="hidden h-[160px] dark:block" />
-            <img src="/logo-qr.png" alt="QR Code" className="-mt-[45px] size-[80px] object-contain logo-theme" />
+            <img src="/logo-light.png" alt="Publista" className="h-[40px] dark:hidden" />
+            <img src="/logo.png" alt="Publista" className="hidden h-[40px] dark:block" />
+            <img src="/logo-qr.png" alt="QR Code" className="-mt-[8px] size-[80px] object-contain logo-theme" />
           </div>
           {/* Small logo — clickable link to dashboard, doesn't trigger expand */}
           <Link
@@ -159,7 +159,7 @@ export function Sidebar() {
               collapsed ? 'h-auto scale-100 opacity-100' : 'pointer-events-none absolute h-0 scale-90 opacity-0',
             )}
           >
-            <img src="/logo-qr.png" alt="Plublista" className="size-12 object-contain logo-theme" />
+            <img src="/logo-qr.png" alt="Publista" className="size-12 object-contain logo-theme" />
           </Link>
         </div>
       </div>
@@ -193,9 +193,9 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     <nav role="navigation" aria-label="Main navigation" className="flex h-full flex-col">
       {/* Logo — centered */}
       <div className="flex flex-col items-center px-6 pt-6 pb-4">
-        <img src="/logo-light.png" alt="Plublista" className="h-[160px] dark:hidden" />
-        <img src="/logo.png" alt="Plublista" className="hidden h-[160px] dark:block" />
-        <img src="/logo-qr.png" alt="QR Code" className="-mt-[45px] size-[80px] object-contain logo-theme" />
+        <img src="/logo-light.png" alt="Publista" className="h-[40px] dark:hidden" />
+        <img src="/logo.png" alt="Publista" className="hidden h-[40px] dark:block" />
+        <img src="/logo-qr.png" alt="QR Code" className="-mt-[8px] size-[80px] object-contain logo-theme" />
       </div>
 
       {/* Nav items — centered with breathing room */}

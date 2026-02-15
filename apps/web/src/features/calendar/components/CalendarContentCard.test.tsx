@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CalendarContentCard } from './CalendarContentCard';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({

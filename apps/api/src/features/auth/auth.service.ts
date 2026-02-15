@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../../db/index';
 import { users } from '../../db/schema/index';
 import { AppError } from '../../lib/errors';
-import type { RegisterInput, ProfileUpdateInput } from '@plublista/shared';
+import type { RegisterInput, ProfileUpdateInput } from '@publista/shared';
 
 export async function loginUser(email: string, password: string) {
   const normalizedEmail = email.toLowerCase().trim();

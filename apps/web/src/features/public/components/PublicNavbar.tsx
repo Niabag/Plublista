@@ -140,9 +140,9 @@ export function PublicNavbar() {
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 lg:h-16 lg:px-8">
         {/* Logo */}
-        <Link to="/" className="flex shrink-0 items-center gap-2">
+        <Link to="/" className="flex shrink-0 items-center gap-0">
           <AnimatedTvLogo size="md" interactive tooltipText="Scannez-moi !" />
-          <img src="/logo.png" alt="Publista" className="hidden h-[170px] sm:block" />
+          <img src="/logo.png" alt="Publista" className="hidden h-[36px] ml-[10px] sm:block" />
         </Link>
 
         {/* Desktop nav */}

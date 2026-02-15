@@ -3,9 +3,9 @@ stepsCompleted: [step-01-init, step-02-discovery, step-03-success, step-04-journ
 status: complete
 completedAt: 2026-02-13
 inputDocuments:
-  - '_bmad-output/planning-artifacts/product-brief-Plublista-2026-02-13.md'
+  - '_bmad-output/planning-artifacts/product-brief-Publista-2026-02-13.md'
   - '_bmad-output/brainstorming/brainstorming-session-2026-02-13.md'
-  - '_bmad-output/planning-artifacts/cost-analysis-Plublista-2026-02-13.md'
+  - '_bmad-output/planning-artifacts/cost-analysis-Publista-2026-02-13.md'
 workflowType: 'prd'
 documentCounts:
   briefs: 1
@@ -20,18 +20,18 @@ classification:
   projectContext: brownfield
 ---
 
-# Product Requirements Document - Plublista
+# Product Requirements Document - Publista
 
 **Author:** Utilisateur
 **Date:** 2026-02-13
 
 ## Executive Summary
 
-**Product:** Plublista — AI-powered multi-platform content creation SaaS for social media managers, marketing teams, and agencies.
+**Product:** Publista — AI-powered multi-platform content creation SaaS for social media managers, marketing teams, and agencies.
 
 **Vision:** Transform social media content creation from a manual, time-consuming process into an AI-automated workflow that produces algorithm-optimized content and publishes it across 15+ platforms in one click.
 
-**Core Differentiator:** AI Auto-Montage — upload raw video clips and get a fully edited, algorithm-optimized Reel in under 3 minutes. No existing tool offers this end-to-end automation. Combined with original AI music (CassetteAI), algorithm-native content optimization, multi-format adaptation (9:16, 16:9, 1:1), and unified multi-platform publishing (Ayrshare), Plublista creates a "create once, publish everywhere" workflow.
+**Core Differentiator:** AI Auto-Montage — upload raw video clips and get a fully edited, algorithm-optimized Reel in under 3 minutes. No existing tool offers this end-to-end automation. Combined with original AI music (CassetteAI), algorithm-native content optimization, multi-format adaptation (9:16, 16:9, 1:1), and unified multi-platform publishing (Ayrshare), Publista creates a "create once, publish everywhere" workflow.
 
 **Target Users:** Freelance social media managers (primary), marketing managers at SMBs, and digital agencies managing multiple client accounts.
 
@@ -49,7 +49,7 @@ classification:
 | **Auto-montage acceptance rate** | > 70% | % of auto-montages published without manual edits | Proves AI quality meets user expectations |
 | **Content production speed** | 5x faster than manual | Time per Reel vs CapCut baseline (45 min → 9 min) | Core value proposition — time savings |
 | **Weekly active creation** | 3+ posts/week | Posts created per user per week | Proves habitual product adoption |
-| **Instagram performance lift** | +30% engagement | Avg engagement rate before/after Plublista adoption | Proves algorithm optimization works |
+| **Instagram performance lift** | +30% engagement | Avg engagement rate before/after Publista adoption | Proves algorithm optimization works |
 | **Multi-platform adoption** | > 30% of users publish to 2+ platforms | Connected platforms per user | Validates multi-platform value |
 
 ### Business Success
@@ -66,7 +66,7 @@ classification:
 | **Ongoing** | CPA | < €30 | Optimize acquisition channels |
 | **Ongoing** | LTV:CAC ratio | > 3:1 | Ensure unit economics are healthy |
 | **Ongoing** | ARPU | > €60/month | Validate pricing tiers |
-| **Ongoing** | "Made with Plublista" organic signups | > 20% of total | Validates product-led virality |
+| **Ongoing** | "Made with Publista" organic signups | > 20% of total | Validates product-led virality |
 
 ### Technical Success
 
@@ -92,19 +92,19 @@ classification:
 
 ### Journey 1: Sophie — Monday Batch Session (Primary User, Success Path)
 
-**Opening:** Monday morning, 8am. Sophie, freelance social media manager, opens Plublista with 7 client accounts to feed this week. Her list: 15 Reels + 10 Carousels. With CapCut, this took 15+ hours. With Plublista, she aims for 3 hours.
+**Opening:** Monday morning, 8am. Sophie, freelance social media manager, opens Publista with 7 client accounts to feed this week. Her list: 15 Reels + 10 Carousels. With CapCut, this took 15+ hours. With Publista, she aims for 3 hours.
 
 **Rising Action:** She starts with her restaurant client. Uploads 3 iPhone clips of the new daily special. Selects "UGC" style, 9:16 format, 30 seconds target. Clicks "Generate Auto-Montage". In 2 minutes, a Reel appears with a punchy hook, jump cuts, original music, and a "Book Now" CTA. She tweaks the hook text, validates. Moves to her e-commerce client: creates an 8-slide Carousel with Flux 2.0 generating product visuals from her reference photos. AI writes captions with targeted hashtags.
 
 **Climax:** By 11am, all 15 Reels and 10 Carousels are created. She opens the Calendar, schedules everything for the week across Instagram + TikTok + YouTube Shorts. One click per content piece. Published to 3 platforms simultaneously via Ayrshare.
 
-**Resolution:** Sophie freed her afternoon. She uses the time to pitch a new client. "With Plublista, I can take on 3 more clients without sacrificing quality." Her freelance MRR grows from €4K to €6K/month.
+**Resolution:** Sophie freed her afternoon. She uses the time to pitch a new client. "With Publista, I can take on 3 more clients without sacrificing quality." Her freelance MRR grows from €4K to €6K/month.
 
 **Capabilities revealed:** Auto-montage, multi-clip upload, style selection, format selection, carousel builder, AI image generation, reference images, AI copy + hashtags, calendar scheduling, multi-platform publishing, batch workflow.
 
 ### Journey 2: Marc — First Reel Ever (Primary User, Onboarding/Edge Case)
 
-**Opening:** Marc, marketing manager at a 20-person e-commerce company, sees a competitor posting Reels that go viral. He's never edited a video in his life. He spots a Reel with "Made with Plublista" and signs up for the free trial.
+**Opening:** Marc, marketing manager at a 20-person e-commerce company, sees a competitor posting Reels that go viral. He's never edited a video in his life. He spots a Reel with "Made with Publista" and signs up for the free trial.
 
 **Rising Action:** Onboarding asks him to connect his Instagram account via Ayrshare. He hesitates — "is this secure?" — but permissions are clearly explained with a trust badge. He lands on the Dashboard. The "New Reel" button catches his eye. He uploads 2 iPhone videos of his products (hastily shot, mediocre lighting). Selects "Auto-Montage", "Dynamic" style, and waits anxiously.
 
@@ -112,13 +112,13 @@ classification:
 
 **Resolution:** Marc publishes his first Reel. 10K views in 48 hours — personal record. He upgrades to Starter (€29) before his trial ends. He now posts 3 times/week, his Instagram page gains 200 followers/week.
 
-**Capabilities revealed:** "Made with Plublista" discovery, free trial signup, Instagram OAuth connection, onboarding flow, auto-montage with poor-quality input (AI resilience), AI enhancement of mediocre footage, one-click publish, upgrade funnel.
+**Capabilities revealed:** "Made with Publista" discovery, free trial signup, Instagram OAuth connection, onboarding flow, auto-montage with poor-quality input (AI resilience), AI enhancement of mediocre footage, one-click publish, upgrade funnel.
 
 ### Journey 3: Léa — Scaling the Agency (Primary User, Business Growth)
 
 **Opening:** Léa runs a 5-person agency managing 25 Instagram accounts. Her bottleneck: content production. Her juniors take 1 hour per Reel on CapCut. Hiring would cost €3K/month.
 
-**Rising Action:** She subscribes to the Agency plan (€499/month). Configures 10 client accounts in Plublista. Trains her 3 juniors in 30 minutes — the interface is intuitive. Juniors begin producing: upload client clips → auto-montage → review → schedule. A junior now produces 20 Reels/day instead of 5.
+**Rising Action:** She subscribes to the Agency plan (€499/month). Configures 10 client accounts in Publista. Trains her 3 juniors in 30 minutes — the interface is intuitive. Juniors begin producing: upload client clips → auto-montage → review → schedule. A junior now produces 20 Reels/day instead of 5.
 
 **Climax:** End of month: the agency produced 400 pieces of content for 25 clients. Same volume as before, but in 60% less time. Léa calculates: 200h/month saved × €25/h = €5,000 savings. Her €499 plan has a 10x ROI.
 
@@ -140,11 +140,11 @@ classification:
 
 ### Journey 5: Marc — Failed Publish & Recovery (Edge Case/Error)
 
-**Opening:** Marc scheduled 5 posts for Wednesday. Thursday morning, he opens Plublista and sees 2 red badges: 2 publications failed.
+**Opening:** Marc scheduled 5 posts for Wednesday. Thursday morning, he opens Publista and sees 2 red badges: 2 publications failed.
 
 **Rising Action:** He clicks the first error: "Instagram publishing failed — media format not supported". The Carousel contained a .webp image unsupported by Instagram. He clicks the second: "TikTok rate limit exceeded — retrying in 1 hour".
 
-**Climax:** For the Carousel, Plublista offers "Re-convert images & retry". One click, images are converted to .jpg, and publishing succeeds. For TikTok, the automatic retry already worked — the post is live.
+**Climax:** For the Carousel, Publista offers "Re-convert images & retry". One click, images are converted to .jpg, and publishing succeeds. For TikTok, the automatic retry already worked — the post is live.
 
 **Resolution:** Marc understands the system handles errors gracefully. He sees all 5 posts published successfully. He never needed to contact support. His trust in the platform increases.
 
@@ -182,21 +182,21 @@ classification:
 - **GDPR Compliance (EU users):** Consent management for data processing, right to erasure (delete all user content + account), data export/portability, privacy policy with clear data usage terms.
 - **OAuth Token Storage:** All platform tokens encrypted at rest (AES-256). Tokens never exposed in frontend. Automatic refresh before expiry.
 - **User Content:** Video clips and generated content stored with user ownership. Deletion cascades to all generated assets. No training on user content without explicit consent.
-- **Payment Data:** Stripe handles all payment data (PCI DSS compliant). Plublista never stores card details.
+- **Payment Data:** Stripe handles all payment data (PCI DSS compliant). Publista never stores card details.
 
 ### Content & Copyright
 
 - **AI-Generated Music (CassetteAI):** Original compositions — no copyright issues. Commercial use included.
 - **AI-Generated Images (Flux 2.0):** Original creations — commercial use included via Fal.ai terms.
 - **User-Uploaded Content:** User's responsibility per Terms of Service. DMCA takedown process if copyright claims arise.
-- **"Made with Plublista" Watermark:** Compliant with platform ToS. Removed on paid plans per user preference.
+- **"Made with Publista" Watermark:** Compliant with platform ToS. Removed on paid plans per user preference.
 
 ## Innovation & Novel Patterns
 
 ### Detected Innovation Areas
 
 **1. AI Auto-Montage (Primary Innovation)**
-No existing tool offers "upload raw video clips → AI creates a fully edited, algorithm-optimized Reel." CapCut requires manual editing with templates. Canva has no video AI. ChatGPT has no visual generation. Plublista's auto-montage combines AI video analysis (moment detection, hook scoring, quality filtering) with algorithm-aware editing patterns (1.7s hook, 3-5s jump cuts, originality score optimization) in a single automated pipeline. This is a genuinely novel workflow automation.
+No existing tool offers "upload raw video clips → AI creates a fully edited, algorithm-optimized Reel." CapCut requires manual editing with templates. Canva has no video AI. ChatGPT has no visual generation. Publista's auto-montage combines AI video analysis (moment detection, hook scoring, quality filtering) with algorithm-aware editing patterns (1.7s hook, 3-5s jump cuts, originality score optimization) in a single automated pipeline. This is a genuinely novel workflow automation.
 
 **2. Algorithm-Native Content Engine**
 Every feature is engineered around Instagram's confirmed 2026 ranking factors (watch time #1, sends per reach #2, originality score). No competitor builds content creation tools with algorithm awareness baked into the generation process. The platform doesn't just create content — it creates content designed to perform.
@@ -205,14 +205,14 @@ Every feature is engineered around Instagram's confirmed 2026 ranking factors (w
 Create content once, and AI automatically adapts framing, composition, and text placement for three output formats (9:16, 16:9, 1:1). This eliminates the manual reformatting burden for multi-platform publishing. Combined with Ayrshare's unified API, this creates a "create once, publish everywhere" workflow that doesn't exist in any current tool.
 
 **4. Product-Led Virality via Watermark**
-The "Made with Plublista" watermark on free-tier content turns every published post into organic marketing. The product markets itself through the very content users create. This is a proven growth pattern (Mailchimp, Calendly) applied to social media content creation.
+The "Made with Publista" watermark on free-tier content turns every published post into organic marketing. The product markets itself through the very content users create. This is a proven growth pattern (Mailchimp, Calendly) applied to social media content creation.
 
 ### Validation Approach
 
 | Innovation | Validation Method | Success Threshold |
 |-----------|------------------|-------------------|
 | AI Auto-Montage | Acceptance rate (published without edits) | > 70% |
-| Algorithm-Native | Engagement lift for Plublista-created content | +30% vs baseline |
+| Algorithm-Native | Engagement lift for Publista-created content | +30% vs baseline |
 | Multi-Format AI | % of users publishing to 2+ platforms | > 30% |
 | Product-Led Virality | Organic signups from watermarked content | > 20% of total signups |
 
@@ -220,7 +220,7 @@ The "Made with Plublista" watermark on free-tier content turns every published p
 
 ### Project-Type Overview
 
-Plublista is a multi-tenant B2B SaaS platform targeting freelance social media managers, marketing teams, and agencies. The platform follows a freemium model with tiered subscriptions, quota-based resource management, and third-party API orchestration as core architectural concerns.
+Publista is a multi-tenant B2B SaaS platform targeting freelance social media managers, marketing teams, and agencies. The platform follows a freemium model with tiered subscriptions, quota-based resource management, and third-party API orchestration as core architectural concerns.
 
 ### Tenant Model
 
@@ -228,7 +228,7 @@ Plublista is a multi-tenant B2B SaaS platform targeting freelance social media m
 
 | Aspect | Decision | Rationale |
 |--------|----------|-----------|
-| **Isolation level** | Row-level (shared schema, shared database) | Cost-effective for MVP. Plublista workloads are compute-bound (AI APIs), not storage-bound. |
+| **Isolation level** | Row-level (shared schema, shared database) | Cost-effective for MVP. Publista workloads are compute-bound (AI APIs), not storage-bound. |
 | **Data boundaries** | All user content (videos, images, generated assets) isolated by `user_id` | Users must never see another user's content or analytics. |
 | **Resource isolation** | Quota-based per subscription tier | API cost control is critical — each user's AI consumption must be tracked and capped. |
 | **Agency accounts (Phase 2)** | Parent-child account model: agency owner manages sub-accounts for clients | Agency tier (€499) manages up to 25 client profiles. Each sub-account has independent quotas and connected platforms. |
@@ -291,7 +291,7 @@ Plublista is a multi-tenant B2B SaaS platform targeting freelance social media m
 |------|-------------|----------------|
 | **GDPR** | Data processing consent, right to erasure, data portability | Consent banner, account deletion cascade (all content + metadata), data export endpoint |
 | **Platform ToS** | Instagram, YouTube, TikTok developer terms | Ayrshare handles compliance for publishing. Direct Graph API follows Meta app review. No automation that violates platform rules. |
-| **PCI DSS** | Payment card data security | Stripe handles all card data. Plublista never touches card numbers. |
+| **PCI DSS** | Payment card data security | Stripe handles all card data. Publista never touches card numbers. |
 | **Content Rights** | AI-generated content ownership | CassetteAI and Flux 2.0 outputs are commercially usable per API terms. Users own their generated content. Clear ToS language. |
 | **Cookie/Tracking** | EU ePrivacy directive | Essential cookies only at MVP. Analytics cookies with consent. No third-party ad trackers. |
 | **Data Residency** | EU data storage preference | Database hosted in EU region (Neon/Supabase EU). Media assets on CDN with EU origin. |
@@ -352,7 +352,7 @@ Plublista is a multi-tenant B2B SaaS platform targeting freelance social media m
 | Advanced transitions | Enhances quality but auto-montage works with basic cuts | Phase 1.5 |
 | Brand Kit | Nice-to-have for agencies, not essential for proving core hypothesis | Phase 1.5 |
 | AI Human Actors (HeyGen) | $0.50-3.00/min, high cost, niche use case | Phase 2 |
-| Analytics Dashboard | Users already have Instagram Insights. Plublista analytics is additive. | Phase 2 |
+| Analytics Dashboard | Users already have Instagram Insights. Publista analytics is additive. | Phase 2 |
 | Multi-Account Management | Léa needs it, but can use separate logins at MVP | Phase 2 |
 | Public API | No third-party demand at launch | Phase 2 |
 | Team collaboration | Requires RBAC complexity beyond MVP | Phase 3 |
@@ -499,8 +499,8 @@ Auto-Montage (M1) + AI Copy (M4) + AI Music (M5) + Multi-Platform Publish (M6) +
 
 ### Growth & Virality
 
-- **FR50:** Free-tier content displays a "Made with Plublista" watermark that is removed on paid plans
-- **FR51:** The watermark links or references Plublista for organic discovery by content viewers
+- **FR50:** Free-tier content displays a "Made with Publista" watermark that is removed on paid plans
+- **FR51:** The watermark links or references Publista for organic discovery by content viewers
 
 ## Non-Functional Requirements
 
@@ -524,7 +524,7 @@ Auto-Montage (M1) + AI Copy (M4) + AI Music (M5) + Multi-Platform Publish (M6) +
 | **NFR9:** API keys (Ayrshare, Fal.ai, Stripe, Claude) | Server-side only, never in client bundle or browser | API key leak = financial exposure and service abuse. |
 | **NFR10:** Authentication sessions | Secure HTTP-only cookies, CSRF protection, session expiry after 30 days of inactivity | Standard web application security. |
 | **NFR11:** Data isolation | Users can never access another user's content, settings, or analytics | Multi-tenant security is fundamental. Verified by automated tests. |
-| **NFR12:** Payment data handling | Zero PCI scope — Stripe handles all card data | Plublista never processes, stores, or transmits card numbers. |
+| **NFR12:** Payment data handling | Zero PCI scope — Stripe handles all card data | Publista never processes, stores, or transmits card numbers. |
 | **NFR13:** Input validation | All user inputs sanitized server-side before processing | Prevent XSS, SQL injection, and command injection across all endpoints. |
 | **NFR14:** HTTPS enforcement | All traffic encrypted in transit via TLS 1.2+ | No plaintext HTTP connections allowed. |
 

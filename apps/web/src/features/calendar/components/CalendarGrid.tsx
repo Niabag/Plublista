@@ -16,7 +16,7 @@ import {
   isToday,
   isSameMonth,
 } from 'date-fns';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 import { CalendarDayCell } from './CalendarDayCell';
 import { CalendarContentCard } from './CalendarContentCard';
 

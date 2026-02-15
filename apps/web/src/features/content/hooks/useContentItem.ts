@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/apiClient';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 interface ContentItemResponse {
   data: ContentItem;

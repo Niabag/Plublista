@@ -19,7 +19,7 @@ import { QuotaIndicator } from '../components/QuotaIndicator';
 import { PlatformCard } from '../components/PlatformCard';
 import { usePlatformConnections } from '../hooks/usePlatformConnections';
 import { apiDelete, apiPost } from '@/lib/apiClient';
-import type { Platform } from '@plublista/shared';
+import type { Platform } from '@publista/shared';
 
 const PLATFORMS: { platform: Platform; comingSoon: boolean }[] = [
   { platform: 'instagram', comingSoon: false },
@@ -105,7 +105,7 @@ export function SettingsPage() {
             Connected Accounts
           </h2>
           <p className="text-sm text-muted-foreground">
-            Connect your social media accounts to publish content directly from Plublista.
+            Connect your social media accounts to publish content directly from Publista.
           </p>
         </div>
 

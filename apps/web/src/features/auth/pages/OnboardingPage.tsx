@@ -75,7 +75,7 @@ export function OnboardingPage() {
     try {
       const updated = await completeOnboarding();
       if (updated) {
-        toast.success('Welcome to Plublista!');
+        toast.success('Welcome to Publista!');
         navigate('/dashboard');
       }
     } finally {
@@ -104,8 +104,8 @@ export function OnboardingPage() {
 
       {/* Onboarding content */}
       <div className="relative z-20 flex min-h-[calc(100vh-4rem)] flex-col items-center px-4 py-12">
-        <img src="/logo.png" alt="Plublista" className="mb-0 h-24" />
-        <img src="/logo-qr.png" alt="QR Code" className="-mt-4 mb-5 h-24" />
+        <img src="/logo.png" alt="Publista" className="mb-0 h-[24px]" />
+        <img src="/logo-qr.png" alt="QR Code" className="-mt-1 mb-5 h-[72px]" />
 
         {/* Stepper */}
         <div className="mb-10 flex items-center gap-0">

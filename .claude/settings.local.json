@@ -89,7 +89,21 @@
       "WebFetch(domain:www.notion.so)",
       "WebFetch(domain:vercel.com)",
       "WebFetch(domain:stripe.com)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git commit:*)",
+      "Bash(magick:*)",
+      "Bash(convert:*)",
+      "Bash(redis-cli ping:*)",
+      "Bash(redis-server:*)",
+      "Bash(docker run:*)",
+      "Bash(wsl redis-server:*)",
+      "Bash(wsl which:*)",
+      "Bash(wsl sudo apt-get:*)",
+      "Bash(wsl sudo apt-get install:*)",
+      "Bash(scoop install:*)",
+      "Bash(choco install:*)",
+      "Bash(\"/c/Program Files/Redis/redis-cli.exe\" ping:*)",
+      "Bash(xargs sed:*)"
     ]
   }
 }

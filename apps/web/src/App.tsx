@@ -21,7 +21,7 @@ function App() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center">
-        <img src="/logo.png" alt="Plublista" className="mx-auto h-48" />
+        <img src="/logo.png" alt="Publista" className="mx-auto h-[48px]" />
         <p className="mt-2 text-muted-foreground">AI-powered content creation platform</p>
         <div className="mt-6 rounded-lg border bg-card p-4 shadow-sm">
           <p className="text-sm font-medium text-muted-foreground">Backend Status</p>

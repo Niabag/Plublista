@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { ALLOWED_FILE_TYPES } from '@plublista/shared';
+import { ALLOWED_FILE_TYPES } from '@publista/shared';
 import type { FileUploadState } from '../hooks/useFileUpload';
 import { UploadedFileCard } from './UploadedFileCard';
 

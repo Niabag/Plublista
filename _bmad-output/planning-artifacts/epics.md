@@ -7,11 +7,11 @@ inputDocuments:
   - '_bmad-output/planning-artifacts/ux-design-specification.md'
 ---
 
-# Plublista - Epic Breakdown
+# Publista - Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for Plublista, decomposing the requirements from the PRD, UX Design, and Architecture into implementable stories.
+This document provides the complete epic and story breakdown for Publista, decomposing the requirements from the PRD, UX Design, and Architecture into implementable stories.
 
 ## Requirements Inventory
 
@@ -79,8 +79,8 @@ This document provides the complete epic and story breakdown for Plublista, deco
 - FR47: Admins can manually adjust user quotas when needed
 - FR48: Admins can trigger token refresh for users with expired platform connections
 - FR49: The system tracks and displays real-time API cost per user for margin protection
-- FR50: Free-tier content displays a "Made with Plublista" watermark that is removed on paid plans
-- FR51: The watermark links or references Plublista for organic discovery by content viewers
+- FR50: Free-tier content displays a "Made with Publista" watermark that is removed on paid plans
+- FR51: The watermark links or references Publista for organic discovery by content viewers
 
 ### NonFunctional Requirements
 
@@ -229,7 +229,7 @@ This document provides the complete epic and story breakdown for Plublista, deco
 | FR48 | Epic 7 | Token refresh |
 | FR49 | Epic 7 | Real-time cost tracking |
 | FR50 | Epic 4 | Watermark on free tier |
-| FR51 | Epic 4 | Watermark links to Plublista |
+| FR51 | Epic 4 | Watermark links to Publista |
 
 ## Epic List
 
@@ -246,7 +246,7 @@ Users can create carousel posts with AI-generated and uploaded images, and singl
 **FRs covered:** FR4, FR6, FR11
 
 ### Epic 4: Publishing & Multi-Platform Distribution
-Users can publish content to multiple platforms simultaneously via Ayrshare (paid) or Instagram Graph API (free), with automatic retry on failure, media format conversion, publishing status tracking, error recovery, and "Made with Plublista" watermark on free tier.
+Users can publish content to multiple platforms simultaneously via Ayrshare (paid) or Instagram Graph API (free), with automatic retry on failure, media format conversion, publishing status tracking, error recovery, and "Made with Publista" watermark on free tier.
 **FRs covered:** FR14, FR15, FR16, FR20, FR21, FR39, FR40, FR50, FR51
 
 ### Epic 5: Calendar, Scheduling & Content Management
@@ -314,7 +314,7 @@ So that user data can be persisted and queried with type safety.
 
 As a visitor,
 I want to sign up with my email and password,
-So that I can create an account and start using Plublista.
+So that I can create an account and start using Publista.
 
 **Acceptance Criteria:**
 
@@ -781,15 +781,15 @@ So that publishing succeeds without user intervention when possible.
 ### Story 4.5: Watermark System
 
 As the system,
-I want to add a "Made with Plublista" watermark to free-tier content,
+I want to add a "Made with Publista" watermark to free-tier content,
 So that published content drives organic discovery and signups.
 
 **Acceptance Criteria:**
 
 **Given** a free-tier user publishes content
 **When** the content is rendered/processed for publishing
-**Then** a subtle "Made with Plublista" watermark is overlaid on the content (FR50)
-**And** the watermark references Plublista for organic discovery (FR51)
+**Then** a subtle "Made with Publista" watermark is overlaid on the content (FR50)
+**And** the watermark references Publista for organic discovery (FR51)
 
 **Given** a paid user publishes content
 **When** the content is processed
@@ -1129,7 +1129,7 @@ So that I can exercise my GDPR right to erasure.
   - The user record is anonymized or deleted
   - An audit log entry records the deletion
 **And** the user is logged out and redirected to the landing page
-**And** a confirmation email is sent: "Your Plublista account has been deleted"
+**And** a confirmation email is sent: "Your Publista account has been deleted"
 
 ### Story 8.2: Data Export
 

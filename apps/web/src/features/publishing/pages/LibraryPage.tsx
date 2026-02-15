@@ -7,7 +7,7 @@ import { usePublishStatus } from '@/features/content/hooks/usePublishStatus';
 import { useRetryPublish } from '@/features/content/hooks/useRetryPublish';
 import { ContentCard } from '@/features/content/components/ContentCard';
 import { ErrorDetailDialog } from '@/features/content/components/ErrorDetailDialog';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 export function LibraryPage() {
   const { items, isPending, isError } = useContentList();

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ContentMixIndicator } from './ContentMixIndicator';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 const makeItem = (type: ContentItem['type']): ContentItem => ({
   id: `item-${type}-${Math.random()}`,

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiPatch } from '@/lib/apiClient';
 import { toast } from 'sonner';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 import { CALENDAR_CONTENT_QUERY_KEY } from './useCalendarContent';
 import { CONTENT_LIST_QUERY_KEY } from '@/features/content/hooks/useContentList';
 

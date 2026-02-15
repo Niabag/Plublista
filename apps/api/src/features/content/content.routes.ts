@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { createContentItemSchema, updateContentTextSchema, imageGenerationSchema, publishContentSchema, scheduleContentSchema, rescheduleContentSchema } from '@plublista/shared';
+import { createContentItemSchema, updateContentTextSchema, imageGenerationSchema, publishContentSchema, scheduleContentSchema, rescheduleContentSchema } from '@publista/shared';
 import { requireAuth } from '../../middleware/requireAuth.middleware';
 import { requireActiveSubscription } from '../../middleware/requireActiveSubscription.middleware';
 import { csrfSynchronisedProtection } from '../../config/csrf';

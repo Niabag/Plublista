@@ -353,7 +353,7 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction) {
 ```typescript
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginInput } from '@plublista/shared';
+import { loginSchema, type LoginInput } from '@publista/shared';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 

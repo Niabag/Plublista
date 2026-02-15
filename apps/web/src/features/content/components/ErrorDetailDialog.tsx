@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Instagram, XCircle, X, RefreshCw, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 const PLATFORM_META: Record<string, { label: string; icon?: typeof Instagram }> = {
   instagram: { label: 'Instagram', icon: Instagram },

@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
-const RENDER_DIR = path.join(os.tmpdir(), 'plublista-render');
+const RENDER_DIR = path.join(os.tmpdir(), 'publista-render');
 
 const FORMAT_RESOLUTIONS: Record<string, { width: number; height: number }> = {
   '9:16': { width: 1080, height: 1920 },
@@ -87,7 +87,10 @@ async function normalizeSegment(
       '-crf', '23',
       '-pix_fmt', 'yuv420p',
       '-r', '30',
-      '-an',
+      '-c:a', 'aac',
+      '-b:a', '128k',
+      '-ac', '2',
+      '-ar', '44100',
     ])
     .output(outputPath);
 
@@ -139,6 +142,12 @@ async function concatWithTransitions(
     cumulativeDur = offset + segDurations[i];
   }
 
+  // Build audio concat filter: concat all audio streams
+  const audioInputs = normalizedPaths.map((_, i) => `[${i}:a]`).join('');
+  filterParts.push(
+    `${audioInputs}concat=n=${normalizedPaths.length}:v=0:a=1[aout]`,
+  );
+
   const filterComplex = filterParts.join(';');
 
   // Build ffmpeg args
@@ -149,12 +158,14 @@ async function concatWithTransitions(
   args.push(
     '-filter_complex', filterComplex,
     '-map', '[vout]',
+    '-map', '[aout]',
     '-c:v', 'libx264',
     '-preset', 'fast',
     '-crf', '23',
     '-pix_fmt', 'yuv420p',
     '-r', '30',
-    '-an',
+    '-c:a', 'aac',
+    '-b:a', '128k',
     '-y',
     outputPath,
   );

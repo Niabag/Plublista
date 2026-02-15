@@ -1,5 +1,5 @@
 {
-  "name": "@plublista/api",
+  "name": "@publista/api",
   "private": true,
   "version": "2.0.0",
   "type": "module",
@@ -19,7 +19,7 @@
     "@aws-sdk/s3-request-presigner": "^3.990.0",
     "@fal-ai/client": "^1.9.1",
     "@neondatabase/serverless": "^1.0.0",
-    "@plublista/shared": "*",
+    "@publista/shared": "*",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.69.1",
     "connect-redis": "^9.0.0",

@@ -1,7 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db/index';
 import { platformConnections } from '../../db/schema/index';
-import type { Platform } from '@plublista/shared';
+import type { Platform } from '@publista/shared';
 
 export async function getUserConnections(userId: string) {
   const results = await db

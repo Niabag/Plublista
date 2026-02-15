@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiPost } from '@/lib/apiClient';
 import { toast } from 'sonner';
-import type { SubscriptionTier } from '@plublista/shared';
-import { PRICING_CONFIG } from '@plublista/shared';
+import type { SubscriptionTier } from '@publista/shared';
+import { PRICING_CONFIG } from '@publista/shared';
 import { SUBSCRIPTION_QUERY_KEY } from './useSubscription';
 import { SESSION_QUERY_KEY } from '@/features/auth/hooks/useAuth';
 

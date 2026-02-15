@@ -7,15 +7,15 @@ date: 2026-02-13
 author: Utilisateur
 ---
 
-# Product Brief: Plublista
+# Product Brief: Publista
 
 ## Executive Summary
 
-Plublista is an AI-powered multi-platform content creation and publishing SaaS platform. It enables marketers, creators, and businesses to produce professional-quality Reels, Carousels, and Posts from a single tool — with every piece of content natively optimized for Instagram's 2026 algorithm ranking factors. Content can be published to Instagram, YouTube, TikTok, and 15+ platforms via a unified publishing layer (Ayrshare), with adaptive format selection (9:16 vertical, 16:9 horizontal, 1:1 square).
+Publista is an AI-powered multi-platform content creation and publishing SaaS platform. It enables marketers, creators, and businesses to produce professional-quality Reels, Carousels, and Posts from a single tool — with every piece of content natively optimized for Instagram's 2026 algorithm ranking factors. Content can be published to Instagram, YouTube, TikTok, and 15+ platforms via a unified publishing layer (Ayrshare), with adaptive format selection (9:16 vertical, 16:9 horizontal, 1:1 square).
 
 The platform's hero feature is **AI Auto-Montage**: users upload raw video clips and AI automatically produces algorithm-optimized Reels with smart cutting, transitions, music, text overlays, and adaptive format selection (9:16 for Reels/TikTok/Shorts, 16:9 for YouTube, 1:1 for Feed posts). For power users, a Scene Assembler allows building Reels scene-by-scene using AI-generated video, uploaded clips, and animated graphics.
 
-Plublista replaces the need for 5-6 separate tools (Canva, CapCut, Later, ChatGPT, Buffer) with one integrated platform. A Freemium tier with product-led virality ("Made with Plublista" watermark on free content) drives organic acquisition through the very content users create.
+Publista replaces the need for 5-6 separate tools (Canva, CapCut, Later, ChatGPT, Buffer) with one integrated platform. A Freemium tier with product-led virality ("Made with Publista" watermark on free content) drives organic acquisition through the very content users create.
 
 ---
 
@@ -48,7 +48,7 @@ No existing tool combines AI content generation + algorithm optimization + multi
 
 ### Proposed Solution
 
-Plublista v2 is an all-in-one platform with a phased approach:
+Publista v2 is an all-in-one platform with a phased approach:
 
 **Phase 1 (Launch) — Core Platform:**
 1. **AI Auto-Montage** (Hero Feature) — Upload raw video clips, AI automatically edits them into algorithm-optimized Reels (smart cutting, transitions, music, text overlays, adaptive format)
@@ -73,7 +73,7 @@ Every output is automatically optimized: 1.7s hooks, jump cuts every 3-5s, origi
 3. **All-in-One Niche** — Replaces 5-6 tools for one specific audience (social media marketers, Instagram-first) — not a generalist trying to serve everyone
 4. **Multi-Platform, One Click** — Create once, publish everywhere (Instagram, YouTube, TikTok, 15+ platforms) with automatic format adaptation (9:16, 16:9, 1:1)
 5. **Zero-Watermark Original Content** — Generates original audio and visuals, avoiding the algorithm penalty that CapCut/TikTok exports receive
-6. **Product-Led Virality** — Free tier content carries subtle "Made with Plublista" branding, turning every published post into organic marketing
+6. **Product-Led Virality** — Free tier content carries subtle "Made with Publista" branding, turning every published post into organic marketing
 7. **API Abstraction Layer** — Architecture designed with provider-agnostic AI layer, allowing seamless switching between Fal.ai, Replicate, or direct API calls without platform lock-in
 
 ---
@@ -100,19 +100,19 @@ Every output is automatically optimized: 1.7s hooks, jump cuts every 3-5s, origi
 - **Profile:** 32, runs a 5-person agency managing 20-30 client Instagram accounts.
 - **Daily reality:** Supervises production, trains juniors, pitches new clients. Content production is the bottleneck for growth.
 - **Pain point:** Employees spend too much time on editing. Can't scale without hiring, and hiring is expensive. Quality varies by who does the editing.
-- **Aha moment:** With Plublista, a junior produces the same volume as a senior. She takes on 10 more clients without hiring.
+- **Aha moment:** With Publista, a junior produces the same volume as a senior. She takes on 10 more clients without hiring.
 - **Willingness-to-pay:** €499/month (Agency plan) — immediate ROI vs a salary.
 
 ### Secondary Users
 
-- **Agency/freelance clients** — Don't touch Plublista but benefit from more frequent, more professional, better-optimized content. They see their Instagram metrics rise.
+- **Agency/freelance clients** — Don't touch Publista but benefit from more frequent, more professional, better-optimized content. They see their Instagram metrics rise.
 - **Managers/decision-makers** — Approve the subscription budget. Need measurable results (Analytics in Phase 2).
 
 ### User Journey
 
 | Stage | Sophie (Freelance) | Marc (SMB) | Léa (Agency) |
 |-------|-------------------|------------|---------------|
-| **Discovery** | Sees a "Made with Plublista" Reel from a competitor, Google search, freelance community | LinkedIn article "AI tools for Instagram 2026" | Peer recommendation between agencies, sales demo |
+| **Discovery** | Sees a "Made with Publista" Reel from a competitor, Google search, freelance community | LinkedIn article "AI tools for Instagram 2026" | Peer recommendation between agencies, sales demo |
 | **Onboarding** | Free trial → imports a client account → tests auto-montage with existing clips | Free trial → connects company IG → tests with product photos | Sales demo → Agency plan → sets up client accounts |
 | **Aha Moment** | First auto-montaged Reel in 2 min vs 45 min on CapCut | First Reel that breaks 10K views (personal record) | Math: 10h/week saved × 5 employees = 200h/month |
 | **Core Usage** | Monday batch: 15 Reels + 10 Carousels for the week, scheduled via Calendar | 2-3 posts/week, primarily auto-montage | Standardized workflow for entire team, shared templates |
@@ -130,7 +130,7 @@ Every output is automatically optimized: 1.7s hooks, jump cuts every 3-5s, origi
 | **Auto-montage acceptance rate** | > 70% | % of auto-montages published without Scene Assembler edits | Proves AI quality meets user expectations |
 | **Content production speed** | 5x faster than manual | Time per Reel vs CapCut baseline (45 min → 9 min) | Core value proposition — time savings |
 | **Weekly active creation** | 3+ posts/week | Posts created per user per week | Proves habitual product adoption |
-| **Instagram performance lift** | +30% engagement | Avg engagement rate before/after Plublista adoption | Proves algorithm optimization works |
+| **Instagram performance lift** | +30% engagement | Avg engagement rate before/after Publista adoption | Proves algorithm optimization works |
 
 ### Business Objectives
 
@@ -147,14 +147,14 @@ Every output is automatically optimized: 1.7s hooks, jump cuts every 3-5s, origi
 ### Key Performance Indicators
 
 **Acquisition:**
-- Free trial signups: 500+/month (via "Made with Plublista" virality + paid)
+- Free trial signups: 500+/month (via "Made with Publista" virality + paid)
 - Trial-to-paid conversion: > 15%
 - Cost per acquisition (CPA): < €30
-- Organic signups from "Made with Plublista" watermark: 20%+ of total
+- Organic signups from "Made with Publista" watermark: 20%+ of total
 
 **Activation:**
 - Trial users creating first content within 24h: > 60%
-- Trial users publishing to at least one platform from Plublista: > 40%
+- Trial users publishing to at least one platform from Publista: > 40%
 - Time to aha moment (first auto-montage): < 10 minutes
 
 **Retention:**
@@ -193,7 +193,7 @@ Every output is automatically optimized: 1.7s hooks, jump cuts every 3-5s, origi
 | **M8** | **Dashboard** | Quick-create buttons, recent content, status badges, basic stats, weekly mix indicator. | Central hub. Entry point for all workflows. |
 | **M9** | **Auth & User Accounts** | Email/password signup + login. User profiles. Session management. | SaaS requirement. |
 | **M10** | **Stripe Billing** | Freemium + Starter (€29) + Pro (€79) + Business (€199) + Agency (€499). Free trial 7 days. | Revenue generation. |
-| **M11** | **"Made with Plublista" watermark** | Subtle branding on Free tier content. Removed on paid plans. | Zero-cost organic acquisition engine. |
+| **M11** | **"Made with Publista" watermark** | Subtle branding on Free tier content. Removed on paid plans. | Zero-cost organic acquisition engine. |
 | **M12** | **PostgreSQL Database** | Replace in-memory storage. Persistent jobs, users, content, settings. | Production SaaS requires reliable persistence. |
 
 ### Out of Scope for MVP

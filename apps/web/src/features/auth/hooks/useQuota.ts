@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/apiClient';
-import type { CreditUsage } from '@plublista/shared';
+import type { CreditUsage } from '@publista/shared';
 
 interface QuotaResponse {
   data: CreditUsage;

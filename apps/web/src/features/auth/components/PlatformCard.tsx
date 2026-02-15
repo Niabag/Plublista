@@ -1,7 +1,7 @@
 import { Instagram, Youtube, Lock, AlertCircle, Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '@/components/ui/button';
-import type { Platform, PlatformConnection } from '@plublista/shared';
+import type { Platform, PlatformConnection } from '@publista/shared';
 
 interface PlatformCardProps {
   platform: Platform;

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getUserQuota } from './quota.service';
-import type { SubscriptionTier } from '@plublista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 
 export async function getQuota(req: Request, res: Response, next: NextFunction) {
   try {

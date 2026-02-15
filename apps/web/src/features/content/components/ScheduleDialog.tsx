@@ -140,7 +140,7 @@ export function ScheduleDialog({
           <span className="mb-2 block text-sm font-medium">Platforms</span>
           {isFree && (
             <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              A <strong>&quot;Made with Plublista&quot;</strong> watermark will be added to published images.
+              A <strong>&quot;Made with Publista&quot;</strong> watermark will be added to published images.
             </div>
           )}
           <div className="space-y-2">

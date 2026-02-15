@@ -4,7 +4,7 @@
 
 ## Summary
 
-Implemented an automatic "Made with Plublista" watermark system for free-tier users. Images (posts and carousels) published by free-tier users are watermarked with a subtle semi-transparent text overlay in the bottom-right corner. Paid users publish clean content without watermarks. Watermark failure is non-fatal — publishing proceeds with original images if the watermark process fails.
+Implemented an automatic "Made with Publista" watermark system for free-tier users. Images (posts and carousels) published by free-tier users are watermarked with a subtle semi-transparent text overlay in the bottom-right corner. Paid users publish clean content without watermarks. Watermark failure is non-fatal — publishing proceeds with original images if the watermark process fails.
 
 ## Changes
 
@@ -13,7 +13,7 @@ Implemented an automatic "Made with Plublista" watermark system for free-tier us
   - `buildWatermarkedKey(userId, contentItemId, ext?)` — generates R2 path for watermarked copies
   - `applyWatermark(fileKey, userId, contentItemId)` — downloads image, composites SVG watermark, uploads as JPEG (quality 92)
   - `applyWatermarkToAll(mediaKeys, userId, contentItemId)` — processes all images sequentially
-  - Watermark: "Made with Plublista" text, bottom-right, white at 65% opacity + dark shadow, font 2.5% of image width (clamped 14–48px)
+  - Watermark: "Made with Publista" text, bottom-right, white at 65% opacity + dark shadow, font 2.5% of image width (clamped 14–48px)
   - Watermarked files stored at `users/{userId}/watermarked/{contentItemId}/{uuid}.jpg`
 
 ### Backend — Publish Job Integration
@@ -24,7 +24,7 @@ Implemented an automatic "Made with Plublista" watermark system for free-tier us
   - Reels excluded (video watermarking deferred to when FFmpeg is added)
 
 ### Frontend — Watermark Notice
-- **`apps/web/src/features/content/components/PublishConfirmDialog.tsx`** — Added amber notice for free-tier users: "A 'Made with Plublista' watermark will be added to published images"
+- **`apps/web/src/features/content/components/PublishConfirmDialog.tsx`** — Added amber notice for free-tier users: "A 'Made with Publista' watermark will be added to published images"
 
 ### Tests
 - **`apps/api/src/services/watermark.service.test.ts`** (new) — 5 tests: key building, watermark application, batch processing
@@ -36,8 +36,8 @@ Implemented an automatic "Made with Plublista" watermark system for free-tier us
 - **TypeScript**: 0 errors on both apps
 
 ## Acceptance Criteria Met
-- [x] Free-tier published content has "Made with Plublista" watermark overlaid
-- [x] Watermark references Plublista for organic discovery
+- [x] Free-tier published content has "Made with Publista" watermark overlaid
+- [x] Watermark references Publista for organic discovery
 - [x] Paid users publish clean content without watermark
 - [x] Watermark applied during content processing for publishing (not stored on original)
 - [x] Frontend shows watermark notice to free-tier users in publish dialog

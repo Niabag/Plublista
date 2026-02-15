@@ -1,5 +1,5 @@
-import type { SubscriptionTier } from '@plublista/shared';
-import { UPLOAD_LIMITS } from '@plublista/shared';
+import type { SubscriptionTier } from '@publista/shared';
+import { UPLOAD_LIMITS } from '@publista/shared';
 import { generatePresignedUploadUrl } from '../../services/r2.service';
 import { AppError } from '../../lib/errors';
 

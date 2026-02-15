@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDraggable } from '@dnd-kit/core';
 import { Film, Images, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 const TYPE_STYLES = {
   reel: 'border-l-indigo-500 bg-indigo-50 dark:bg-indigo-950/30',

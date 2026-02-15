@@ -5,13 +5,13 @@ completedAt: 2026-02-13
 lastStep: 14
 inputDocuments:
   - prd.md
-  - product-brief-Plublista-2026-02-13.md
+  - product-brief-Publista-2026-02-13.md
   - brainstorming-session-2026-02-13.md
-  - cost-analysis-Plublista-2026-02-13.md
+  - cost-analysis-Publista-2026-02-13.md
   - architecture.md
 ---
 
-# UX Design Specification Plublista
+# UX Design Specification Publista
 
 **Author:** Utilisateur
 **Date:** 2026-02-13
@@ -24,7 +24,7 @@ inputDocuments:
 
 ### Project Vision
 
-Plublista is an AI-powered content creation SaaS that transforms social media production from a fragmented, time-consuming manual process into an automated, algorithm-optimized workflow. The platform's hero feature — AI Auto-Montage — allows users to upload raw video clips and receive a fully edited, algorithm-optimized Reel in under 3 minutes. Combined with AI image generation, AI music, AI copywriting, and unified multi-platform publishing via Ayrshare, Plublista creates a "create once, publish everywhere" experience that replaces 5-6 separate tools.
+Publista is an AI-powered content creation SaaS that transforms social media production from a fragmented, time-consuming manual process into an automated, algorithm-optimized workflow. The platform's hero feature — AI Auto-Montage — allows users to upload raw video clips and receive a fully edited, algorithm-optimized Reel in under 3 minutes. Combined with AI image generation, AI music, AI copywriting, and unified multi-platform publishing via Ayrshare, Publista creates a "create once, publish everywhere" experience that replaces 5-6 separate tools.
 
 The UX must serve three distinct user archetypes with vastly different needs: a non-technical marketing manager creating their first Reel ever, a freelance social media manager batch-producing 25 content pieces in a morning, and an agency founder standardizing production across a 5-person team. The design challenge is delivering simplicity for beginners while providing power and speed for professionals — within the same interface.
 
@@ -74,16 +74,16 @@ The UX must serve three distinct user archetypes with vastly different needs: a 
 
 ### Defining Experience
 
-The core experience of Plublista is **"Upload → AI Magic → Done."** The defining interaction is the Auto-Montage flow: a user uploads raw video clips, selects a style, and receives a fully edited, algorithm-optimized Reel — ready to publish. This single interaction must feel effortless, fast (< 3 minutes), and produce results that users are proud to publish without edits (>70% acceptance rate target).
+The core experience of Publista is **"Upload → AI Magic → Done."** The defining interaction is the Auto-Montage flow: a user uploads raw video clips, selects a style, and receives a fully edited, algorithm-optimized Reel — ready to publish. This single interaction must feel effortless, fast (< 3 minutes), and produce results that users are proud to publish without edits (>70% acceptance rate target).
 
 The secondary core loop is the **batch creation cycle**: Create content → Review AI output → Accept/Refine → Schedule → Move to next piece. For power users (Sophie), this loop repeats 25+ times in a single session. Every second of friction in this loop costs minutes of productivity.
 
-The tertiary experience is **calendar-driven planning**: View the week → Spot content gaps → Create directly from the calendar → Fill the schedule. This transforms Plublista from a "creation tool" into a "content workflow hub."
+The tertiary experience is **calendar-driven planning**: View the week → Spot content gaps → Create directly from the calendar → Fill the schedule. This transforms Publista from a "creation tool" into a "content workflow hub."
 
 ### Platform Strategy
 
 **Primary platform: Desktop web application (responsive)**
-- Content creation is a desktop workflow. Creators use large screens for video review, drag-and-drop, and multi-window work (reference images, client briefs alongside Plublista).
+- Content creation is a desktop workflow. Creators use large screens for video review, drag-and-drop, and multi-window work (reference images, client briefs alongside Publista).
 - React 18 + Vite + Tailwind CSS frontend. Remotion Player for in-browser video preview.
 - Target browsers: Chrome, Firefox, Safari, Edge (latest 2 versions).
 
@@ -144,7 +144,7 @@ After the first month, the user sees how much content they created vs. time spen
 
 1. **AI First, Human Always** — The AI generates the first draft of everything (montage, copy, images, music). The human validates, refines, or regenerates. Users never start from a blank canvas. But the human always has the final say — no auto-publishing, no AI decisions without approval.
 
-2. **One Click, Not Ten** — Every core action should be achievable in the minimum possible clicks. Upload → Generate → Publish can be 3 clicks. Calendar scheduling is drag-and-drop. Multi-platform publishing is one toggle. If a competitor requires 10 steps, Plublista does it in 1-3.
+2. **One Click, Not Ten** — Every core action should be achievable in the minimum possible clicks. Upload → Generate → Publish can be 3 clicks. Calendar scheduling is drag-and-drop. Multi-platform publishing is one toggle. If a competitor requires 10 steps, Publista does it in 1-3.
 
 3. **Show, Don't Tell** — Video previews instead of settings descriptions. Visual calendar instead of list views. Thumbnail grids instead of file names. Format previews (9:16, 16:9, 1:1) shown as visual frames, not radio buttons. The product is visual — the interface must be visual.
 
@@ -157,7 +157,7 @@ After the first month, the user sees how much content they created vs. time spen
 ### Primary Emotional Goals
 
 **1. Empowerment — "I can do this"**
-The dominant emotion Plublista must evoke. Marc, who has never edited a video, should feel capable of producing professional Reels. The AI handles the hard parts, but the user feels like they did it. The product amplifies the user's abilities rather than replacing them. This is the emotion that drives adoption.
+The dominant emotion Publista must evoke. Marc, who has never edited a video, should feel capable of producing professional Reels. The AI handles the hard parts, but the user feels like they did it. The product amplifies the user's abilities rather than replacing them. This is the emotion that drives adoption.
 
 **2. Relief — "This used to take forever"**
 Sophie's primary emotion. The transition from 15+ hours of manual work to 3 hours of AI-assisted creation should feel like a weight lifted. Every batch session should end with a sense of relief: "The week is handled." This is the emotion that drives retention.
@@ -169,7 +169,7 @@ The Auto-Montage result must make users feel proud of the output. Marc shows his
 
 | Stage | Target Emotion | Anti-Emotion (Avoid) | Design Implication |
 |-------|---------------|---------------------|-------------------|
-| **Discovery** (landing page, "Made with Plublista") | Curiosity + Hope — "Could this really work for me?" | Skepticism — "Another AI gimmick" | Show real results, not promises. Demo video of Auto-Montage in action. Social proof from creators. |
+| **Discovery** (landing page, "Made with Publista") | Curiosity + Hope — "Could this really work for me?" | Skepticism — "Another AI gimmick" | Show real results, not promises. Demo video of Auto-Montage in action. Social proof from creators. |
 | **Signup & Onboarding** | Excitement + Ease — "This is simple, I want to try it" | Overwhelm — "Too many options, too complex" | Minimal signup fields. Guided onboarding: connect Instagram → upload first clip → generate first Reel. No feature dump. |
 | **First Auto-Montage** | Wonder + Pride — "I made this? It's actually good!" | Disappointment — "This doesn't look professional" | The first result MUST impress. Use the best default style. Show the result dramatically (fade-in reveal, not sudden load). |
 | **Core Creation Loop** | Flow + Efficiency — "I'm in the zone, content is flowing" | Frustration — "This is slowing me down" | Minimize navigation. Batch-friendly UI. No page reloads between creations. Quick-action shortcuts. |
@@ -203,7 +203,7 @@ The Auto-Montage result must make users feel proud of the output. Marc shows his
 **Delight over Mere Satisfaction**
 - Occasional "wow" moments: an Auto-Montage that's better than expected, a particularly good AI caption, music that perfectly matches the mood
 - Easter eggs for power users: keyboard shortcuts revealed progressively, "You've been on fire — 10 Reels this week!" mini-celebrations
-- "Made with Plublista" watermark on free tier creates a subtle pride moment when content gets engagement
+- "Made with Publista" watermark on free tier creates a subtle pride moment when content gets engagement
 
 ### Design Implications
 
@@ -211,7 +211,7 @@ The Auto-Montage result must make users feel proud of the output. Marc shows his
 |---------------|-------------------|
 | **Empowerment** | AI does the work, user gets the credit. No "AI generated this" messaging. Frame as "Your Reel is ready." Results labeled as the user's creation, not the AI's output. |
 | **Relief** | Time-saved metrics visible. Before/after comparisons implicit in the experience. Batch completion celebrations. Calendar view showing "week handled." |
-| **Pride** | High-quality defaults. Preview that looks polished. Export in highest quality. "Made with Plublista" as a badge of quality, not a limitation. |
+| **Pride** | High-quality defaults. Preview that looks polished. Export in highest quality. "Made with Publista" as a badge of quality, not a limitation. |
 | **Confidence** | Smart defaults eliminate decision paralysis. Undo available everywhere. Preview before publish. Clear error messages with clear solutions. |
 | **Flow state** | Minimal navigation between tasks. No modal interruptions during creation. Keyboard shortcuts for power users. Auto-save always on. |
 | **Trust** | Transparent quota tracking. No silent failures. Publishing status always visible. Error recovery always available. Data deletion confirms what was removed. |
@@ -222,7 +222,7 @@ The Auto-Montage result must make users feel proud of the output. Marc shows his
 
 2. **Anxiety Is the Enemy** — Every moment of uncertainty (Is it rendering? Did it publish? Am I running out of quota? Did my payment go through?) must be eliminated with clear, real-time feedback. Loading states must be informative. Errors must be actionable. Progress must be visible.
 
-3. **The User Is the Creator, the AI Is the Tool** — Language throughout the interface must reinforce that the user created the content, not the AI. "Your Reel is ready" not "AI generated a Reel." "You've created 100 pieces of content this month" not "Plublista generated 100 pieces." This subtle framing drives emotional ownership and pride.
+3. **The User Is the Creator, the AI Is the Tool** — Language throughout the interface must reinforce that the user created the content, not the AI. "Your Reel is ready" not "AI generated a Reel." "You've created 100 pieces of content this month" not "Publista generated 100 pieces." This subtle framing drives emotional ownership and pride.
 
 4. **Delight Through Speed** — The most emotionally impactful design decision is speed. A 30-second Auto-Montage generation feels magical. A 5-minute one feels broken. Fast page loads feel premium. Slow ones feel cheap. Invest in perceived and actual performance as a primary emotional design tool.
 
@@ -234,9 +234,9 @@ The Auto-Montage result must make users feel proud of the output. Marc shows his
 
 **1. Canva — The "Anyone Can Design" Revolution**
 
-Canva solved the same problem as Plublista but for graphic design: making professional creation accessible to non-designers. Their UX is the direct benchmark.
+Canva solved the same problem as Publista but for graphic design: making professional creation accessible to non-designers. Their UX is the direct benchmark.
 
-| UX Strength | How It Works | Lesson for Plublista |
+| UX Strength | How It Works | Lesson for Publista |
 |-------------|-------------|---------------------|
 | **Template-first approach** | Users start from a template, not a blank canvas. Every template is professional-grade. | Auto-Montage should feel like an "intelligent template" — the AI creates the first version, the user refines. Never show a blank timeline. |
 | **One-click magic** | "Magic Resize" adapts design to any format instantly. "Magic Background Remove" is one click. | Multi-format adaptation (9:16, 16:9, 1:1) should be one-click like Canva's Magic Resize. The "magic" metaphor resonates with users. |
@@ -245,25 +245,25 @@ Canva solved the same problem as Plublista but for graphic design: making profes
 
 **2. CapCut — Video Editing Made Accessible**
 
-CapCut is the direct competitor for video creation. Understanding what they do well and where they fail informs Plublista's positioning.
+CapCut is the direct competitor for video creation. Understanding what they do well and where they fail informs Publista's positioning.
 
-| UX Strength | How It Works | Lesson for Plublista |
+| UX Strength | How It Works | Lesson for Publista |
 |-------------|-------------|---------------------|
 | **Template-based video creation** | Pick a template, drop in your clips, export. Fast for beginners. | Auto-Montage goes further: users don't even choose a template — AI creates the edit from scratch. Position this as "beyond templates." |
 | **One-tap effects** | Filters, transitions, text effects applied with single tap. | Style presets (Dynamic, Cinematic, UGC) should apply a complete "look" in one click — color grading, transition type, text style, music mood. |
 | **Tutorial integration** | In-app tutorials contextual to what user is doing. | Onboarding tooltips that appear contextually: "First time creating a Carousel? Here's how reference images work." |
 
-| UX Weakness | The Problem | Plublista's Advantage |
+| UX Weakness | The Problem | Publista's Advantage |
 |-------------|------------|----------------------|
-| **Timeline complexity** | Even simplified, the timeline UI intimidates non-editors like Marc | Plublista eliminates the timeline entirely for Auto-Montage. No tracks, no scrubbing, no keyframes. |
-| **Watermark stigma** | CapCut watermarks are penalized by Instagram's algorithm | Plublista generates original content — no watermarks, no algorithm penalty. This is a UX story, not just a technical one. |
-| **No publishing integration** | Create in CapCut, then manually upload to each platform | Plublista's one-click multi-platform publish is a massive UX advantage. Create and distribute in one tool. |
+| **Timeline complexity** | Even simplified, the timeline UI intimidates non-editors like Marc | Publista eliminates the timeline entirely for Auto-Montage. No tracks, no scrubbing, no keyframes. |
+| **Watermark stigma** | CapCut watermarks are penalized by Instagram's algorithm | Publista generates original content — no watermarks, no algorithm penalty. This is a UX story, not just a technical one. |
+| **No publishing integration** | Create in CapCut, then manually upload to each platform | Publista's one-click multi-platform publish is a massive UX advantage. Create and distribute in one tool. |
 
 **3. Linear — The Speed-First SaaS Benchmark**
 
 Linear (project management tool) has the best batch workflow UX in SaaS. Sophie's batch creation sessions need Linear-level speed.
 
-| UX Strength | How It Works | Lesson for Plublista |
+| UX Strength | How It Works | Lesson for Publista |
 |-------------|-------------|---------------------|
 | **Keyboard-first navigation** | Every action has a keyboard shortcut. Power users never touch the mouse. | Batch creation needs shortcuts: Cmd+N (new content), Cmd+Enter (accept & schedule), Cmd+K (command palette). |
 | **Instant everything** | Pages load instantly. No spinners for navigation. Optimistic updates. | Dashboard, calendar, content list must load < 1s. Optimistic UI updates when scheduling. |
@@ -272,9 +272,9 @@ Linear (project management tool) has the best batch workflow UX in SaaS. Sophie'
 
 **4. Notion — The Progressive Disclosure Master**
 
-Notion serves both simple note-takers and complex database builders with the same interface. This is exactly Plublista's challenge (Marc vs. Sophie).
+Notion serves both simple note-takers and complex database builders with the same interface. This is exactly Publista's challenge (Marc vs. Sophie).
 
-| UX Strength | How It Works | Lesson for Plublista |
+| UX Strength | How It Works | Lesson for Publista |
 |-------------|-------------|---------------------|
 | **Slash commands** | Type "/" to access all features. Simple for beginners, powerful for experts. | Could inspire quick-create: type "/" in calendar to instantly start "New Reel" or "New Carousel" without navigating away. |
 | **Blocks architecture** | Everything is a block. Simple concept, infinite flexibility. | Content creation follows a "card" metaphor: every content piece is a card with thumbnail, status, platform badges, and quick actions. |
@@ -285,7 +285,7 @@ Notion serves both simple note-takers and complex database builders with the sam
 
 **Navigation Patterns:**
 
-| Pattern | Source | Application in Plublista |
+| Pattern | Source | Application in Publista |
 |---------|--------|------------------------|
 | **Persistent sidebar + main canvas** | Canva, Notion, Figma | Left sidebar (navigation) + main content area (creation/preview). Sidebar collapses during full-screen preview. |
 | **Command palette (Cmd+K)** | Linear, Notion, VS Code | Global quick-access: search content, navigate to any view, start new creation, check quota — all from one shortcut. |
@@ -293,7 +293,7 @@ Notion serves both simple note-takers and complex database builders with the sam
 
 **Interaction Patterns:**
 
-| Pattern | Source | Application in Plublista |
+| Pattern | Source | Application in Publista |
 |---------|--------|------------------------|
 | **Drag-and-drop scheduling** | Google Calendar, Asana, Trello | Calendar view: drag content cards to dates/times. Drag to reschedule. Visual and intuitive. |
 | **Preview-before-commit** | Canva (template preview), Spotify (song preview) | Every Auto-Montage result shows full preview before publish. Every style change shows live preview. No blind commits. |
@@ -302,7 +302,7 @@ Notion serves both simple note-takers and complex database builders with the sam
 
 **Visual Patterns:**
 
-| Pattern | Source | Application in Plublista |
+| Pattern | Source | Application in Publista |
 |---------|--------|------------------------|
 | **Card-based content grid** | Pinterest, Dribbble, Instagram | Content library and dashboard show content as visual cards with thumbnails. Not a table — a visual grid that matches the visual nature of the product. |
 | **Status badges/pills** | Linear (status dots), GitHub (PR labels) | Content status: Draft (gray), Scheduled (blue), Published (green), Failed (red). Visible at a glance on every content card. |
@@ -311,7 +311,7 @@ Notion serves both simple note-takers and complex database builders with the sam
 
 ### Anti-Patterns to Avoid
 
-| Anti-Pattern | Where It Fails | Why Avoid for Plublista |
+| Anti-Pattern | Where It Fails | Why Avoid for Publista |
 |-------------|---------------|------------------------|
 | **Feature dump onboarding** | Many SaaS tools show all features in a tour on first login | Marc would be overwhelmed. Onboarding should show ONE thing: "Upload clips → Get a Reel." Everything else comes later. |
 | **Settings-heavy creation** | Tools that require configuring 10 options before starting | Auto-Montage must work with ZERO configuration. Style: Dynamic (default). Format: 9:16 (default). Duration: 30s (default). One click to generate. Options available but never required. |
@@ -329,7 +329,7 @@ Notion serves both simple note-takers and complex database builders with the sam
 - Drag-and-drop scheduling → Calendar interaction pattern
 - Progress-with-personality → Auto-Montage generation progress UI
 
-**Adapt for Plublista:**
+**Adapt for Publista:**
 - Canva's Magic Resize → One-click format adaptation (9:16 → 16:9 → 1:1) but applied to video, not just images
 - Linear's batch operations → Multi-select content + bulk schedule/publish, adapted for visual content cards
 - Notion's progressive disclosure → Simple Mode (Marc) vs. Advanced Mode (Sophie), but triggered by usage patterns, not a settings toggle
@@ -350,7 +350,7 @@ Notion serves both simple note-takers and complex database builders with the sam
 
 shadcn/ui is a collection of accessible, customizable React components built on Radix UI primitives and styled with Tailwind CSS. Unlike traditional component libraries (MUI, Ant Design), shadcn/ui components are copied directly into the project — no npm dependency, full ownership and control over every component.
 
-This is the optimal choice for Plublista because it aligns perfectly with the existing tech stack (React 18 + Vite + Tailwind CSS) and provides the right balance of development speed and visual customization for a solo developer building an MVP.
+This is the optimal choice for Publista because it aligns perfectly with the existing tech stack (React 18 + Vite + Tailwind CSS) and provides the right balance of development speed and visual customization for a solo developer building an MVP.
 
 ### Rationale for Selection
 
@@ -364,10 +364,10 @@ Unlike MUI or Chakra UI, shadcn/ui components are owned by the project. They're 
 Every shadcn/ui component is built on Radix UI, which provides WAI-ARIA compliant accessibility out of the box. Dialogs, dropdowns, toasts, tabs — all keyboard-navigable and screen-reader-friendly without extra effort.
 
 **4. Modern aesthetic — Clean, professional, customizable**
-shadcn/ui's default design is clean and modern — aligning with the "professional but approachable" visual identity Plublista needs. The dark/light mode support is built-in. The aesthetic is neutral enough to brand without a full redesign.
+shadcn/ui's default design is clean and modern — aligning with the "professional but approachable" visual identity Publista needs. The dark/light mode support is built-in. The aesthetic is neutral enough to brand without a full redesign.
 
 **5. Solo developer velocity — Right components for the job**
-shadcn/ui provides exactly the components needed for Plublista's UI: Cards (content grid), Dialog (publish confirmation), Dropdown Menu (style selection), Calendar (scheduling), Tabs (navigation), Toast (notifications), Progress (Auto-Montage rendering), Badge (status pills), Command (Cmd+K palette).
+shadcn/ui provides exactly the components needed for Publista's UI: Cards (content grid), Dialog (publish confirmation), Dropdown Menu (style selection), Calendar (scheduling), Tabs (navigation), Toast (notifications), Progress (Auto-Montage rendering), Badge (status pills), Command (Cmd+K palette).
 
 **6. Community momentum — Best-in-class for 2026 React**
 shadcn/ui is the most adopted component system in the React + Tailwind ecosystem as of 2026. Strong community, active maintenance, extensive examples, and wide adoption means proven patterns and easy troubleshooting.
@@ -387,7 +387,7 @@ src/
 
 **Key shadcn/ui components to use:**
 
-| Component | Plublista Use Case |
+| Component | Publista Use Case |
 |-----------|-------------------|
 | **Card** | Content cards in grid (thumbnail + status + actions) |
 | **Dialog** | Publish confirmation, error details, style preview |
@@ -421,7 +421,7 @@ src/
 - Brand-specific component variants (e.g., `ContentCard` extends `Card` with thumbnail + status badge + quick actions)
 - Custom icons using Lucide (shadcn/ui's default icon set) supplemented with platform-specific icons (Instagram, YouTube, TikTok logos)
 
-**Plublista-specific components (built on top of shadcn/ui):**
+**Publista-specific components (built on top of shadcn/ui):**
 
 | Custom Component | Built From | Purpose |
 |-----------------|-----------|---------|
@@ -432,7 +432,7 @@ src/
 | **FormatPreview** | Custom + aspect-ratio utilities | Visual format selector showing 9:16, 16:9, 1:1 frames |
 | **StylePicker** | Card + visual thumbnails | Visual style selection grid with preview thumbnails |
 | **ContentCalendar** | Calendar + ContentCard + DnD | Full content scheduling calendar with drag-and-drop |
-| **CommandPalette** | Command | Global Cmd+K with Plublista-specific actions |
+| **CommandPalette** | Command | Global Cmd+K with Publista-specific actions |
 
 **Dark mode strategy:**
 - Light mode as default (content creation benefits from bright, clean UI for accurate color preview)
@@ -456,10 +456,10 @@ The user provides the raw material and receives the finished product. The entire
 
 ### User Mental Model
 
-**Current mental model (before Plublista):**
+**Current mental model (before Publista):**
 Users approach video creation with the mental model of "editing" — a multi-step, skill-dependent process: import clips → arrange on timeline → trim each clip → add transitions → sync music → add text → export → upload to platform → write caption. Each step requires a decision and a skill. The mental model is "I must become an editor to create content."
 
-**Plublista's new mental model:**
+**Publista's new mental model:**
 "I provide the ingredients, AI cooks the meal." The mental model shifts from "editor" to "creative director" — the user makes high-level decisions (style, mood, format) while AI handles execution. This is the same mental model shift that Canva brought to graphic design: you don't need to be a designer, you need to know what you want.
 
 **Mental model transitions by persona:**
@@ -516,7 +516,7 @@ The individual steps are familiar. The combination is novel. No tool currently c
 | Dashboard "New Reel" button | Opens Auto-Montage creation view | Primary entry point for new users |
 | Calendar empty slot "+" | Opens creation with date pre-filled | Power user entry from calendar view |
 | Cmd+K → "New Reel" | Opens Auto-Montage creation view | Keyboard-first power users |
-| Drag files onto Plublista window | Opens Auto-Montage with files pre-loaded | Fastest path for users with clips ready |
+| Drag files onto Publista window | Opens Auto-Montage with files pre-loaded | Fastest path for users with clips ready |
 
 **2. Interaction — The Creation Flow**
 
@@ -623,7 +623,7 @@ Step 3: RESULT PREVIEW
 ### Color System
 
 **Brand Color Strategy: "Professional Creativity"**
-Plublista needs to convey two seemingly contradictory qualities: creative energy (it's a content creation tool) and professional reliability (it handles client accounts and billing). The color system bridges this gap with a vibrant primary color paired with clean, neutral supporting tones.
+Publista needs to convey two seemingly contradictory qualities: creative energy (it's a content creation tool) and professional reliability (it handles client accounts and billing). The color system bridges this gap with a vibrant primary color paired with clean, neutral supporting tones.
 
 **Primary Palette:**
 
@@ -634,7 +634,7 @@ Plublista needs to convey two seemingly contradictory qualities: creative energy
 | **Primary Light** | Soft Indigo | `#A5B4FC` (Indigo-300) | Backgrounds, selected states, subtle accents |
 | **Primary Subtle** | Ghost Indigo | `#EEF2FF` (Indigo-50) | Card backgrounds, hover highlights, gentle emphasis |
 
-**Rationale for Indigo/Violet:** Indigo sits between blue (trust, reliability — Stripe, Linear) and purple (creativity, innovation — Figma, Notion). This positions Plublista as both creative and professional. It's distinctive from competitors: Canva (teal/purple), CapCut (black/red), Later (orange), Buffer (blue).
+**Rationale for Indigo/Violet:** Indigo sits between blue (trust, reliability — Stripe, Linear) and purple (creativity, innovation — Figma, Notion). This positions Publista as both creative and professional. It's distinctive from competitors: Canva (teal/purple), CapCut (black/red), Later (orange), Buffer (blue).
 
 **Semantic Colors:**
 
@@ -815,7 +815,7 @@ The celebration moment — a success modal showing multi-platform publish confir
 
 **Composite approach: All six directions represent different screens within a single cohesive application flow.**
 
-Rather than choosing one direction over another, the six directions form the complete Plublista user journey:
+Rather than choosing one direction over another, the six directions form the complete Publista user journey:
 1. **Dashboard Hub** → Landing screen and content management
 2. **Auto-Montage Upload** → Content creation entry point
 3. **Generation Progress** → AI processing feedback
@@ -834,7 +834,7 @@ Each direction was designed with consistent design tokens (Indigo #6366F1 primar
 | **Split-panel creation view** | Preview + controls side-by-side eliminates context switching. Users see changes immediately. Matches the mental model of "reviewing AI output." |
 | **Step-by-step progress** | Transparent AI processing builds trust and excitement. Users understand what the AI is doing, reducing "black box" anxiety. Turns wait time into engagement time. |
 | **Celebration modals** | Multi-platform publish is a high-value moment. Celebrating it reinforces the product's value proposition ("This used to take 30 minutes, now it's one click"). |
-| **Calendar as command center** | Power users think in weeks and months, not individual posts. Calendar view transforms Plublista from "content tool" to "content workflow hub." |
+| **Calendar as command center** | Power users think in weeks and months, not individual posts. Calendar view transforms Publista from "content tool" to "content workflow hub." |
 
 ### Implementation Approach
 
@@ -862,7 +862,7 @@ Each direction was designed with consistent design tokens (Indigo #6366F1 primar
 
 **Goal:** Marc goes from signup to his first published Reel in < 5 minutes.
 
-**Entry point:** "Made with Plublista" watermark on a competitor's Reel → Landing page → Sign up
+**Entry point:** "Made with Publista" watermark on a competitor's Reel → Landing page → Sign up
 
 ```mermaid
 flowchart TD
@@ -900,7 +900,7 @@ flowchart TD
     T --> W{Instagram Connected?}
     W -->|Yes| X[Publish Confirmation: '🎉 Live on Instagram!']
     W -->|No| Y[Download video + prompt to connect]
-    X --> Z[Onboarding Complete: 'Welcome to Plublista!']
+    X --> Z[Onboarding Complete: 'Welcome to Publista!']
     V --> Z
     Y --> Z
     Z --> AA[Dashboard with first content card visible]
@@ -994,7 +994,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Monday 8am - Sophie opens Plublista] --> B[Dashboard: Shows weekly overview]
+    A[Monday 8am - Sophie opens Publista] --> B[Dashboard: Shows weekly overview]
     B --> C[Calendar View: See gaps across all clients]
     C --> D{Content Type}
     D -->|Reel needed| E[New Reel - Auto-Montage Flow]
@@ -1087,7 +1087,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Marc opens Plublista] --> B[Dashboard: Red badge on 2 content cards]
+    A[Marc opens Publista] --> B[Dashboard: Red badge on 2 content cards]
     B --> C{Notification Bar: '2 posts need attention'}
     C --> D[Click failed content card]
     D --> E[Error Detail Panel]
@@ -1175,9 +1175,9 @@ flowchart TD
 
 **shadcn/ui Components — Coverage Analysis:**
 
-Based on our 5 user journeys and 6 design directions, here is the complete mapping of shadcn/ui components to Plublista use cases:
+Based on our 5 user journeys and 6 design directions, here is the complete mapping of shadcn/ui components to Publista use cases:
 
-| shadcn/ui Component | Plublista Use Case | Journey Coverage |
+| shadcn/ui Component | Publista Use Case | Journey Coverage |
 |---------------------|-------------------|-----------------|
 | **Button** | Primary CTAs ("Generate", "Publish", "Schedule"), secondary actions ("Regenerate", "Save Draft") | All journeys |
 | **Card** | Content cards in dashboard grid, clip upload cards, stat cards | J1, J2, J3 |
@@ -1593,7 +1593,7 @@ Based on our 5 user journeys and 6 design directions, here is the complete mappi
 - Clear error messages: "[Field name] [what's wrong] [how to fix]" — e.g., "Caption must be under 2,200 characters (currently 2,350)"
 - Successful validation: green checkmark appears, no text needed
 
-**Form patterns specific to Plublista:**
+**Form patterns specific to Publista:**
 
 | Form Context | Pattern | Rationale |
 |-------------|---------|-----------|
@@ -1732,7 +1732,7 @@ Based on our 5 user journeys and 6 design directions, here is the complete mappi
 
 **Desktop-first approach (primary platform)**
 
-Plublista is fundamentally a desktop content creation tool. Video upload, AI-powered editing, multi-platform preview, and calendar management all benefit from large screens, mouse precision, and keyboard shortcuts. The responsive strategy optimizes for desktop first, then adapts gracefully for tablet review workflows.
+Publista is fundamentally a desktop content creation tool. Video upload, AI-powered editing, multi-platform preview, and calendar management all benefit from large screens, mouse precision, and keyboard shortcuts. The responsive strategy optimizes for desktop first, then adapts gracefully for tablet review workflows.
 
 **Desktop (1024px+) — Full experience:**
 
@@ -1803,11 +1803,11 @@ Plublista is fundamentally a desktop content creation tool. Video upload, AI-pow
 
 **WCAG 2.1 Level AA compliance — the industry standard.**
 
-Plublista targets WCAG 2.1 Level AA compliance across all features. This is the recommended level for SaaS products — it covers the vast majority of accessibility needs without the rarely-needed AAA requirements.
+Publista targets WCAG 2.1 Level AA compliance across all features. This is the recommended level for SaaS products — it covers the vast majority of accessibility needs without the rarely-needed AAA requirements.
 
 **Perceivable (WCAG Principle 1):**
 
-| Requirement | Implementation | Plublista-Specific |
+| Requirement | Implementation | Publista-Specific |
 |-------------|---------------|-------------------|
 | **1.1.1 Non-text Content** | Alt text on all images, thumbnails, and icons | AI-generated image thumbnails get auto-generated alt text describing the content. Video thumbnails use content title as alt. |
 | **1.3.1 Info and Relationships** | Semantic HTML: `<nav>`, `<main>`, `<aside>`, `<header>`, `<section>` | Sidebar is `<nav>`, main content is `<main>`, top bar is `<header>`. Status badges use `<span role="status">`. |
@@ -1817,7 +1817,7 @@ Plublista targets WCAG 2.1 Level AA compliance across all features. This is the 
 
 **Operable (WCAG Principle 2):**
 
-| Requirement | Implementation | Plublista-Specific |
+| Requirement | Implementation | Publista-Specific |
 |-------------|---------------|-------------------|
 | **2.1.1 Keyboard** | All functionality available via keyboard | Tab through sidebar → main content. Arrow keys in calendar grid. Enter to activate buttons. Escape to close modals. |
 | **2.1.2 No Keyboard Trap** | Focus never gets trapped | Dialog focus cycles within dialog; Escape always exits. Sheet panels have explicit close. |
@@ -1828,7 +1828,7 @@ Plublista targets WCAG 2.1 Level AA compliance across all features. This is the 
 
 **Understandable (WCAG Principle 3):**
 
-| Requirement | Implementation | Plublista-Specific |
+| Requirement | Implementation | Publista-Specific |
 |-------------|---------------|-------------------|
 | **3.1.1 Language of Page** | `lang` attribute on `<html>` | `lang="en"` (or user's preferred language for future i18n) |
 | **3.2.1 On Focus** | No unexpected context changes on focus | Focusing a ContentCard does NOT open it — Enter is required. No auto-submitting on focus. |
@@ -1838,7 +1838,7 @@ Plublista targets WCAG 2.1 Level AA compliance across all features. This is the 
 
 **Robust (WCAG Principle 4):**
 
-| Requirement | Implementation | Plublista-Specific |
+| Requirement | Implementation | Publista-Specific |
 |-------------|---------------|-------------------|
 | **4.1.2 Name, Role, Value** | All components have accessible names and roles | Custom components (ContentCard, PlatformSelector, etc.) use proper ARIA roles as specified in Component Strategy. |
 | **4.1.3 Status Messages** | Status updates announced to screen readers | Toast notifications use `aria-live="polite"`. Generation progress uses `aria-live="polite"`. Error alerts use `aria-live="assertive"`. |

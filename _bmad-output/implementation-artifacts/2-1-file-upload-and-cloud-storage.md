@@ -266,7 +266,7 @@ New variables needed (add to `.env.example` and `.env`):
 CLOUDFLARE_R2_ACCOUNT_ID=your-account-id
 CLOUDFLARE_R2_ACCESS_KEY_ID=your-access-key
 CLOUDFLARE_R2_SECRET_ACCESS_KEY=your-secret-key
-CLOUDFLARE_R2_BUCKET_NAME=plublista-dev
+CLOUDFLARE_R2_BUCKET_NAME=publista-dev
 CLOUDFLARE_R2_ENDPOINT=https://{account-id}.r2.cloudflarestorage.com
 ```
 

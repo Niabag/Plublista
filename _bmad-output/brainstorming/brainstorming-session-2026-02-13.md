@@ -1,7 +1,7 @@
 ---
 stepsCompleted: [1]
 inputDocuments: []
-session_topic: 'Plublista v2 - Evolution from code-to-reel to full Instagram content creation SaaS'
+session_topic: 'Publista v2 - Evolution from code-to-reel to full Instagram content creation SaaS'
 session_goals: 'Define architecture, AI stack, and feature set for a marketing-optimized Instagram content platform'
 selected_approach: 'AI-Recommended Techniques'
 techniques_used: ['Market Research', 'Algorithm Analysis', 'Technology Benchmarking', 'Strategic Decision Matrix']
@@ -18,7 +18,7 @@ context_file: '_bmad/bmm/data/project-context-template.md'
 
 ## Session Overview
 
-**Topic:** Plublista v2 — Pivot from "Code → Instagram Reel" tool to a full-scale AI-powered Instagram content creation SaaS platform
+**Topic:** Publista v2 — Pivot from "Code → Instagram Reel" tool to a full-scale AI-powered Instagram content creation SaaS platform
 **Goals:** Define the complete feature set, technology stack, and architecture optimized for Instagram's 2026 algorithm
 
 ---
@@ -27,7 +27,7 @@ context_file: '_bmad/bmm/data/project-context-template.md'
 
 ### Algorithm Ranking Factors (Confirmed by Adam Mosseri)
 
-| Factor | Weight | Implication for Plublista |
+| Factor | Weight | Implication for Publista |
 |--------|--------|--------------------------|
 | **Watch Time** | #1 Most Important | Must generate content with strong 3-second hooks. Viewers decide in 1.7s. 60%+ hold rate = 5-10x more reach |
 | **Sends Per Reach (DM Shares)** | #2 for Discovery | Content must be shareable — emotional, useful, or surprising |
@@ -48,7 +48,7 @@ context_file: '_bmad/bmm/data/project-context-template.md'
 
 1. **Hook in first 1.7 seconds** — visual hook must stop the scroll
 2. **Jump cuts every 3-5 seconds** → +32% engagement
-3. **Trending audio** → +42% engagement (but Plublista should generate original audio for Originality Score bonus)
+3. **Trending audio** → +42% engagement (but Publista should generate original audio for Originality Score bonus)
 4. **Optimal Reel length:** 7-30s for viral potential, 30-90s for storytelling
 5. **Carousels:** 8-10 slides at 1080×1350px portrait, strong hook slide 1, CTA on last slide
 6. **Mixed-media carousels** (image + video slides) perform 30% better than image-only
@@ -64,7 +64,7 @@ context_file: '_bmad/bmm/data/project-context-template.md'
 ### Decision 1: Video Generation API → **Fal.ai (Multi-Model Gateway)**
 
 **Why Fal.ai as the primary gateway:**
-- Already integrated in Plublista for music generation
+- Already integrated in Publista for music generation
 - Access to 600+ models through ONE unified API
 - Includes Kling 3.0, Veo 3, Hailuo, Wan 2.6, and more
 - Pay-per-second pricing (cheapest option)
@@ -93,7 +93,7 @@ context_file: '_bmad/bmm/data/project-context-template.md'
 
 **Pricing:** $99/month for 100 credits (Pro), ~$0.50/credit per 30-second video
 
-**Use case in Plublista:** Generate spokesperson/presenter scenes, UGC-style testimonials, product presentations with realistic human actors
+**Use case in Publista:** Generate spokesperson/presenter scenes, UGC-style testimonials, product presentations with realistic human actors
 
 ### Decision 3: Image Generation → **Flux 2.0 Pro via Fal.ai**
 
@@ -140,13 +140,13 @@ Already integrated and working well. Evolve:
 
 ---
 
-## PART 3: COMPLETE FEATURE ARCHITECTURE — PLUBLISTA v2
+## PART 3: COMPLETE FEATURE ARCHITECTURE — PUBLISTA v2
 
 ### Navigation Structure
 
 ```
 ┌──────────────────────────────────────────────┐
-│  PLUBLISTA v2                                │
+│  PUBLISTA v2                                │
 │                                              │
 │  📊 Dashboard     (Hub central)              │
 │  ✨ Create        (Assembleur de contenu)    │
@@ -416,7 +416,7 @@ When user selects **REEL**, they choose between:
 
 ### Built-in Intelligence Rules
 
-Every piece of content Plublista generates will automatically follow these rules:
+Every piece of content Publista generates will automatically follow these rules:
 
 **For Reels:**
 1. First scene = visual hook (1.7s rule)
@@ -445,7 +445,7 @@ Every piece of content Plublista generates will automatically follow these rules
 
 ## PART 5: TECHNOLOGY STACK SUMMARY
 
-### Complete Stack for Plublista v2
+### Complete Stack for Publista v2
 
 | Layer | Technology | Role |
 |-------|-----------|------|
@@ -468,7 +468,7 @@ Every piece of content Plublista generates will automatically follow these rules
 
 ```
                     ┌──────────────┐
-                    │   PLUBLISTA   │
+                    │   PUBLISTA   │
                     │   BACKEND     │
                     └──────┬───────┘
                            │
@@ -488,7 +488,7 @@ Every piece of content Plublista generates will automatically follow these rules
 └──────┘ └──────┘ └─────────┘
 
                     ┌──────────────┐
-                    │   PLUBLISTA   │
+                    │   PUBLISTA   │
                     │   BACKEND     │
                     └──────┬───────┘
                            │

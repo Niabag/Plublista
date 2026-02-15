@@ -13,7 +13,7 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 import { useCalendarContent, CALENDAR_CONTENT_QUERY_KEY } from '../hooks/useCalendarContent';
 import { useReschedule } from '../hooks/useReschedule';
 import { CalendarGrid } from '../components/CalendarGrid';

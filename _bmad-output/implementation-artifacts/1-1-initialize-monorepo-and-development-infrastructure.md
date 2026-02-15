@@ -42,10 +42,10 @@ so that all subsequent development has a consistent, working foundation.
   - [x] Install and initialize shadcn/ui (`npx shadcn@canary init`)
   - [x] Configure `vite.config.ts` with React plugin, Tailwind plugin, path aliases, and `/api` proxy (AC: #8)
   - [x] Create minimal `App.tsx` with a health-check display confirming frontend works
-  - [x] Add `apps/web/package.json` workspace-aware dependency on `@plublista/shared`
+  - [x] Add `apps/web/package.json` workspace-aware dependency on `@publista/shared`
 
 - [x] **Task 3: Scaffold apps/api (Express backend)** (AC: #4)
-  - [x] Create `apps/api/package.json` with Express 5, tsx, and workspace dependency on `@plublista/shared`
+  - [x] Create `apps/api/package.json` with Express 5, tsx, and workspace dependency on `@publista/shared`
   - [x] Create `apps/api/tsconfig.json` extending base config
   - [x] Create `apps/api/src/index.ts` entry point (start Express on port 3001)
   - [x] Create `apps/api/src/app.ts` with Express config (CORS, JSON parser, health endpoint)
@@ -53,7 +53,7 @@ so that all subsequent development has a consistent, working foundation.
   - [x] Configure tsx watch mode for development
 
 - [x] **Task 4: Scaffold packages/shared** (AC: #5)
-  - [x] Create `packages/shared/package.json` with name `@plublista/shared`
+  - [x] Create `packages/shared/package.json` with name `@publista/shared`
   - [x] Create `packages/shared/tsconfig.json` extending base config
   - [x] Create `packages/shared/src/index.ts` barrel export
   - [x] Create `packages/shared/src/types/api.types.ts` with `ApiResponse<T>`, `ApiError`, `PaginatedResponse<T>` types
@@ -92,7 +92,7 @@ This story establishes the foundation for the ENTIRE project. Every decision her
 The complete project tree is defined in architecture.md § "Complete Project Directory Structure". This story creates the skeleton — DO NOT create feature folders yet. Only create:
 
 ```
-plublista-v2/
+publista-v2/
 ├── .github/workflows/ci.yml
 ├── .env.example
 ├── .gitignore
@@ -210,7 +210,7 @@ All API responses use this wrapper — established starting from the `/api/healt
 These patterns are set once here and MUST be followed by all future stories:
 
 1. **Workspace structure:** `apps/web`, `apps/api`, `packages/shared` — no deviations
-2. **Shared types via `@plublista/shared`:** Both apps import types/schemas from shared package
+2. **Shared types via `@publista/shared`:** Both apps import types/schemas from shared package
 3. **API response wrapper:** `{ data }` for success — start with `/api/health`
 4. **ESLint + Prettier:** Consistent across all workspaces
 5. **TypeScript strict mode:** Enable `strict: true` in `tsconfig.base.json`
@@ -232,7 +232,7 @@ These patterns are set once here and MUST be followed by all future stories:
 
 ```json
 {
-  "name": "plublista-v2",
+  "name": "publista-v2",
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
@@ -320,7 +320,7 @@ export default defineConfig({
 
 ```bash
 # Database (Story 1.2)
-DATABASE_URL=postgresql://user:password@host:5432/plublista
+DATABASE_URL=postgresql://user:password@host:5432/publista
 
 # Backend
 PORT=3001

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiDelete } from '@/lib/apiClient';
-import type { Platform, PlatformConnection } from '@plublista/shared';
+import type { Platform, PlatformConnection } from '@publista/shared';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 

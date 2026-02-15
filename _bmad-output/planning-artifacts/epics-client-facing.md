@@ -3,7 +3,7 @@ stepsCompleted: [1, 2, 3, 4]
 status: complete
 completedAt: 2026-02-14
 inputDocuments:
-  - 'client-facing-brief-Plublista-2026-02-14.md'
+  - 'client-facing-brief-Publista-2026-02-14.md'
   - 'architecture.md'
   - 'ux-design-specification.md'
 date: 2026-02-14

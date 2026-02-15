@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { StatusBadge } from './StatusBadge';
-import type { ContentStatus } from '@plublista/shared';
+import type { ContentStatus } from '@publista/shared';
 
 describe('StatusBadge', () => {
   const statuses: { status: ContentStatus; label: string; colorClass: string }[] = [

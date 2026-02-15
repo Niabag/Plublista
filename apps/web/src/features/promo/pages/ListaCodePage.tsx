@@ -60,7 +60,7 @@ export function ListaCodePage() {
               <Sparkles className="mb-1 ml-2 inline size-5 text-[#3F48CC]" />
             </h2>
             <p className="mb-8 text-center text-gray-400">
-              Use this exclusive promo code to unlock your reward on Plublista
+              Use this exclusive promo code to unlock your reward on Publista
             </p>
 
             {/* Promo code */}

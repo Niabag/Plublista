@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import type { SubscriptionTier } from '@plublista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 import { AppError } from '../lib/errors';
 import { logCost } from './costTracker';
 

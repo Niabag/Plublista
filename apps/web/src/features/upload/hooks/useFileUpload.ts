@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { apiPost } from '@/lib/apiClient';
-import { ALLOWED_FILE_TYPES, UPLOAD_LIMITS } from '@plublista/shared';
-import type { SubscriptionTier } from '@plublista/shared';
+import { ALLOWED_FILE_TYPES, UPLOAD_LIMITS } from '@publista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 
 interface PresignedUrlResponse {
   data: {

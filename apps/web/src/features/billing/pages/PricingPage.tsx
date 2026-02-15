@@ -1,8 +1,8 @@
 import { Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PRICING_CONFIG, TIER_ORDER, getTierChangeDirection } from '@plublista/shared';
-import type { SubscriptionTier } from '@plublista/shared';
+import { PRICING_CONFIG, TIER_ORDER, getTierChangeDirection } from '@publista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useCheckout } from '../hooks/useCheckout';
 import { useSubscription } from '../hooks/useSubscription';

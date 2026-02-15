@@ -1,4 +1,4 @@
-import type { ErrorCode } from '@plublista/shared';
+import type { ErrorCode } from '@publista/shared';
 
 export interface ValidationDetail {
   field: string;

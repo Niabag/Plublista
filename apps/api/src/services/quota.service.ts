@@ -3,8 +3,8 @@ import { db } from '../db/index';
 import { quotaUsage } from '../db/schema/index';
 import { users } from '../db/schema/users';
 import { AppError } from '../lib/errors';
-import { CREDIT_COSTS, CREDIT_LIMITS } from '@plublista/shared';
-import type { CreditOperation, SubscriptionTier } from '@plublista/shared';
+import { CREDIT_COSTS, CREDIT_LIMITS } from '@publista/shared';
+import type { CreditOperation, SubscriptionTier } from '@publista/shared';
 
 const PLATFORM_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,

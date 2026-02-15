@@ -111,10 +111,10 @@ vi.mock('../../services/fal.service', () => ({
   generateImage: vi.fn(),
 }));
 
-// Mock quota service
+// Mock quota service (credit-based)
 vi.mock('../../services/quota.service', () => ({
-  checkAndDecrementQuota: vi.fn(),
-  restoreQuota: vi.fn(),
+  checkAndDecrementCredits: vi.fn(),
+  restoreCredits: vi.fn(),
 }));
 
 // Mock encryption

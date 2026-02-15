@@ -15,8 +15,13 @@ function getClient(): Anthropic {
 
 /** Strip markdown code fences (```json ... ```) that Claude may wrap around JSON. */
 function stripCodeFences(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return match ? match[1].trim() : text.trim();
+  // Match closed fences first
+  const closed = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (closed) return closed[1].trim();
+  // Handle unclosed fences (truncated response)
+  const open = text.match(/```(?:json)?\s*([\s\S]*)/);
+  if (open) return open[1].trim();
+  return text.trim();
 }
 
 export interface ClipAnalysis {
@@ -35,7 +40,7 @@ export async function analyzeClips(
       withTimeout(async () => {
         const response = await getClient().messages.create({
           model: 'claude-sonnet-4-5-20250929',
-          max_tokens: 1024,
+          max_tokens: 4096,
           messages: [
             {
               role: 'user',
@@ -64,6 +69,7 @@ Respond with ONLY valid JSON, no markdown.`,
         try {
           parsed = JSON.parse(text);
         } catch {
+          console.error('[Claude] Invalid JSON response:', raw.slice(0, 500));
           throw new AppError('EXTERNAL_API_ERROR', 'Claude returned invalid JSON', 502);
         }
 

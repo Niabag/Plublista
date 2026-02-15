@@ -5,11 +5,11 @@ status: 'complete'
 completedAt: '2026-02-13'
 inputDocuments:
   - '_bmad-output/planning-artifacts/prd.md'
-  - '_bmad-output/planning-artifacts/product-brief-Plublista-2026-02-13.md'
+  - '_bmad-output/planning-artifacts/product-brief-Publista-2026-02-13.md'
   - '_bmad-output/brainstorming/brainstorming-session-2026-02-13.md'
-  - '_bmad-output/planning-artifacts/cost-analysis-Plublista-2026-02-13.md'
+  - '_bmad-output/planning-artifacts/cost-analysis-Publista-2026-02-13.md'
 workflowType: 'architecture'
-project_name: 'Plublista'
+project_name: 'Publista'
 user_name: 'Utilisateur'
 date: '2026-02-13'
 ---
@@ -95,7 +95,7 @@ Full-stack SaaS with AI orchestration — requires separate frontend (SPA) and b
 **Initialization Command:**
 
 ```bash
-mkdir plublista-v2 && cd plublista-v2
+mkdir publista-v2 && cd publista-v2
 npm init -y
 npm create vite@latest apps/web -- --template react-ts
 mkdir -p apps/api/src
@@ -131,7 +131,7 @@ mkdir -p packages/shared/src
 
 **Code Organization:**
 ```
-plublista-v2/
+publista-v2/
 ├── apps/
 │   ├── web/          # React + Vite frontend (SPA)
 │   └── api/          # Express.js backend (REST API + job workers)
@@ -450,7 +450,7 @@ logger.error({ userId, error: err.message, stack: err.stack }, 'Auto-montage ren
 ### Complete Project Directory Structure
 
 ```
-plublista-v2/
+publista-v2/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                    # Lint → Test → Build → Deploy

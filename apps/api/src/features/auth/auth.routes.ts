@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { registerSchema, loginSchema, profileUpdateSchema, changePasswordSchema } from '@plublista/shared';
+import { registerSchema, loginSchema, profileUpdateSchema, changePasswordSchema } from '@publista/shared';
 import { validate } from '../../middleware/validate.middleware';
 import { csrfSynchronisedProtection } from '../../config/csrf';
 import { requireAuth } from '../../middleware/requireAuth.middleware';

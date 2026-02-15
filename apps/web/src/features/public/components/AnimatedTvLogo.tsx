@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-type TvLogoSize = 'sm' | 'md' | 'lg';
+type TvLogoSize = 'sm' | 'md' | 'lg' | 'xl';
 
 const SIZE_MAP: Record<TvLogoSize, string> = {
   sm: 'size-8',
   md: 'size-12',
   lg: 'size-48 md:size-64',
+  xl: 'size-24',
 };
 
 export function AnimatedTvLogo({

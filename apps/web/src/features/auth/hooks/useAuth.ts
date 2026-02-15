@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { RegisterInput, LoginInput, ProfileUpdateInput, ApiResponse, User } from '@plublista/shared';
+import type { RegisterInput, LoginInput, ProfileUpdateInput, ApiResponse, User } from '@publista/shared';
 import { apiPost, apiGet, apiPut } from '../../../lib/apiClient';
 
 interface ApiError {

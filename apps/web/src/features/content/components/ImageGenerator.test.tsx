@@ -157,7 +157,7 @@ describe('ImageGenerator', () => {
   });
 
   it('shows quota exceeded message on 429 error', async () => {
-    mockApiPost.mockRejectedValue({ code: 'QUOTA_EXCEEDED', message: 'Monthly AI image quota reached' });
+    mockApiPost.mockRejectedValue({ code: 'QUOTA_EXCEEDED', message: 'Not enough credits. Upgrade your plan for more.' });
 
     renderComponent();
 
@@ -166,7 +166,7 @@ describe('ImageGenerator', () => {
     fireEvent.click(screen.getByText('Generate'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Monthly AI image quota reached/)).toBeInTheDocument();
+      expect(screen.getByText(/Not enough credits/)).toBeInTheDocument();
     });
   });
 

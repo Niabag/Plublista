@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../lib/errors';
 import { getUserConnections, disconnectPlatform } from './platformConnection.service';
-import type { Platform } from '@plublista/shared';
+import type { Platform } from '@publista/shared';
 
 const VALID_PLATFORMS: Platform[] = ['instagram', 'youtube', 'tiktok', 'facebook', 'linkedin', 'x'];
 

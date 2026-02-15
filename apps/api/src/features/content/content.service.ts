@@ -8,7 +8,7 @@ import { addRenderJob } from '../../jobs/queues';
 import { generateCopy } from '../../services/claude.service';
 import { generateImage } from '../../services/fal.service';
 import { checkAndDecrementCredits, restoreCredits } from '../../services/quota.service';
-import type { CreateContentItemInput, UpdateContentTextInput, ImageGenerationInput } from '@plublista/shared';
+import type { CreateContentItemInput, UpdateContentTextInput, ImageGenerationInput } from '@publista/shared';
 
 const contentItemColumns = {
   id: contentItems.id,

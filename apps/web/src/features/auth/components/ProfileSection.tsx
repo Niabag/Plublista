@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { profileUpdateSchema, type ProfileUpdateInput } from '@plublista/shared';
+import { profileUpdateSchema, type ProfileUpdateInput } from '@publista/shared';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../hooks/useAuth';

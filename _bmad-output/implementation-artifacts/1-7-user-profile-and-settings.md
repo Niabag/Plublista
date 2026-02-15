@@ -172,7 +172,7 @@ export interface QuotaUsage {
 
 ```typescript
 // Add to apps/api/src/features/auth/auth.service.ts
-import type { ProfileUpdateInput } from '@plublista/shared';
+import type { ProfileUpdateInput } from '@publista/shared';
 
 export async function updateUserProfile(userId: string, data: ProfileUpdateInput) {
   const [updated] = await db
@@ -204,8 +204,8 @@ export async function updateUserProfile(userId: string, data: ProfileUpdateInput
 
 ```typescript
 // apps/api/src/features/quota/quota.service.ts
-import { QUOTA_LIMITS } from '@plublista/shared';
-import type { SubscriptionTier } from '@plublista/shared';
+import { QUOTA_LIMITS } from '@publista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 
 // Response format: { data: { tier, quotas, period } } — standard API envelope
 export function getUserQuota(subscriptionTier: SubscriptionTier) {

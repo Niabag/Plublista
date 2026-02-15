@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { checkoutSchema } from '@plublista/shared';
+import { checkoutSchema } from '@publista/shared';
 import { requireAuth } from '../../middleware/requireAuth.middleware';
 import { csrfSynchronisedProtection } from '../../config/csrf';
 import { validate } from '../../middleware/validate.middleware';

@@ -28,7 +28,7 @@ export function ImageGenerator({ contentItemId, onImageGenerated, disabled }: Im
         onError: (err) => {
           const apiError = err as { code?: string; message?: string };
           if (apiError.code === 'QUOTA_EXCEEDED') {
-            toast.error('Monthly AI image quota reached. Upgrade your plan for more.');
+            toast.error('Not enough credits. Upgrade your plan for more.');
           } else {
             toast.error(apiError.message ?? 'Image generation failed');
           }
@@ -90,7 +90,7 @@ export function ImageGenerator({ contentItemId, onImageGenerated, disabled }: Im
 
       {quotaExceeded && (
         <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-          Monthly AI image quota reached. Upgrade your plan for more images.
+          Not enough credits. Upgrade your plan for more.
         </div>
       )}
 

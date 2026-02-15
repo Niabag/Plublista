@@ -18,6 +18,7 @@ import type { PublishJobData, AyrsharePublishJobData } from './queues';
 import { classifyError, PermanentPublishError } from './errors';
 import { convertMediaForPlatform } from '../services/mediaConversion.service';
 import { applyWatermarkToAll } from '../services/watermark.service';
+import { checkAndDecrementCredits, restoreCredits } from '../services/quota.service';
 
 function buildCaption(caption: string | null, hashtags: string[]): string {
   const parts: string[] = [];
@@ -214,6 +215,9 @@ export async function processPublishJob(data: PublishJobData): Promise<void> {
 
 export async function processAyrsharePublishJob(data: AyrsharePublishJobData): Promise<void> {
   const { publishJobIds, platforms, userId, contentItemId } = data;
+
+  // 0. Deduct credits for Ayrshare platforms (1 credit per platform)
+  await checkAndDecrementCredits(userId, 'publishAyrshare', platforms.length);
 
   // 1. Update all publish jobs to 'publishing'
   for (const jobId of publishJobIds) {
@@ -458,6 +462,9 @@ export function startAyrshareWorker(): Worker {
     }
 
     if (shouldFail) {
+      // Restore credits on permanent failure
+      await restoreCredits(userId, 'publishAyrshare', platforms.length);
+
       await db
         .update(contentItems)
         .set({ status: 'failed', updatedAt: new Date() })

@@ -1,5 +1,5 @@
-import { CREDIT_LIMITS } from '@plublista/shared';
-import type { SubscriptionTier } from '@plublista/shared';
+import { CREDIT_LIMITS } from '@publista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 import { getOrCreateCreditUsage } from './quotaUsage.service';
 
 export async function getUserQuota(userId: string, subscriptionTier: SubscriptionTier) {

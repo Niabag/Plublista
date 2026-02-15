@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/cn';
-import type { ContentStatus } from '@plublista/shared';
+import type { ContentStatus } from '@publista/shared';
 
 const STATUS_CONFIG: Record<ContentStatus, { label: string; className: string }> = {
   draft: {

@@ -49,7 +49,7 @@ export function AppLayout() {
     return <Navigate to="/onboarding" replace />;
   }
 
-  const pageTitle = pageTitles[location.pathname] ?? 'Plublista';
+  const pageTitle = pageTitles[location.pathname] ?? 'Publista';
   const showLavaLamp = true;
 
   return (

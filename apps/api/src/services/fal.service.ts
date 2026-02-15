@@ -39,8 +39,8 @@ export async function generateImage(
           throw new AppError('EXTERNAL_API_ERROR', 'Fal.ai returned no image URL', 502);
         }
 
-        // Flux image generation pricing: ~$0.05 per image
-        const costUsd = 0.05;
+        // Flux image generation pricing: ~$0.025 per image
+        const costUsd = 0.025;
         await logCost(userId, 'fal', 'flux-image', costUsd);
 
         return { imageUrl, costUsd };

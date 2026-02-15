@@ -202,7 +202,7 @@ N/A
 
 ### Completion Notes List
 - All 8 tasks completed successfully
-- Shared Zod schema (`updateContentTextSchema`) created and exported from `@plublista/shared`
+- Shared Zod schema (`updateContentTextSchema`) created and exported from `@publista/shared`
 - PATCH endpoint follows existing route pattern: `contentLimiter → requireAuth → csrfSynchronisedProtection → validate → handler`
 - Service enforces `status === 'draft'` constraint — only draft items can be text-edited
 - `apiPatch` helper added to web apiClient (was missing)

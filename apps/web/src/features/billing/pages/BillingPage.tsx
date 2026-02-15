@@ -3,8 +3,8 @@ import { CreditCard, Download, ExternalLink, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PRICING_CONFIG } from '@plublista/shared';
-import type { SubscriptionTier } from '@plublista/shared';
+import { PRICING_CONFIG } from '@publista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 import { useBillingDetails } from '../hooks/useBillingDetails';
 
 const STATUS_STYLES: Record<string, string> = {

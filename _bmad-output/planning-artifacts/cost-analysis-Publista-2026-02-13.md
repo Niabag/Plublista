@@ -3,11 +3,11 @@ status: complete
 date: 2026-02-13
 author: Utilisateur
 relatedDocuments:
-  - '_bmad-output/planning-artifacts/product-brief-Plublista-2026-02-13.md'
+  - '_bmad-output/planning-artifacts/product-brief-Publista-2026-02-13.md'
   - '_bmad-output/brainstorming/brainstorming-session-2026-02-13.md'
 ---
 
-# Per-User API Cost Analysis & Usage Quotas — Plublista
+# Per-User API Cost Analysis & Usage Quotas — Publista
 
 ## 1. API Unit Costs (February 2026)
 
@@ -48,7 +48,7 @@ relatedDocuments:
 
 ### Publishing Strategy: Hybrid Approach
 
-To optimize costs, Plublista uses a **hybrid publishing architecture**:
+To optimize costs, Publista uses a **hybrid publishing architecture**:
 
 - **Free tier** → Instagram Graph API direct (free, no Ayrshare cost)
 - **Paid tiers** → Ayrshare unified API (multi-platform)

@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiPost } from '@/lib/apiClient';
 import { toast } from 'sonner';
-import type { SubscriptionTier } from '@plublista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 
 interface CheckoutResponse {
   data: { url: string };

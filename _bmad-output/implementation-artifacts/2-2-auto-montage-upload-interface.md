@@ -105,7 +105,7 @@ so that I can control the source material for my auto-montage.
 - **State management:** Zustand for UI state (`useUiStore`), TanStack Query for server state, React state for form/editor state
 - **API calls:** `apiPost`, `apiGet` from `@/lib/apiClient` — auto-handles CSRF tokens
 - **Content types:** `ContentType = 'reel' | 'carousel' | 'post'`, `ContentItem` interface in shared package
-- **Upload schemas:** `createContentItemSchema`, `ALLOWED_VIDEO_TYPES` from `@plublista/shared`
+- **Upload schemas:** `createContentItemSchema`, `ALLOWED_VIDEO_TYPES` from `@publista/shared`
 - **Test pattern (frontend):** Vitest + React Testing Library + userEvent. Mock API calls with `vi.mock('@/lib/apiClient')`
 
 ### @dnd-kit Implementation Guide

@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { changePasswordSchema, type ChangePasswordInput } from '@plublista/shared';
+import { changePasswordSchema, type ChangePasswordInput } from '@publista/shared';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { apiPut } from '@/lib/apiClient';

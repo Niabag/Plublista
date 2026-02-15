@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/apiClient';
-import type { ContentItemStatusResponse } from '@plublista/shared';
+import type { ContentItemStatusResponse } from '@publista/shared';
 
 interface StatusResponse {
   data: ContentItemStatusResponse;

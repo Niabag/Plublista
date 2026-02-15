@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Film, Images, ImageIcon } from 'lucide-react';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 
 interface ContentMixIndicatorProps {
   items: ContentItem[];

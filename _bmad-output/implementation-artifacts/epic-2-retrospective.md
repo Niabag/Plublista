@@ -18,7 +18,7 @@ Epic 2 delivered the full Auto-Montage content creation pipeline across 7 storie
 
 1. **Consistent architecture patterns** — Every backend endpoint follows the same controller → service → DB pattern with `rateLimiter → requireAuth → csrfSynchronisedProtection → validate(schema) → handler` middleware chain. This made each new endpoint predictable and fast to implement.
 
-2. **Shared Zod schemas** — Validating at both frontend and backend via `@plublista/shared` caught issues early and kept types in sync. The `tsup` build step is an extra step but worth it.
+2. **Shared Zod schemas** — Validating at both frontend and backend via `@publista/shared` caught issues early and kept types in sync. The `tsup` build step is an extra step but worth it.
 
 3. **Graceful degradation in the render pipeline** — The Claude API failure → continue without copy decision (Story 2.6) is architecturally sound and prevents a secondary AI service from blocking the primary rendering flow.
 
@@ -30,7 +30,7 @@ Epic 2 delivered the full Auto-Montage content creation pipeline across 7 storie
 
 ## What Didn't Go Well
 
-1. **Shared package rebuild friction** — Every time a new export is added to `@plublista/shared`, a manual `npm run build` is required before the API or web app can see it. This caused multiple "Module has no exported member" TypeScript errors during development.
+1. **Shared package rebuild friction** — Every time a new export is added to `@publista/shared`, a manual `npm run build` is required before the API or web app can see it. This caused multiple "Module has no exported member" TypeScript errors during development.
 
 2. **Vitest mock hoisting surprises** — `vi.mock` factories are hoisted before `const` declarations. This caused `Cannot access before initialization` errors in content.test.ts and render.job.test.ts. The fix (`vi.hoisted()`) is non-obvious and was encountered twice.
 

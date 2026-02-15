@@ -1,8 +1,8 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../../db/index';
 import { quotaUsage } from '../../db/schema/index';
-import { CREDIT_LIMITS } from '@plublista/shared';
-import type { SubscriptionTier } from '@plublista/shared';
+import { CREDIT_LIMITS } from '@publista/shared';
+import type { SubscriptionTier } from '@publista/shared';
 
 const PLATFORM_LIMITS: Record<SubscriptionTier, number> = {
   free: 1,

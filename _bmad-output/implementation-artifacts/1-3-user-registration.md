@@ -8,7 +8,7 @@ Status: done
 
 As a visitor,
 I want to sign up with my email and password,
-so that I can create an account and start using Plublista.
+so that I can create an account and start using Publista.
 
 ## Acceptance Criteria
 
@@ -25,7 +25,7 @@ so that I can create an account and start using Plublista.
 
 - [x] **Task 2: Create AppError class** (AC: #1, #2, #3)
   - [x]Create `apps/api/src/lib/errors.ts` — `AppError` extends `Error` with `code` (ErrorCode), `message`, `statusCode`
-  - [x]Import `ERROR_CODES` type from `@plublista/shared`
+  - [x]Import `ERROR_CODES` type from `@publista/shared`
 
 - [x] **Task 3: Create error handler middleware** (AC: #2)
   - [x]Create `apps/api/src/middleware/errorHandler.middleware.ts`
@@ -250,7 +250,7 @@ throw new AppError('VALIDATION_ERROR', 'Validation failed', 400);
 ### apps/api/src/lib/errors.ts
 
 ```typescript
-import type { ErrorCode } from '@plublista/shared';
+import type { ErrorCode } from '@publista/shared';
 
 export class AppError extends Error {
   public readonly code: ErrorCode;
@@ -336,7 +336,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../../db/index';
 import { users } from '../../db/schema/index';
 import { AppError } from '../../lib/errors';
-import type { RegisterInput } from '@plublista/shared';
+import type { RegisterInput } from '@publista/shared';
 
 const BCRYPT_ROUNDS = 12;
 

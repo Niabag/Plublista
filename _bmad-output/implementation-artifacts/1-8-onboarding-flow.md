@@ -16,7 +16,7 @@ so that I can set up my account and understand the platform quickly.
 4. **AC4 — Step 3: Create First Reel (Placeholder):** The third step shows a prominent "Create My Reel" CTA mockup. Since Auto-Montage (Story 2.4) is not yet implemented, this step displays the planned UI with a "Coming soon" badge and a "Complete Onboarding" button.
 5. **AC5 — Progress Persistence:** Onboarding completion is tracked via an `onboardingCompletedAt` timestamp field on the users table. A database migration adds this nullable column.
 6. **AC6 — Route Guards:** Users who have not completed onboarding are redirected from authenticated routes to `/onboarding`. Users who have completed onboarding are redirected from `/onboarding` to `/dashboard`. The onboarding page requires authentication.
-7. **AC7 — Completion:** After clicking "Complete Onboarding" on the final step, the backend marks `onboardingCompletedAt`, a success toast ("Welcome to Plublista!") appears, and the user is redirected to `/dashboard`.
+7. **AC7 — Completion:** After clicking "Complete Onboarding" on the final step, the backend marks `onboardingCompletedAt`, a success toast ("Welcome to Publista!") appears, and the user is redirected to `/dashboard`.
 
 ## Tasks / Subtasks
 
@@ -73,7 +73,7 @@ so that I can set up my account and understand the platform quickly.
 
 - [x] Task 7: Wire up completion flow and hooks (AC: 5, 7)
   - [x] Add `completeOnboarding()` method to `useAuth` hook — calls `apiPost('/api/auth/onboarding/complete')`, updates session cache with returned user
-  - [x] OnboardingPage calls `completeOnboarding()` on final step, then `navigate('/dashboard')` + `toast.success('Welcome to Plublista!')`
+  - [x] OnboardingPage calls `completeOnboarding()` on final step, then `navigate('/dashboard')` + `toast.success('Welcome to Publista!')`
   - [x] Update `useAuth` return to include `completeOnboarding`
 
 - [x] Task 8: Implement route guards (AC: 6)

@@ -105,7 +105,7 @@ export function SlideCard({
         onError: (err) => {
           const apiError = err as { code?: string; message?: string };
           if (apiError.code === 'QUOTA_EXCEEDED') {
-            toast.error('Monthly AI image quota reached. Upgrade your plan for more.');
+            toast.error('Not enough credits. Upgrade your plan for more.');
           } else {
             toast.error(apiError.message ?? 'Image generation failed');
           }

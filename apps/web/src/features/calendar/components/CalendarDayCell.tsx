@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import type { ContentItem } from '@plublista/shared';
+import type { ContentItem } from '@publista/shared';
 import { CalendarContentCard } from './CalendarContentCard';
 
 const MAX_VISIBLE = 3;

@@ -112,7 +112,7 @@ export function CreatePostPage() {
         onError: (err) => {
           const apiError = err as { code?: string; message?: string };
           if (apiError.code === 'QUOTA_EXCEEDED') {
-            toast.error('Monthly AI image quota reached. Upgrade your plan for more.');
+            toast.error('Not enough credits. Upgrade your plan for more.');
           } else if (apiError.code === 'ACCOUNT_SUSPENDED') {
             toast.error(apiError.message ?? 'Account suspended. Please update your payment method.');
           } else {

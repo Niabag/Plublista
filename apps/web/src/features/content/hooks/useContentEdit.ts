@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiPatch } from '@/lib/apiClient';
 import { toast } from 'sonner';
-import type { UpdateContentTextInput, ContentItem } from '@plublista/shared';
+import type { UpdateContentTextInput, ContentItem } from '@publista/shared';
 import { CONTENT_ITEM_QUERY_KEY } from './useContentItem';
 
 interface ContentItemResponse {
