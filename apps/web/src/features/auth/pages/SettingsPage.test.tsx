@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -169,5 +170,45 @@ describe('SettingsPage', () => {
     const emailInput = screen.getByLabelText('Email');
     expect(emailInput).toHaveValue('test@example.com');
     expect(emailInput).toBeDisabled();
+  });
+
+  // ── GDPR / Data & Privacy ────────────────────────
+
+  it('renders Data & Privacy section with export and delete buttons', () => {
+    renderSettingsPage();
+
+    expect(screen.getByText('Data & Privacy')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /export my data/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /delete my account/i })).toBeInTheDocument();
+  });
+
+  it('opens delete account dialog when Delete button is clicked', async () => {
+    const user = userEvent.setup();
+    renderSettingsPage();
+
+    await user.click(screen.getByRole('button', { name: /delete my account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Delete your account?')).toBeInTheDocument();
+    });
+    expect(screen.getByPlaceholderText('Type DELETE to confirm')).toBeInTheDocument();
+  });
+
+  it('keeps Permanently delete button disabled until DELETE is typed', async () => {
+    const user = userEvent.setup();
+    renderSettingsPage();
+
+    await user.click(screen.getByRole('button', { name: /delete my account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Delete your account?')).toBeInTheDocument();
+    });
+
+    const confirmButton = screen.getByRole('button', { name: /permanently delete/i });
+    expect(confirmButton).toBeDisabled();
+
+    await user.type(screen.getByPlaceholderText('Type DELETE to confirm'), 'DELETE');
+
+    expect(confirmButton).not.toBeDisabled();
   });
 });

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
-import { registerUser, updateUserProfile, completeOnboarding as completeOnboardingService } from './auth.service';
+import { registerUser, updateUserProfile, changePassword as changePasswordService, completeOnboarding as completeOnboardingService } from './auth.service';
 import { AppError } from '../../lib/errors';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
@@ -59,6 +59,16 @@ export async function updateProfile(req: Request, res: Response, next: NextFunct
     const userId = (req.user as { id: string }).id;
     const updated = await updateUserProfile(userId, req.body);
     res.json({ data: updated });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function changePassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const userId = (req.user as { id: string }).id;
+    await changePasswordService(userId, req.body.currentPassword, req.body.newPassword);
+    res.json({ data: { message: 'Password changed' } });
   } catch (err) {
     next(err);
   }

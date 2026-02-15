@@ -50,7 +50,7 @@ export function AppLayout() {
   }
 
   const pageTitle = pageTitles[location.pathname] ?? 'Plublista';
-  const showLavaLamp = location.pathname !== '/dashboard';
+  const showLavaLamp = true;
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

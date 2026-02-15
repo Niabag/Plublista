@@ -110,6 +110,11 @@ vi.mock('express-rate-limit', () => ({
   rateLimit: () => (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
+// Mock requireActiveSubscription — tested separately in billing.test.ts
+vi.mock('../../middleware/requireActiveSubscription.middleware', () => ({
+  requireActiveSubscription: (_req: unknown, _res: unknown, next: () => void) => next(),
+}));
+
 // Mock bcrypt
 vi.mock('bcrypt', () => ({
   default: {

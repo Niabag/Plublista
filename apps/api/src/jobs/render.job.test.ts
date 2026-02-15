@@ -47,7 +47,30 @@ vi.mock('../services/fal.service', () => ({
 
 vi.mock('../services/r2.service', () => ({
   buildFileKey: vi.fn().mockReturnValue('users/user-1/renders/render.mp4'),
+  downloadBuffer: vi.fn().mockResolvedValue(Buffer.from('fake-clip-data')),
+  uploadBuffer: vi.fn().mockResolvedValue(undefined),
 }));
+
+vi.mock('../services/ffmpeg.service', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/ffmpeg.service')>();
+  return {
+    ...actual,
+    composeVideo: vi.fn().mockImplementation(async (_timeline: unknown, tempDir: string) => {
+      const fsp = (await import('node:fs/promises')).default;
+      const path = (await import('node:path')).default;
+      const outputPath = path.join(tempDir, 'output.mp4');
+      await fsp.writeFile(outputPath, Buffer.from('fake-rendered-video'));
+      return outputPath;
+    }),
+  };
+});
+
+vi.mock('../services/quota.service', () => ({
+  restoreCredits: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock global fetch (used for music download)
+vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
 
 // Mock BullMQ Worker to avoid real Redis connection
 vi.mock('bullmq', () => ({

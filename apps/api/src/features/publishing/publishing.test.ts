@@ -79,6 +79,11 @@ vi.mock('../../jobs/queues', () => ({
   addAyrsharePublishJob: vi.fn().mockResolvedValue('mock-ayrshare-job-id'),
 }));
 
+// Mock requireActiveSubscription — tested separately in billing.test.ts
+vi.mock('../../middleware/requireActiveSubscription.middleware', () => ({
+  requireActiveSubscription: (_req: unknown, _res: unknown, next: () => void) => next(),
+}));
+
 // Mock claude service
 vi.mock('../../services/claude.service', () => ({
   generateCopy: vi.fn().mockResolvedValue({

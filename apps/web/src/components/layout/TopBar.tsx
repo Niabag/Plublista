@@ -57,8 +57,8 @@ export function TopBar({ title }: { title: string }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full">
-            <Avatar size="sm">
-              <AvatarFallback>{initials}</AvatarFallback>
+            <Avatar className="size-10">
+              <AvatarFallback className="bg-white text-black text-sm font-semibold">{initials}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>

@@ -39,38 +39,38 @@ export function ProfileSection() {
   if (!user) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 rounded-lg bg-black p-6">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Profile</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h2 className="text-lg font-semibold text-white">Profile</h2>
+        <p className="text-sm text-gray-400">
           Manage your account information.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {apiError && (
-          <div className="rounded-md bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+          <div className="rounded-md bg-red-900/20 p-3 text-sm text-red-400">
             {apiError.message}
           </div>
         )}
 
         <div>
-          <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="displayName" className="block text-sm font-medium text-gray-300">
             Display name
           </label>
           <input
             id="displayName"
             type="text"
             {...register('displayName')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
           {errors.displayName && (
-            <p className="mt-1 text-sm text-red-600">{errors.displayName.message}</p>
+            <p className="mt-1 text-sm text-red-400">{errors.displayName.message}</p>
           )}
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-300">
             Email
           </label>
           <input
@@ -78,12 +78,12 @@ export function ProfileSection() {
             type="email"
             value={user.email}
             disabled
-            className="mt-1 block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500 shadow-sm dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-400"
+            className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-800/50 px-3 py-2 text-gray-400 shadow-sm"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label className="block text-sm font-medium text-gray-300">
             Subscription
           </label>
           <div className="mt-1">

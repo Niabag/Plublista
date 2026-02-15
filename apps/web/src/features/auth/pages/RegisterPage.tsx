@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { RegisterForm } from '../components/RegisterForm';
 import { useAuth } from '../hooks/useAuth';
+import { PublicNavbar } from '@/features/public/components/PublicNavbar';
 
 export function RegisterPage() {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white">
+    <div className="relative min-h-screen bg-black">
       {/* Lava lamp effect layer */}
       <div className="lava-container">
         <div className="lava-blob lava-blob-1" />
@@ -24,8 +25,13 @@ export function RegisterPage() {
       {/* Black semi-transparent overlay */}
       <div className="fixed inset-0 z-10 bg-black/50" />
 
+      {/* Navbar */}
+      <div className="relative z-50">
+        <PublicNavbar />
+      </div>
+
       {/* Register card */}
-      <div className="relative z-20 flex min-h-screen flex-col items-center px-4 py-12">
+      <div className="relative z-20 flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-12">
         <img src="/logo.png" alt="Plublista" className="mb-0 h-24" />
         <img src="/logo-qr.png" alt="QR Code" className="-mt-4 mb-5 h-24" />
         <div className="w-full max-w-lg">

@@ -14,6 +14,7 @@ import billingRoutes from './features/billing/billing.routes';
 import toolsRoutes from './features/tools/tools.routes';
 import tvRoutes from './features/tv/tv.routes';
 import adminRoutes from './features/admin/admin.routes';
+import gdprRoutes from './features/gdpr/gdpr.routes';
 import { errorHandler } from './middleware/errorHandler.middleware';
 
 const app = express();
@@ -93,6 +94,7 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/tools', toolsRoutes);
 app.use('/api/tv', tvRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/gdpr', gdprRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

@@ -15,8 +15,8 @@ export type { CreditUsage } from './types/quota.types.js';
 export type { ContentType, ContentStatus, ContentItem, RenderJobData, ContentItemStatusResponse } from './types/content.types.js';
 
 // Schemas
-export { loginSchema, registerSchema } from './schemas/auth.schema.js';
-export type { LoginInput, RegisterInput } from './schemas/auth.schema.js';
+export { loginSchema, registerSchema, changePasswordSchema } from './schemas/auth.schema.js';
+export type { LoginInput, RegisterInput, ChangePasswordInput } from './schemas/auth.schema.js';
 
 export { profileUpdateSchema } from './schemas/profile.schema.js';
 export type { ProfileUpdateInput } from './schemas/profile.schema.js';

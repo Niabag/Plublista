@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { registerSchema, loginSchema, profileUpdateSchema } from '@plublista/shared';
+import { registerSchema, loginSchema, profileUpdateSchema, changePasswordSchema } from '@plublista/shared';
 import { validate } from '../../middleware/validate.middleware';
 import { csrfSynchronisedProtection } from '../../config/csrf';
 import { requireAuth } from '../../middleware/requireAuth.middleware';
-import { register, login, logout, getMe, updateProfile, completeOnboarding } from './auth.controller';
+import { register, login, logout, getMe, updateProfile, changePassword, completeOnboarding } from './auth.controller';
 
 const router = Router();
 
@@ -49,6 +49,15 @@ router.put(
   csrfSynchronisedProtection,
   validate(profileUpdateSchema),
   updateProfile,
+);
+
+router.put(
+  '/password',
+  authLimiter,
+  requireAuth,
+  csrfSynchronisedProtection,
+  validate(changePasswordSchema),
+  changePassword,
 );
 
 router.post(

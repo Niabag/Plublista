@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,10 +12,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { ProfileSection } from '../components/ProfileSection';
+import { ChangePasswordSection } from '../components/ChangePasswordSection';
 import { QuotaIndicator } from '../components/QuotaIndicator';
 import { PlatformCard } from '../components/PlatformCard';
 import { usePlatformConnections } from '../hooks/usePlatformConnections';
+import { apiDelete, apiPost } from '@/lib/apiClient';
 import type { Platform } from '@plublista/shared';
 
 const PLATFORMS: { platform: Platform; comingSoon: boolean }[] = [
@@ -27,11 +31,31 @@ const PLATFORMS: { platform: Platform; comingSoon: boolean }[] = [
 ];
 
 export function SettingsPage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { getConnection, connectPlatform, disconnectPlatform, isDisconnecting } =
     usePlatformConnections();
   const [disconnectTarget, setDisconnectTarget] = useState<Platform | null>(null);
   const [oauthError, setOauthError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const exportMutation = useMutation({
+    mutationFn: () => apiPost<{ data: { downloadUrl: string } }>('/api/gdpr/export', {}),
+    onSuccess: (res) => {
+      window.open(res.data.downloadUrl, '_blank');
+      toast.success('Data export ready — download started.');
+    },
+    onError: () => toast.error('Failed to generate data export. Please try again.'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => apiDelete('/api/gdpr/account'),
+    onSuccess: () => {
+      toast.success('Account deleted.');
+      navigate('/');
+    },
+    onError: () => toast.error('Failed to delete account. Please try again.'),
+  });
 
   // Handle OAuth callback query params
   useEffect(() => {
@@ -71,6 +95,8 @@ export function SettingsPage() {
     <div className="mx-auto max-w-2xl space-y-8">
       <ProfileSection />
 
+      <ChangePasswordSection />
+
       <QuotaIndicator />
 
       <div className="space-y-4">
@@ -98,6 +124,71 @@ export function SettingsPage() {
         </div>
       </div>
 
+      {/* Data & Privacy — GDPR */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Data & Privacy</h2>
+          <p className="text-sm text-muted-foreground">
+            Export your data or permanently delete your account.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button
+            variant="outline"
+            onClick={() => exportMutation.mutate()}
+            disabled={exportMutation.isPending}
+          >
+            {exportMutation.isPending ? 'Generating...' : 'Export my data'}
+          </Button>
+
+          <Button
+            variant="destructive"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            Delete my account
+          </Button>
+        </div>
+      </div>
+
+      {/* Delete account confirmation dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowDeleteDialog(false);
+          setDeleteConfirmText('');
+        }
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action is <strong>permanent and irreversible</strong>. All your content, connected
+              accounts, subscription, and files will be deleted.
+              <br /><br />
+              Type <strong>DELETE</strong> below to confirm.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <input
+            type="text"
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder="Type DELETE to confirm"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteMutation.mutate()}
+              disabled={deleteConfirmText !== 'DELETE' || deleteMutation.isPending}
+              className="bg-rose-600 hover:bg-rose-700"
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Permanently delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Disconnect platform dialog */}
       <AlertDialog
         open={!!disconnectTarget}
         onOpenChange={(open) => !open && setDisconnectTarget(null)}

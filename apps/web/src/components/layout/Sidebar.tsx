@@ -34,16 +34,39 @@ function NavItem({
   collapsed: boolean;
   onClick?: () => void;
 }) {
-  const link = (
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex w-full justify-center">
+            <NavLink
+              to={item.to}
+              onClick={onClick}
+              className={({ isActive }) =>
+                cn(
+                  'flex h-11 w-11 items-center justify-center rounded-md',
+                  isActive
+                    ? 'bg-primary/10 text-primary dark:bg-indigo-950 dark:text-indigo-400'
+                    : 'text-sidebar-foreground/80 hover:bg-sidebar-accent',
+                )
+              }
+            >
+              <item.icon className="size-5 shrink-0" />
+            </NavLink>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="right">{item.label}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
     <NavLink
       to={item.to}
       onClick={onClick}
       className={({ isActive }) =>
         cn(
-          'flex items-center rounded-md text-sm font-medium transition-all duration-300 ease-in-out',
-          collapsed
-            ? 'mx-auto h-11 w-11 justify-center p-0'
-            : 'gap-3 border-l-2 px-3 py-2',
+          'flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium',
           isActive
             ? 'border-primary bg-primary/10 text-primary dark:bg-indigo-950 dark:text-indigo-400'
             : 'border-transparent text-sidebar-foreground/80 hover:bg-sidebar-accent',
@@ -51,20 +74,9 @@ function NavItem({
       }
     >
       <item.icon className="size-5 shrink-0" />
-      {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
+      <span className="whitespace-nowrap">{item.label}</span>
     </NavLink>
   );
-
-  if (collapsed) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>{link}</TooltipTrigger>
-        <TooltipContent side="right">{item.label}</TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return link;
 }
 
 const HOVER_OPEN_DELAY = 200;
